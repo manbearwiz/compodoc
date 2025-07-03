@@ -1,6 +1,5 @@
 import * as fs from 'fs-extra';
 import * as LiveServer from '@compodoc/live-server';
-import * as _ from 'lodash';
 import * as path from 'path';
 
 import { SyntaxKind } from 'ts-morph';
@@ -84,7 +83,7 @@ export class Application {
      * @param options An object containing the options that should be used.
      */
     constructor(options?: Object) {
-        for (let option in options) {
+        for (const option in options) {
             if (typeof Configuration.mainData[option] !== 'undefined') {
                 Configuration.mainData[option] = options[option];
             }
@@ -171,15 +170,7 @@ export class Application {
      * @return {boolean} Result of scan
      */
     public hasWatchedFilesTSFiles(): boolean {
-        let result = false;
-
-        _.forEach(this.updatedFiles, file => {
-            if (path.extname(file) === '.ts') {
-                result = true;
-            }
-        });
-
-        return result;
+        return this.updatedFiles.some(file => path.extname(file) === '.ts');
     }
 
     /**
@@ -187,15 +178,9 @@ export class Application {
      * @return {boolean} Result of scan
      */
     public hasWatchedFilesRootMarkdownFiles(): boolean {
-        let result = false;
-
-        _.forEach(this.updatedFiles, file => {
-            if (path.extname(file) === '.md' && path.dirname(file) === cwd) {
-                result = true;
-            }
-        });
-
-        return result;
+        return this.updatedFiles.some(
+            file => path.extname(file) === '.md' && path.dirname(file) === cwd
+        );
     }
 
     /**
@@ -210,7 +195,7 @@ export class Application {
         logger.info('Searching package.json file');
         FileEngine.get(cwd + path.sep + 'package.json').then(
             packageData => {
-                let parsedData = JSON.parse(packageData);
+                const parsedData = JSON.parse(packageData);
                 this.packageJsonData = parsedData;
                 if (
                     typeof parsedData.name !== 'undefined' &&
@@ -1907,7 +1892,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                         totalStatementDocumented += 1;
                     }
 
-                    _.forEach(element.propertiesClass, (property: any) => {
+                    element.propertiesClass.forEach(element.propertiesClass, (property: any) => {
                         if (property.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
@@ -1920,7 +1905,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                             totalStatementDocumented += 1;
                         }
                     });
-                    _.forEach(element.methodsClass, (method: any) => {
+                    element.methodsClass.forEach(element.methodsClass, (method: any) => {
                         if (method.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;

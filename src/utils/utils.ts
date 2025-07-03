@@ -1,5 +1,4 @@
 import * as fs from 'fs-extra';
-import * as _ from 'lodash';
 import * as path from 'path';
 import { ts } from 'ts-morph';
 
@@ -11,7 +10,6 @@ import { AngularLifecycleHooks } from './angular-lifecycles-hooks';
 import { kindToType } from './kind-to-type';
 import { JsdocParserUtil } from './jsdoc-parser.util';
 import { markedAcl } from './marked.acl';
-import exp = require('node:constants');
 
 const getCurrentDirectory = ts.sys.getCurrentDirectory;
 const useCaseSensitiveFileNames = ts.sys.useCaseSensitiveFileNames;
@@ -37,8 +35,8 @@ export const formatDiagnosticsHost: ts.FormatDiagnosticsHost = {
 
 export function markedtags(tags: Array<any>) {
     const jsdocParserUtil = new JsdocParserUtil();
-    let mtags = tags;
-    _.forEach(mtags, tag => {
+    const mtags = tags;
+    mtags.forEach(tag => {
         const rawComment = jsdocParserUtil.parseJSDocNode(tag);
         tag.comment = markedAcl(LinkParser.resolveLinks(rawComment));
     });
@@ -46,13 +44,13 @@ export function markedtags(tags: Array<any>) {
 }
 
 export function mergeTagsAndArgs(args: Array<any>, jsdoctags?: Array<any>): Array<any> {
-    let margs = _.cloneDeep(args);
-    _.forEach(margs, arg => {
+    const margs = JSON.parse(JSON.stringify(args));
+    margs.forEach(arg => {
         arg.tagName = {
             text: 'param'
         };
         if (jsdoctags) {
-            _.forEach(jsdoctags, jsdoctag => {
+            jsdoctags.forEach(jsdoctag => {
                 if (jsdoctag.name && jsdoctag.name.text === arg.name) {
                     arg.tagName = jsdoctag.tagName;
                     arg.name = jsdoctag.name;
@@ -63,32 +61,30 @@ export function mergeTagsAndArgs(args: Array<any>, jsdoctags?: Array<any>): Arra
         }
     });
     // Add example & returns & private
-    if (jsdoctags) {
-        _.forEach(jsdoctags, jsdoctag => {
-            if (
-                jsdoctag.tagName &&
-                (jsdoctag.tagName.text === 'example' || jsdoctag.tagName.text === 'private')
-            ) {
-                margs.push({
-                    tagName: jsdoctag.tagName,
-                    comment: jsdoctag.comment
-                });
+    jsdoctags?.forEach(jsdoctag => {
+        if (
+            jsdoctag.tagName &&
+            (jsdoctag.tagName.text === 'example' || jsdoctag.tagName.text === 'private')
+        ) {
+            margs.push({
+                tagName: jsdoctag.tagName,
+                comment: jsdoctag.comment
+            });
+        }
+        if (
+            jsdoctag.tagName &&
+            (jsdoctag.tagName.text === 'returns' || jsdoctag.tagName.text === 'return')
+        ) {
+            let ret = {
+                tagName: jsdoctag.tagName,
+                comment: jsdoctag.comment
+            };
+            if (jsdoctag.typeExpression && jsdoctag.typeExpression.type) {
+                ret.returnType = kindToType(jsdoctag.typeExpression.type.kind);
             }
-            if (
-                jsdoctag.tagName &&
-                (jsdoctag.tagName.text === 'returns' || jsdoctag.tagName.text === 'return')
-            ) {
-                let ret = {
-                    tagName: jsdoctag.tagName,
-                    comment: jsdoctag.comment
-                };
-                if (jsdoctag.typeExpression && jsdoctag.typeExpression.type) {
-                    ret.returnType = kindToType(jsdoctag.typeExpression.type.kind);
-                }
-                margs.push(ret);
-            }
-        });
-    }
+            margs.push(ret);
+        }
+    });
     return margs;
 }
 
@@ -187,7 +183,7 @@ if (!Array.prototype.includes) {
             }
 
             // 1. Let O be ? ToObject(this value).
-            let o = Object(this);
+            const o = Object(this);
 
             // 2. Let len be ? ToLength(? Get(O, "length")).
             let len = o.length >>> 0;
@@ -235,15 +231,16 @@ if (!Array.prototype.includes) {
 export function findMainSourceFolder(files: string[]) {
     let mainFolder = '';
     let mainFolderCount = 0;
-    let rawFolders = files.map(filepath => {
-        let shortPath = filepath.replace(process.cwd() + path.sep, '');
-        return path.dirname(shortPath);
-    });
-    let folders = {};
-    rawFolders = _.uniq(rawFolders);
+    const rawFolders = new Set(
+        files.map(filepath => {
+            const shortPath = filepath.replace(process.cwd() + path.sep, '');
+            return path.dirname(shortPath);
+        })
+    );
+    const folders = {};
 
-    for (let i = 0; i < rawFolders.length; i++) {
-        let sep = rawFolders[i].split(path.sep);
+    for (const f of rawFolders) {
+        const sep = f.split(path.sep);
         sep.forEach(folder => {
             if (folders[folder]) {
                 folders[folder] += 1;
@@ -252,7 +249,7 @@ export function findMainSourceFolder(files: string[]) {
             }
         });
     }
-    for (let f in folders) {
+    for (const f in folders) {
         if (folders[f] > mainFolderCount) {
             mainFolderCount = folders[f];
             mainFolder = f;
@@ -390,7 +387,13 @@ export function detectIndent(str, count): string {
     return indentString(stripIndent(str), count || 0);
 }
 
-export function getSubstringFromMultilineString(multilineString: string, startLine: number, startColumn: number, endLine: number, endColumn: number) {
+export function getSubstringFromMultilineString(
+    multilineString: string,
+    startLine: number,
+    startColumn: number,
+    endLine: number,
+    endColumn: number
+) {
     // Split the string into lines
     const lines = multilineString.split('\n');
 
@@ -405,7 +408,10 @@ export function getSubstringFromMultilineString(multilineString: string, startLi
         selectedLines[0] = selectedLines[0].slice(startColumn + 1);
 
         // And slice the end line from the start to endColumn
-        selectedLines[selectedLines.length - 1] = selectedLines[selectedLines.length - 1].slice(0, endColumn - 1);
+        selectedLines[selectedLines.length - 1] = selectedLines[selectedLines.length - 1].slice(
+            0,
+            endColumn - 1
+        );
     }
 
     // Join the lines back together into a single string

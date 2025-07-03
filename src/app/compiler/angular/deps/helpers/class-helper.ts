@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import { ts, SyntaxKind } from 'ts-morph';
 
 import { getNamesCompareFn, mergeTagsAndArgs, markedtags } from '../../../../../utils/utils';
@@ -41,7 +39,7 @@ export class ClassHelper {
     }
 
     private checkForDeprecation(tags: any[], result: { [key in string | number]: any }) {
-        _.forEach(tags, tag => {
+        tags.forEach(tag => {
             if (tag.tagName && tag.tagName.text && tag.tagName.text.indexOf('deprecated') > -1) {
                 result.deprecated = true;
                 result.deprecationMessage = tag.comment || '';
@@ -78,15 +76,15 @@ export class ClassHelper {
     }
 
     private formatDecorators(decorators) {
-        let _decorators = [];
+        const _decorators = [];
 
-        _.forEach(decorators, (decorator: any) => {
+        decorators.forEach((decorator: any) => {
             if (decorator.expression) {
                 if (decorator.expression.text) {
                     _decorators.push({ name: decorator.expression.text });
                 }
                 if (decorator.expression.expression) {
-                    let info: any = { name: decorator.expression.expression.text };
+                    const info: any = { name: decorator.expression.expression.text };
                     if (decorator.expression.arguments) {
                         info.stringifiedArguments = this.stringifyArguments(
                             decorator.expression.arguments
@@ -371,7 +369,7 @@ export class ClassHelper {
         }
         // Check for ECMAScript Private Fields
         if (member.name && member.name.escapedText) {
-            const isPrivate: boolean = member.name.escapedText.indexOf('#') === 0;
+            const isPrivate: boolean = member.name.escapedText.startsWith('#');
             if (isPrivate) {
                 return true;
             }
@@ -400,7 +398,7 @@ export class ClassHelper {
             for (const doc of member.jsDoc) {
                 if (doc.tags) {
                     for (const tag of doc.tags) {
-                        if (internalTags.indexOf(tag.tagName.text) > -1) {
+                        if (internalTags.includes(tag.tagName.text)) {
                             return true;
                         }
                     }
@@ -431,7 +429,7 @@ export class ClassHelper {
             for (const doc of member.jsDoc) {
                 if (doc.tags) {
                     for (const tag of doc.tags) {
-                        if (internalTags.indexOf(tag.tagName.text) > -1) {
+                        if (internalTags.includes(tag.tagName.text)) {
                             return true;
                         }
                     }
@@ -1174,8 +1172,8 @@ export class ClassHelper {
                     return modifier.kind;
                 });
                 if (
-                    _.indexOf(kinds, SyntaxKind.PublicKeyword) !== -1 &&
-                    _.indexOf(kinds, SyntaxKind.StaticKeyword) !== -1
+                    kinds.includes(SyntaxKind.PublicKeyword) &&
+                    kinds.includes(SyntaxKind.StaticKeyword)
                 ) {
                     kinds = kinds.filter(kind => kind !== SyntaxKind.PublicKeyword);
                 }
@@ -1238,8 +1236,8 @@ export class ClassHelper {
                     return modifier.kind;
                 });
                 if (
-                    _.indexOf(kinds, SyntaxKind.PublicKeyword) !== -1 &&
-                    _.indexOf(kinds, SyntaxKind.StaticKeyword) !== -1
+                    kinds.includes(SyntaxKind.PublicKeyword) &&
+                    kinds.includes(SyntaxKind.StaticKeyword)
                 ) {
                     kinds = kinds.filter(kind => kind !== SyntaxKind.PublicKeyword);
                 }
@@ -1382,8 +1380,8 @@ export class ClassHelper {
                     return modifier.kind;
                 });
                 if (
-                    _.indexOf(kinds, SyntaxKind.PublicKeyword) !== -1 &&
-                    _.indexOf(kinds, SyntaxKind.StaticKeyword) !== -1
+                    kinds.includes(SyntaxKind.PublicKeyword) &&
+                    kinds.includes(SyntaxKind.StaticKeyword)
                 ) {
                     kinds = kinds.filter(kind => kind !== SyntaxKind.PublicKeyword);
                 }

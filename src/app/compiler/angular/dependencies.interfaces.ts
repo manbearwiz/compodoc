@@ -1,3 +1,5 @@
+import { ts } from "ts-morph";
+
 export interface IDep {
     id?: string;
     type?: string;
@@ -93,7 +95,7 @@ export interface IFunctionDecDep extends IDep {
 
     returnType?: string;
     args?: Array<any>;
-    jsdoctags?: string;
+    jsdoctags?: Array<ts.JSDocTag>;
 }
 
 export interface IEnumDecDep extends IDep {

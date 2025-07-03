@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { IApiSourceResult } from './api-source-result.interface';
 
 const AngularAPIs: Array<IAngularMainApi> = require('../src/data/api-list.json');
@@ -14,17 +13,13 @@ export class AngularApiUtil {
     }
 
     public findApi(type: string): IApiSourceResult<IAngularMainApi> {
-        let foundedApi;
-        _.forEach(AngularAPIs, mainApi => {
-            _.forEach(mainApi.items, api => {
-                if (api.title === type) {
-                    foundedApi = api;
-                }
-            });
-        });
+        const foundApi = AngularAPIs.find(mainApi =>
+            mainApi.items.some(api => api.title === type)
+        )?.items.find(api => api.title === type);
+
         return {
             source: 'external',
-            data: foundedApi
+            data: foundApi
         };
     }
 }

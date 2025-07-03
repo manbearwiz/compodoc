@@ -1,6 +1,5 @@
 import * as path from 'path';
 
-import * as _ from 'lodash';
 import { Project, ts, SyntaxKind } from 'ts-morph';
 
 import { IsKindType, kindToType } from '../../utils/kind-to-type';
@@ -131,37 +130,45 @@ export class AngularDependencies extends FrameworkDependencies {
                 // link ...VAR to VAR values, recursively
                 ((_var, _newVar) => {
                     // getType pr reconstruire....
-                    const elementsMatcher = variabelToReplace => {
+                    const elementsMatcher = (variabelToReplace: {
+                        initializer: { elements: any[] };
+                    }) => {
                         if (variabelToReplace.initializer) {
                             if (variabelToReplace.initializer.elements) {
                                 if (variabelToReplace.initializer.elements.length > 0) {
-                                    variabelToReplace.initializer.elements.forEach(element => {
-                                        // Direct value -> Kind 79
-                                        if (
-                                            element.text &&
-                                            element.kind === SyntaxKind.Identifier
-                                        ) {
-                                            newVar.push({
-                                                name: element.text,
-                                                type: this.symbolHelper.getType(element.text)
-                                            });
-                                        }
-                                        // if _variable is ArrayLiteralExpression 203
-                                        // and has SpreadElements in his elements
-                                        // merge them
-                                        if (
-                                            element.kind === SyntaxKind.SpreadElement &&
-                                            element.expression
-                                        ) {
-                                            const el = deps.miscellaneous.variables.find(
-                                                variable =>
-                                                    variable.name === element.expression.text
-                                            );
-                                            if (el) {
-                                                elementsMatcher(el);
+                                    variabelToReplace.initializer.elements.forEach(
+                                        (element: {
+                                            text: string;
+                                            kind: ts.SyntaxKind;
+                                            expression: { text: any };
+                                        }) => {
+                                            // Direct value -> Kind 79
+                                            if (
+                                                element.text &&
+                                                element.kind === SyntaxKind.Identifier
+                                            ) {
+                                                newVar.push({
+                                                    name: element.text,
+                                                    type: this.symbolHelper.getType(element.text)
+                                                });
+                                            }
+                                            // if _variable is ArrayLiteralExpression 203
+                                            // and has SpreadElements in his elements
+                                            // merge them
+                                            if (
+                                                element.kind === SyntaxKind.SpreadElement &&
+                                                element.expression
+                                            ) {
+                                                const el = deps.miscellaneous.variables.find(
+                                                    variable =>
+                                                        variable.name === element.expression.text
+                                                );
+                                                if (el) {
+                                                    elementsMatcher(el);
+                                                }
                                             }
                                         }
-                                    });
+                                    );
                                 }
                             }
                         }
@@ -169,11 +176,17 @@ export class AngularDependencies extends FrameworkDependencies {
                     elementsMatcher(_var);
                 })(_variable, newVar);
 
-                const onLink = mod => {
-                    const process = (initialArray, _var) => {
+                const onLink = (mod: {
+                    imports: any;
+                    exports: any;
+                    controllers: any;
+                    declarations: any;
+                    providers: any;
+                }) => {
+                    const process = (initialArray: any[], _var: { name: any }) => {
                         let indexToClean = 0;
                         let found = false;
-                        const findVariableInArray = (el, index) => {
+                        const findVariableInArray = (el: { name: any }, index: number) => {
                             if (el.name === _var.name) {
                                 indexToClean = index;
                                 found = true;
@@ -186,8 +199,9 @@ export class AngularDependencies extends FrameworkDependencies {
                             // Add variable
                             newVar.forEach(newEle => {
                                 if (
-                                    typeof _.find(initialArray, { name: newEle.name }) ===
-                                    'undefined'
+                                    !initialArray.some(
+                                        (el: { name: any }) => el.name === newEle.name
+                                    )
                                 ) {
                                     initialArray.push(newEle);
                                 }
@@ -233,7 +247,14 @@ export class AngularDependencies extends FrameworkDependencies {
         return deps;
     }
 
-    private processClass(node, file, srcFile, outputSymbols, fileBody, astFile) {
+    private processClass(
+        node: ts.Node,
+        file: string,
+        srcFile: ts.SourceFile,
+        outputSymbols: { guards: any[]; classes: any[] },
+        fileBody: any,
+        astFile?: ts.SourceFile
+    ) {
         const name = this.getSymboleName(node);
         const IO = this.getClassIO(file, srcFile, node, fileBody, astFile);
         const sourceCode = srcFile.getText();
@@ -255,10 +276,11 @@ export class AngularDependencies extends FrameworkDependencies {
         deps.inputsClass = IO.inputs ?? [];
         deps.outputsClass = IO.outputs ?? [];
         if (IO.properties) {
-            const {inputSignals, outputSignals, properties} = this.componentHelper.getInputOutputSignals(IO.properties);
+            const { inputSignals, outputSignals, properties } =
+                this.componentHelper.getInputOutputSignals(IO.properties);
 
-            deps.inputsClass = deps.inputsClass.concat(inputSignals)
-            deps.outputsClass = deps.outputsClass.concat(outputSignals)
+            deps.inputsClass = deps.inputsClass.concat(inputSignals);
+            deps.outputsClass = deps.outputsClass.concat(outputSignals);
             deps.properties = properties;
         }
         if (IO.description) {
@@ -435,14 +457,20 @@ export class AngularDependencies extends FrameworkDependencies {
             ) {
                 return;
             }
-            const parseNode = (file, srcFile, node, fileBody, astFile) => {
+            const parseNode = (
+                file: string,
+                srcFile: ts.SourceFile,
+                node: ts.Node,
+                fileBody: ts.ModuleBody,
+                astFile: ts.SourceFile
+            ) => {
                 const sourceCode = srcFile.getText();
                 const hash = crypto.createHash('sha512').update(sourceCode).digest('hex');
 
                 if (nodeHasDecorator(node)) {
                     let classWithCustomDecorator = false;
                     const nodeDecorators = getNodeDecorators(node);
-                    const visitDecorator = (visitedDecorator, index) => {
+                    const visitDecorator = (visitedDecorator: ts.Decorator, index: any) => {
                         let deps: IDep;
 
                         const name = this.getSymboleName(node);
@@ -548,7 +576,7 @@ export class AngularDependencies extends FrameworkDependencies {
                             }
                             deps = injectableDeps;
                             if (typeof IO.ignore === 'undefined') {
-                                if (_.includes(IO.implements, 'HttpInterceptor')) {
+                                if (IO.implements?.includes('HttpInterceptor')) {
                                     injectableDeps.type = 'interceptor';
                                     outputSymbols.interceptors.push(injectableDeps);
                                 } else if (this.isGuard(IO.implements)) {
@@ -626,7 +654,9 @@ export class AngularDependencies extends FrameworkDependencies {
                         }
                     };
 
-                    const filterByDecorators = filteredNode => {
+                    const filterByDecorators = (filteredNode: {
+                        expression: { expression: { text: string } };
+                    }) => {
                         if (filteredNode.expression && filteredNode.expression.expression) {
                             let _test = /(NgModule|Component|Injectable|Pipe|Directive)/.test(
                                 filteredNode.expression.expression.text
@@ -778,19 +808,15 @@ export class AngularDependencies extends FrameworkDependencies {
                         if (typeof infos.ignore === 'undefined') {
                             this.debug(typeAliasDeps);
                         }
-                    } else if (ts.isModuleDeclaration(node)) {
-                        if (node.body) {
-                            if (node.body.statements && node.body.statements.length > 0) {
-                                node.body.statements.forEach(statement =>
-                                    parseNode(file, srcFile, statement, node.body, astFile)
-                                );
-                            }
-                        }
+                    } else if (ts.isModuleDeclaration(node) && ts.isModuleBlock(node.body)) {
+                        node.body.statements.forEach(statement =>
+                            parseNode(file, srcFile, statement, node.body, astFile)
+                        );
                     }
                 } else {
                     const IO = this.getRouteIO(file, srcFile, node);
                     if (IO.routes) {
-                        let newRoutes;
+                        let newRoutes: object;
                         try {
                             newRoutes = RouterParserUtil.cleanRawRouteParsed(IO.routes);
                         } catch (e) {
@@ -821,8 +847,8 @@ export class AngularDependencies extends FrameworkDependencies {
                         // 3. with a catch : platformBrowserDynamic().bootstrapModule(AppModule).catch(error => console.error(error));
                         // 4. with parameters : platformBrowserDynamic().bootstrapModule(AppModule, {}).catch(error => console.error(error));
                         // Find recusively in expression nodes one with name 'bootstrapModule'
-                        let rootModule;
-                        let resultNode;
+                        let rootModule: string;
+                        let resultNode: { arguments: any[] };
                         if (srcFile.text.indexOf(bootstrapModuleReference) !== -1) {
                             if (node.expression) {
                                 resultNode = this.findExpressionByNameInExpressions(
@@ -830,23 +856,18 @@ export class AngularDependencies extends FrameworkDependencies {
                                     'bootstrapModule'
                                 );
                             }
-                            if (typeof node.thenStatement !== 'undefined') {
-                                if (
-                                    node.thenStatement.statements &&
-                                    node.thenStatement.statements.length > 0
-                                ) {
-                                    let firstStatement = node.thenStatement.statements[0];
-                                    resultNode = this.findExpressionByNameInExpressions(
-                                        firstStatement.expression,
-                                        'bootstrapModule'
-                                    );
-                                }
+                            if (ts.isIfStatement(node) && node.thenStatement?.statements?.length) {
+                                let firstStatement = node.thenStatement.statements[0];
+                                resultNode = this.findExpressionByNameInExpressions(
+                                    firstStatement.expression,
+                                    'bootstrapModule'
+                                );
                             }
+
                             if (!resultNode) {
                                 if (
-                                    node.expression &&
-                                    node.expression.arguments &&
-                                    node.expression.arguments.length > 0
+                                    ts.isCallExpression(node.expression) &&
+                                    node.expression.arguments.length
                                 ) {
                                     resultNode = this.findExpressionByNameInExpressionArguments(
                                         node.expression.arguments,
@@ -855,13 +876,11 @@ export class AngularDependencies extends FrameworkDependencies {
                                 }
                             }
                             if (resultNode) {
-                                if (resultNode.arguments.length > 0) {
-                                    _.forEach(resultNode.arguments, (argument: any) => {
-                                        if (argument.text) {
-                                            rootModule = argument.text;
-                                        }
-                                    });
-                                }
+                                resultNode.arguments?.forEach((argument: any) => {
+                                    if (argument.text) {
+                                        rootModule = argument.text;
+                                    }
+                                });
                                 if (rootModule) {
                                     RouterParserUtil.setRootModule(rootModule);
                                 }
@@ -869,22 +888,9 @@ export class AngularDependencies extends FrameworkDependencies {
                         }
                     }
                     if (ts.isVariableStatement(node) && !RouterParserUtil.isVariableRoutes(node)) {
-                        let isDestructured = false;
-                        // Check for destructuring array
                         const nodeVariableDeclarations = node.declarationList.declarations;
-                        if (nodeVariableDeclarations) {
-                            if (nodeVariableDeclarations.length > 0) {
-                                if (
-                                    nodeVariableDeclarations[0].name &&
-                                    nodeVariableDeclarations[0].name.kind ===
-                                        SyntaxKind.ArrayBindingPattern
-                                ) {
-                                    isDestructured = true;
-                                }
-                            }
-                        }
 
-                        const visitVariableNode = variableNode => {
+                        const visitVariableNode = (variableNode: ts.VariableStatement) => {
                             const infos: any = this.visitVariableDeclaration(variableNode);
                             if (infos) {
                                 const name = infos.name;
@@ -932,7 +938,7 @@ export class AngularDependencies extends FrameworkDependencies {
                             }
                         };
 
-                        if (isDestructured) {
+                        if (ts.isObjectBindingPattern(nodeVariableDeclarations?.[0]?.name)) {
                             if (nodeVariableDeclarations[0].name.elements) {
                                 const destructuredVariables =
                                     nodeVariableDeclarations[0].name.elements;
@@ -1069,12 +1075,11 @@ export class AngularDependencies extends FrameworkDependencies {
      * @param entity Entity to store
      * @param store Store
      */
-    private addNewEntityInStore(entity, store) {
-        const findSameEntityInStore = _.filter(store, {
-            name: entity.name,
-            id: entity.id,
-            file: entity.file
-        });
+    private addNewEntityInStore(entity: IInjectableDep, store: any[]) {
+        const findSameEntityInStore = store.filter(
+            (item: { name: any; id: any; file: any }) =>
+                item.name === entity.name && item.id === entity.id && item.file === entity.file
+        );
         if (findSameEntityInStore.length === 0) {
             store.push(entity);
         }
@@ -1090,8 +1095,8 @@ export class AngularDependencies extends FrameworkDependencies {
             if (deps[symbols] && deps[symbols].length > 0) {
                 logger.debug('', `- ${symbols}:`);
                 deps[symbols]
-                    .map(i => i.name)
-                    .forEach(d => {
+                    .map((i: { name: any }) => i.name)
+                    .forEach((d: any) => {
                         logger.debug('', `\t- ${d}`);
                     });
             }
@@ -1107,7 +1112,7 @@ export class AngularDependencies extends FrameworkDependencies {
     }
 
     private checkForDeprecation(tags: any[], result: { [key in string | number]: any }) {
-        _.forEach(tags, tag => {
+        tags.forEach(tag => {
             if (tag.tagName && tag.tagName.text && tag.tagName.text.indexOf('deprecated') > -1) {
                 result.deprecated = true;
                 result.deprecationMessage = tag.comment || '';
@@ -1115,9 +1120,9 @@ export class AngularDependencies extends FrameworkDependencies {
         });
     }
 
-    private findExpressionByNameInExpressions(entryNode, name) {
-        let result;
-        const loop = function (node, z) {
+    private findExpressionByNameInExpressions(entryNode: ts.Expression, name: string) {
+        let result: any;
+        const loop = function (node: { expression: { name: { text: any } } }, z: any) {
             if (node) {
                 if (node.expression && !node.expression.name) {
                     loop(node.expression, z);
@@ -1135,32 +1140,29 @@ export class AngularDependencies extends FrameworkDependencies {
         return result;
     }
 
-    private findExpressionByNameInExpressionArguments(arg, name) {
-        let result;
-        const that = this;
-        let i = 0;
-        let len = arg.length;
-        const loop = function (node, z) {
-            if (node.body) {
-                if (node.body.statements && node.body.statements.length > 0) {
-                    let j = 0;
-                    const leng = node.body.statements.length;
-                    for (j; j < leng; j++) {
-                        result = that.findExpressionByNameInExpressions(node.body.statements[j], z);
-                    }
+    private findExpressionByNameInExpressionArguments(
+        arg: ts.NodeArray<ts.Expression>,
+        name: string
+    ) {
+        let result: any;
+        for (const node of arg) {
+            if (
+                ts.isFunctionDeclaration(node) &&
+                ts.isBlock(node.body) &&
+                node.body?.statements?.length
+            ) {
+                for (const statement of node.body.statements) {
+                    result = this.findExpressionByNameInExpressions(statement, name);
                 }
             }
-        };
-        for (i; i < len; i++) {
-            loop(arg[i], name);
         }
         return result;
     }
 
-    private parseDecorators(decorators, type: string): boolean {
+    private parseDecorators(decorators: any[], type: string): boolean {
         let result = false;
         if (decorators.length > 1) {
-            _.forEach(decorators, function (decorator: any) {
+            decorators.forEach((decorator: { expression: { expression: { text: string } } }) => {
                 if (decorator.expression.expression) {
                     if (decorator.expression.expression.text === type) {
                         result = true;
@@ -1177,7 +1179,10 @@ export class AngularDependencies extends FrameworkDependencies {
         return result;
     }
 
-    private parseDecorator(decorator, type: string): boolean {
+    private parseDecorator(
+        decorator: { expression: { expression: { text: string } } },
+        type: string
+    ): boolean {
         let result = false;
         if (decorator.expression.expression) {
             if (decorator.expression.expression.text === type) {
@@ -1187,35 +1192,35 @@ export class AngularDependencies extends FrameworkDependencies {
         return result;
     }
 
-    private isController(metadata) {
+    private isController(metadata: any) {
         return this.parseDecorator(metadata, 'Controller');
     }
 
-    private isEntity(metadata) {
+    private isEntity(metadata: any) {
         return this.parseDecorator(metadata, 'Entity');
     }
 
-    private isComponent(metadata) {
+    private isComponent(metadata: any) {
         return this.parseDecorator(metadata, 'Component');
     }
 
-    private isPipe(metadata) {
+    private isPipe(metadata: any) {
         return this.parseDecorator(metadata, 'Pipe');
     }
 
-    private isDirective(metadata) {
+    private isDirective(metadata: any) {
         return this.parseDecorator(metadata, 'Directive');
     }
 
-    private isInjectable(metadata) {
+    private isInjectable(metadata: any) {
         return this.parseDecorator(metadata, 'Injectable');
     }
 
-    private isModule(metadata) {
+    private isModule(metadata: any) {
         return this.parseDecorator(metadata, 'NgModule') || this.parseDecorator(metadata, 'Module');
     }
 
-    private hasInternalDecorator(metadatas) {
+    private hasInternalDecorator(metadatas: any[]) {
         return (
             this.parseDecorators(metadatas, 'Controller') ||
             this.parseDecorators(metadatas, 'Component') ||
@@ -1229,32 +1234,31 @@ export class AngularDependencies extends FrameworkDependencies {
 
     private isGuard(ioImplements: string[]): boolean {
         return (
-            _.includes(ioImplements, 'CanActivate') ||
-            _.includes(ioImplements, 'CanActivateChild') ||
-            _.includes(ioImplements, 'CanDeactivate') ||
-            _.includes(ioImplements, 'Resolve') ||
-            _.includes(ioImplements, 'CanLoad')
+            ioImplements.includes('CanActivate') ||
+            ioImplements.includes('CanActivateChild') ||
+            ioImplements.includes('CanDeactivate') ||
+            ioImplements.includes('Resolve') ||
+            ioImplements.includes('CanLoad')
         );
     }
 
-    private getSymboleName(node): string {
-        return node.name.text;
+    private getSymboleName(node: ts.Node): string {
+        return ts.isIdentifier(node) ? node.text : '';
     }
 
     private findProperties(
         visitedNode: ts.Decorator,
         sourceFile: ts.SourceFile
-    ): ReadonlyArray<ts.ObjectLiteralElementLike> {
+    ): ReadonlyArray<ts.ObjectLiteralElementLike | ts.StringLiteral> {
         if (
-            visitedNode.expression &&
-            visitedNode.expression.arguments &&
-            visitedNode.expression.arguments.length > 0
+            ts.isCallExpression(visitedNode.expression) &&
+            visitedNode.expression.arguments?.length
         ) {
             const pop = visitedNode.expression.arguments[0];
 
-            if (pop && pop.properties && pop.properties.length >= 0) {
+            if (ts.isObjectLiteralExpression(pop)) {
                 return pop.properties;
-            } else if (pop && pop.kind && pop.kind === SyntaxKind.StringLiteral) {
+            } else if (ts.isStringLiteral(pop)) {
                 return [pop];
             } else {
                 logger.warn('Empty metadatas, trying to find it with imports.');
@@ -1265,7 +1269,7 @@ export class AngularDependencies extends FrameworkDependencies {
         return [];
     }
 
-    private isAngularLifecycleHook(methodName) {
+    private isAngularLifecycleHook(methodName: string) {
         /**
          * Copyright https://github.com/ng-bootstrap/ng-bootstrap
          */
@@ -1295,20 +1299,20 @@ export class AngularDependencies extends FrameworkDependencies {
         };
         const jsdoctags = this.jsdocParserUtil.getJSDocs(node);
 
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags?.[0]?.tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
             result.jsdoctags = markedtags(jsdoctags[0].tags);
         }
         return result;
     }
 
-    private visitArgument(arg) {
-        if (arg.name && arg.name.kind == SyntaxKind.ObjectBindingPattern) {
+    private visitArgument(arg: ts.Node) {
+        if (ts.isObjectBindingPattern(arg)) {
             let results = [];
 
             const destrucuredGroupId = uuidv4();
 
-            results = arg.name.elements.map(element => this.visitArgument(element));
+            results = arg.name.elements.map((element) => this.visitArgument(element));
 
             results = results.map(result => {
                 result.destrucuredGroupId = destrucuredGroupId;
@@ -1365,7 +1369,7 @@ export class AngularDependencies extends FrameworkDependencies {
         }
     }
 
-    private mapType(type): string | undefined {
+    private mapType(type: SyntaxKind): string | undefined {
         switch (type) {
             case SyntaxKind.NullKeyword:
                 return 'null';
@@ -1386,16 +1390,10 @@ export class AngularDependencies extends FrameworkDependencies {
         }
     }
 
-    private hasPrivateJSDocTag(tags): boolean {
-        let result = false;
-        if (tags) {
-            tags.forEach(tag => {
-                if (tag.tagName && tag.tagName.text && tag.tagName.text === 'private') {
-                    result = true;
-                }
-            });
-        }
-        return result;
+    private hasPrivateJSDocTag(tags: Array<ts.JSDocTag>): boolean {
+        return tags.some(
+            (tag) => tag?.tagName?.text === 'private'
+        );
     }
 
     private visitFunctionDeclaration(method: ts.FunctionDeclaration) {
@@ -1439,17 +1437,17 @@ export class AngularDependencies extends FrameworkDependencies {
                     })
                     .reverse();
                 if (
-                    _.indexOf(kinds, SyntaxKind.PublicKeyword) !== -1 &&
-                    _.indexOf(kinds, SyntaxKind.StaticKeyword) !== -1
+                    kinds.includes(SyntaxKind.PublicKeyword) &&
+                    kinds.includes(SyntaxKind.StaticKeyword)
                 ) {
                     kinds = kinds.filter(kind => kind !== SyntaxKind.PublicKeyword);
                 }
             }
         }
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags?.[0]?.tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
             result.jsdoctags = markedtags(jsdoctags[0].tags);
-            _.forEach(jsdoctags[0].tags, tag => {
+            jsdoctags[0]?.tags?.forEach((tag) => {
                 if (tag.tagName) {
                     if (tag.tagName.text) {
                         if (tag.tagName.text.indexOf('ignore') > -1) {
@@ -1467,36 +1465,23 @@ export class AngularDependencies extends FrameworkDependencies {
         return result;
     }
 
-    private visitVariableDeclaration(node) {
-        if (node.declarationList && node.declarationList.declarations) {
-            let i = 0;
-            const len = node.declarationList.declarations.length;
-            for (i; i < len; i++) {
-                const result: any = {
-                    name: node.declarationList.declarations[i].name.text,
-                    defaultValue: node.declarationList.declarations[i].initializer
-                        ? this.classHelper.stringifyDefaultValue(
-                              node.declarationList.declarations[i].initializer
-                          )
+    private visitVariableDeclaration(node: ts.VariableStatement) {
+        if (node.declarationList?.declarations) {
+            for (const declaration of node.declarationList.declarations) {
+                const result = {
+                    name: declaration.name.text,
+                    defaultValue: declaration.initializer
+                        ? this.classHelper.stringifyDefaultValue(declaration.initializer)
                         : undefined,
                     deprecated: false,
-                    deprecationMessage: ''
+                    deprecationMessage: '',
+                    initializer: declaration.initializer,
+                    type: declaration.type
+                        ? this.classHelper.visitType(declaration.type)
+                        : kindToType(declaration.initializer?.kind)
                 };
-                if (node.declarationList.declarations[i].initializer) {
-                    result.initializer = node.declarationList.declarations[i].initializer;
-                }
-                if (node.declarationList.declarations[i].type) {
-                    result.type = this.classHelper.visitType(
-                        node.declarationList.declarations[i].type
-                    );
-                }
-                if (typeof result.type === 'undefined' && result.initializer) {
-                    result.type = kindToType(result.initializer.kind);
-                }
-                const jsdoctags = this.jsdocParserUtil.getJSDocs(
-                    node.declarationList.declarations[i]
-                );
-                if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+                const jsdoctags = this.jsdocParserUtil.getJSDocs(declaration);
+                if (jsdoctags?.length && jsdoctags[0].tags) {
                     this.checkForDeprecation(jsdoctags[0].tags, result);
                 }
                 return result;
@@ -1504,15 +1489,11 @@ export class AngularDependencies extends FrameworkDependencies {
         }
     }
 
-    private visitEnumTypeAliasFunctionDeclarationDescription(node): string {
+    private visitEnumTypeAliasFunctionDeclarationDescription(node: unknown): string {
         let description: string = '';
-        if (node.jsDoc) {
-            if (node.jsDoc.length > 0) {
-                if (typeof node.jsDoc[0].comment !== 'undefined') {
-                    const rawDescription = this.jsdocParserUtil.parseJSDocNode(node.jsDoc[0]);
-                    description = markedAcl(rawDescription);
-                }
-            }
+        if (node?.jsDoc?.[0]?.comment) {
+            const rawDescription = this.jsdocParserUtil.parseJSDocNode(node.jsDoc[0]);
+            description = markedAcl(rawDescription);
         }
         return description;
     }
@@ -1554,15 +1535,13 @@ export class AngularDependencies extends FrameworkDependencies {
         return result;
     }
 
-    private visitEnumDeclarationForRoutes(fileName, node) {
+    private visitEnumDeclarationForRoutes(fileName: string, node: ts.VariableStatement) {
         if (node.declarationList.declarations) {
-            let i = 0;
-            let len = node.declarationList.declarations.length;
-            for (i; i < len; i++) {
-                const routesInitializer = node.declarationList.declarations[i].initializer;
+            for (const declaration of node.declarationList.declarations) {
+                const routesInitializer = declaration.initializer;
                 const data = new CodeGenerator().generate(routesInitializer);
                 RouterParserUtil.addRoute({
-                    name: node.declarationList.declarations[i].name.text,
+                    name: declaration.name.text,
                     data: RouterParserUtil.cleanRawRoute(data),
                     filename: fileName
                 });
@@ -1600,8 +1579,8 @@ export class AngularDependencies extends FrameworkDependencies {
         filename: string,
         sourceFile: ts.SourceFile,
         node: ts.Node,
-        fileBody,
-        astFile
+        fileBody: ts.ModuleBody,
+        astFile: ts.SourceFile
     ) {
         /**
          * Copyright https://github.com/ng-bootstrap/ng-bootstrap
@@ -1627,7 +1606,13 @@ export class AngularDependencies extends FrameworkDependencies {
         return res[0] || {};
     }
 
-    private getInterfaceIO(filename: string, sourceFile, node, fileBody, astFile) {
+    private getInterfaceIO(
+        filename: string,
+        sourceFile: ts.SourceFile,
+        node: ts.Node,
+        fileBody: ts.ModuleBody,
+        astFile: ts.SourceFile
+    ) {
         /**
          * Copyright https://github.com/ng-bootstrap/ng-bootstrap
          */

@@ -190,16 +190,15 @@ export class ExtendsMerger {
     }
 
     private findInDependencies(name: string) {
-        const mergedData = concat(
-            [],
-            this.components,
-            this.classes,
-            this.injectables,
-            this.directives,
-            this.controllers
-        );
+        const mergedData = [
+            ...this.components,
+            ...this.classes,
+            ...this.injectables,
+            ...this.directives,
+            ...this.controllers
+        ];
 
-        let result = find(mergedData, { name: name } as any);
+        let result = mergedData.find((item) => item.name === name);
 
         // Find in aliases ?
         if (!result) {
@@ -208,7 +207,7 @@ export class ExtendsMerger {
             if (isInAlias) {
                 const finalOriginalName = this.findInAliases(name);
                 if (finalOriginalName) {
-                    result = find(mergedData, { name: finalOriginalName } as any);
+                    result = mergedData.find((item) => item.name === finalOriginalName);
                 }
             }
         }

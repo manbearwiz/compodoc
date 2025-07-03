@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import { COMPODOC_DEFAULTS } from '../utils/defaults';
 
 import { ConfigurationInterface } from './interfaces/configuration.interface';
@@ -105,15 +103,13 @@ export class Configuration implements ConfigurationInterface {
     }
 
     public addPage(page: PageInterface) {
-        let indexPage = _.findIndex(this._pages, { name: page.name });
-        if (indexPage === -1) {
+        if (!this.hasPage(page.name)) {
             this._pages.push(page);
         }
     }
 
     public hasPage(name: string): boolean {
-        let indexPage = _.findIndex(this._pages, { name: name });
-        return indexPage !== -1;
+        return this._pages.some(p => p.name === name);
     }
 
     public addAdditionalPage(page: PageInterface) {
@@ -133,16 +129,8 @@ export class Configuration implements ConfigurationInterface {
     }
 
     public resetRootMarkdownPages() {
-        let indexPage = _.findIndex(this._pages, { name: 'index' });
-        this._pages.splice(indexPage, 1);
-        indexPage = _.findIndex(this._pages, { name: 'changelog' });
-        this._pages.splice(indexPage, 1);
-        indexPage = _.findIndex(this._pages, { name: 'contributing' });
-        this._pages.splice(indexPage, 1);
-        indexPage = _.findIndex(this._pages, { name: 'license' });
-        this._pages.splice(indexPage, 1);
-        indexPage = _.findIndex(this._pages, { name: 'todo' });
-        this._pages.splice(indexPage, 1);
+        const namesToRemove = ['index', 'changelog', 'contributing', 'license', 'todo'];
+        this._pages = this._pages.filter(p => !namesToRemove.includes(p.name));
         this._mainData.markdowns = [];
     }
 

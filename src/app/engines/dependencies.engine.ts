@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import { MiscellaneousData } from '../interfaces/miscellaneous-data.interface';
 import { ParsedData } from '../interfaces/parsed-data.interface';
 import { RouteInterface } from '../interfaces/routes.interface';
@@ -116,19 +114,45 @@ export class DependenciesEngine {
             }
         });
         this.rawData = data;
-        this.modules = _.sortBy(this.rawData.modules, [el => el.name.toLowerCase()]);
-        this.rawModulesForOverview = _.sortBy(data.modulesForGraph, [el => el.name.toLowerCase()]);
-        this.rawModules = _.sortBy(data.modulesForGraph, [el => el.name.toLowerCase()]);
-        this.components = _.sortBy(this.rawData.components, [el => el.name.toLowerCase()]);
-        this.controllers = _.sortBy(this.rawData.controllers, [el => el.name.toLowerCase()]);
-        this.entities = _.sortBy(this.rawData.entities, [el => el.name.toLowerCase()]);
-        this.directives = _.sortBy(this.rawData.directives, [el => el.name.toLowerCase()]);
-        this.injectables = _.sortBy(this.rawData.injectables, [el => el.name.toLowerCase()]);
-        this.interceptors = _.sortBy(this.rawData.interceptors, [el => el.name.toLowerCase()]);
-        this.guards = _.sortBy(this.rawData.guards, [el => el.name.toLowerCase()]);
-        this.interfaces = _.sortBy(this.rawData.interfaces, [el => el.name.toLowerCase()]);
-        this.pipes = _.sortBy(this.rawData.pipes, [el => el.name.toLowerCase()]);
-        this.classes = _.sortBy(this.rawData.classes, [el => el.name.toLowerCase()]);
+        this.modules = [...this.rawData.modules].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.rawModulesForOverview = [...data.modulesForGraph].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.rawModules = [...data.modulesForGraph].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.components = [...this.rawData.components].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.controllers = [...this.rawData.controllers].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.entities = [...this.rawData.entities].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.directives = [...this.rawData.directives].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.injectables = [...this.rawData.injectables].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.interceptors = [...this.rawData.interceptors].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.guards = [...this.rawData.guards].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.interfaces = [...this.rawData.interfaces].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.pipes = [...this.rawData.pipes].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
+        this.classes = [...this.rawData.classes].sort((a, b) =>
+            a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+        );
         this.miscellaneous = this.rawData.miscellaneous;
         this.prepareMiscellaneous();
         this.updateModulesDeclarationsExportsTypes();
@@ -218,7 +242,7 @@ export class DependenciesEngine {
 
     private manageDuplicatesName() {
         const processDuplicates = (element, index, array) => {
-            const elementsWithSameName = _.filter(array, { name: element.name });
+            const elementsWithSameName = array.filter(el => el.name === element.name);
             if (elementsWithSameName.length > 1) {
                 // First element is the reference for duplicates
                 for (let i = 1; i < elementsWithSameName.length; i++) {
@@ -283,69 +307,91 @@ export class DependenciesEngine {
 
     public update(updatedData): void {
         if (updatedData.modules.length > 0) {
-            _.forEach(updatedData.modules, (module: IModuleDep) => {
-                const _index = _.findIndex(this.modules, { name: module.name });
-                this.modules[_index] = module;
+            updatedData.modules.forEach((module: IModuleDep) => {
+                const idx = this.modules.findIndex(m => m.name === module.name);
+                if (idx !== -1) {
+                    this.modules[idx] = module;
+                }
             });
         }
         if (updatedData.components.length > 0) {
-            _.forEach(updatedData.components, (component: IComponentDep) => {
-                const _index = _.findIndex(this.components, { name: component.name });
-                this.components[_index] = component;
+            updatedData.components.forEach((component: IComponentDep) => {
+                const idx = this.components.findIndex(c => c.name === component.name);
+                if (idx !== -1) {
+                    this.components[idx] = component;
+                }
             });
         }
         if (updatedData.controllers.length > 0) {
-            _.forEach(updatedData.controllers, (controller: IControllerDep) => {
-                const _index = _.findIndex(this.controllers, { name: controller.name });
-                this.controllers[_index] = controller;
+            updatedData.controllers.forEach((controller: IControllerDep) => {
+                const idx = this.controllers.findIndex(c => c.name === controller.name);
+                if (idx !== -1) {
+                    this.controllers[idx] = controller;
+                }
             });
         }
         if (updatedData.entities.length > 0) {
-            _.forEach(updatedData.entities, (entity: IControllerDep) => {
-                const _index = _.findIndex(this.entities, { name: entity.name });
-                this.entities[_index] = entity;
+            updatedData.entities.forEach((entity: IControllerDep) => {
+                const idx = this.entities.findIndex(e => e.name === entity.name);
+                if (idx !== -1) {
+                    this.entities[idx] = entity;
+                }
             });
         }
         if (updatedData.directives.length > 0) {
-            _.forEach(updatedData.directives, (directive: IDirectiveDep) => {
-                const _index = _.findIndex(this.directives, { name: directive.name });
-                this.directives[_index] = directive;
+            updatedData.directives.forEach((directive: IDirectiveDep) => {
+                const idx = this.directives.findIndex(d => d.name === directive.name);
+                if (idx !== -1) {
+                    this.directives[idx] = directive;
+                }
             });
         }
         if (updatedData.injectables.length > 0) {
-            _.forEach(updatedData.injectables, (injectable: IInjectableDep) => {
-                const _index = _.findIndex(this.injectables, { name: injectable.name });
-                this.injectables[_index] = injectable;
+            updatedData.injectables.forEach((injectable: IInjectableDep) => {
+                const idx = this.injectables.findIndex(i => i.name === injectable.name);
+                if (idx !== -1) {
+                    this.injectables[idx] = injectable;
+                }
             });
         }
         if (updatedData.interceptors.length > 0) {
-            _.forEach(updatedData.interceptors, (interceptor: IInterceptorDep) => {
-                const _index = _.findIndex(this.interceptors, { name: interceptor.name });
-                this.interceptors[_index] = interceptor;
+            updatedData.interceptors.forEach((interceptor: IInterceptorDep) => {
+                const idx = this.interceptors.findIndex(i => i.name === interceptor.name);
+                if (idx !== -1) {
+                    this.interceptors[idx] = interceptor;
+                }
             });
         }
         if (updatedData.guards.length > 0) {
-            _.forEach(updatedData.guards, (guard: IGuardDep) => {
-                const _index = _.findIndex(this.guards, { name: guard.name });
-                this.guards[_index] = guard;
+            updatedData.guards.forEach((guard: IGuardDep) => {
+                const idx = this.guards.findIndex(g => g.name === guard.name);
+                if (idx !== -1) {
+                    this.guards[idx] = guard;
+                }
             });
         }
         if (updatedData.interfaces.length > 0) {
-            _.forEach(updatedData.interfaces, (int: IInterfaceDep) => {
-                const _index = _.findIndex(this.interfaces, { name: int.name });
-                this.interfaces[_index] = int;
+            updatedData.interfaces.forEach((int: IInterfaceDep) => {
+                const idx = this.interfaces.findIndex(i => i.name === int.name);
+                if (idx !== -1) {
+                    this.interfaces[idx] = int;
+                }
             });
         }
         if (updatedData.pipes.length > 0) {
-            _.forEach(updatedData.pipes, (pipe: IPipeDep) => {
-                const _index = _.findIndex(this.pipes, { name: pipe.name });
-                this.pipes[_index] = pipe;
+            updatedData.pipes.forEach((pipe: IPipeDep) => {
+                const idx = this.pipes.findIndex(p => p.name === pipe.name);
+                if (idx !== -1) {
+                    this.pipes[idx] = pipe;
+                }
             });
         }
         if (updatedData.classes.length > 0) {
-            _.forEach(updatedData.classes, (classe: any) => {
-                const _index = _.findIndex(this.classes, { name: classe.name });
-                this.classes[_index] = classe;
+            updatedData.classes.forEach((classe: any) => {
+                const idx = this.classes.findIndex(c => c.name === classe.name);
+                if (idx !== -1) {
+                    this.classes[idx] = classe;
+                }
             });
         }
         /**
