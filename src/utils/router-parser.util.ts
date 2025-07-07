@@ -1,11 +1,12 @@
 const Handlebars = require('handlebars');
+
+import * as path from 'node:path';
 import * as JSON5 from 'json5';
 import * as _ from 'lodash';
-import * as path from 'path';
-import { Project, ts, SourceFile, SyntaxKind, Node } from 'ts-morph';
+import { Node, Project, type SourceFile, SyntaxKind, ts } from 'ts-morph';
 
 import FileEngine from '../app/engines/file.engine';
-import { RoutingGraphNode } from '../app/nodes/routing-graph-node';
+import type { RoutingGraphNode } from '../app/nodes/routing-graph-node';
 
 import ImportsUtil from './imports.util';
 import { logger } from './logger';
@@ -87,7 +88,7 @@ export class RouterParserUtil {
         this.rootModule = module;
     }
 
-    public hasRouterModuleInImports(imports: Array<any>): boolean {
+    public hasRouterModuleInImports(imports: any[]): boolean {
         return imports.some(
             importNode =>
                 importNode.name.includes('RouterModule.forChild') ||
@@ -96,7 +97,7 @@ export class RouterParserUtil {
         );
     }
 
-    public fixIncompleteRoutes(miscellaneousVariables: Array<any>): void {
+    public fixIncompleteRoutes(miscellaneousVariables: any[]): void {
         const matchingVariables = [];
         // For each incompleteRoute, scan if one misc variable is in code
         // if ok, try recreating complete route
@@ -190,31 +191,29 @@ export class RouterParserUtil {
     public foundLazyModuleWithPath(modulePath: string): string {
         // path is like app/customers/customers.module#CustomersModule
         const split = modulePath.split('#');
-        const lazyModuleName = split[1];
-        return lazyModuleName;
+        return split[1];
     }
 
     public foundLazyComponentWithPath(componentPath: string): string {
         // path is like app/customers/customers.component#CustomersComponent
         const split = componentPath.split('#');
-        const lazyComponentName = split[1];
-        return lazyComponentName;
+        return split[1];
     }
 
     public constructRoutesTree() {
         // routes[] contains routes with module link
         // modulesTree contains modules tree
         // make a final routes tree with that
-        traverse(this.modulesTree).forEach(function (node) {
+        traverse(this.modulesTree).forEach(node => {
             if (node) {
                 if (node.parent) {
-                    delete node.parent;
+                    node.parent = undefined;
                 }
                 if (node.initializer) {
-                    delete node.initializer;
+                    node.initializer = undefined;
                 }
                 if (node.importsNode) {
-                    delete node.importsNode;
+                    node.importsNode = undefined;
                 }
             }
         });
@@ -236,12 +235,12 @@ export class RouterParserUtil {
                     if (route?.data) {
                         try {
                             route.children = JSON5.parse(route.data);
-                        } catch (e) {
+                        } catch (_e) {
                             logger.error(
                                 'Error during generation of routes JSON file, maybe a trailing comma or an external variable inside one route.'
                             );
                         }
-                        delete route.data;
+                        route.data = undefined;
                         route.kind = 'module';
                         routesTree.children.push(route);
                     }
@@ -260,7 +259,7 @@ export class RouterParserUtil {
                         const len = routes.length;
                         let routeAddedOnce = false;
                         for (i; i < len; i++) {
-                            const route = routes[i];
+                            const _route = routes[i];
                             if (routes[i].component) {
                                 routeAddedOnce = true;
                                 routesTree.children.push({
@@ -286,11 +285,11 @@ export class RouterParserUtil {
             // loopModulesParser(routesTree);
         }
 
-        let cleanedRoutesTree = undefined;
+        let cleanedRoutesTree;
 
         const cleanRoutesTree = route => {
             for (const i in route.children) {
-                const routes = route.children[i].routes;
+                const _routes = route.children[i].routes;
             }
             return route;
         };
@@ -306,7 +305,7 @@ export class RouterParserUtil {
                     if (typeof route !== 'undefined') {
                         if (route.data) {
                             route.children = JSON5.parse(route.data);
-                            delete route.data;
+                            route.data = undefined;
                             route.kind = 'module';
                             _rawModule.children.push(route);
                         }
@@ -317,7 +316,7 @@ export class RouterParserUtil {
                 if (typeof route !== 'undefined') {
                     if (route.data) {
                         route.children = JSON5.parse(route.data);
-                        delete route.data;
+                        route.data = undefined;
                         route.kind = 'module';
                         _rawModule.children.push(route);
                     }
@@ -389,8 +388,8 @@ export class RouterParserUtil {
         this.modulesTree = getNestedChildren(this.modules);
     }
 
-    public generateRoutesIndex(outputFolder: string, routes: Array<any>): Promise<void> {
-        return FileEngine.get(__dirname + '/../src/templates/partials/routes-index.hbs').then(
+    public generateRoutesIndex(outputFolder: string, routes: any[]): Promise<void> {
+        return FileEngine.get(`${__dirname}/../src/templates/partials/routes-index.hbs`).then(
             data => {
                 const template: any = Handlebars.compile(data);
                 const result = template({
@@ -403,11 +402,11 @@ export class RouterParserUtil {
                 }
 
                 return FileEngine.write(
-                    outputFolder + path.sep + '/js/routes/routes_index.js',
+                    `${outputFolder + path.sep}/js/routes/routes_index.js`,
                     result
                 );
             },
-            err => Promise.reject('Error during routes index generation')
+            _err => Promise.reject('Error during routes index generation')
         );
     }
 
@@ -464,7 +463,7 @@ export class RouterParserUtil {
         for (const identifier of identifiers) {
             // Loop through their parents nodes, and if one is a variableStatement and === 'routes'
             let foundParentVariableStatement = false;
-            const parent = identifier.getParentWhile(n => {
+            const _parent = identifier.getParentWhile(n => {
                 if (n.getKind() === SyntaxKind.VariableStatement) {
                     if (this.isVariableRoutes(n.compilerNode)) {
                         foundParentVariableStatement = true;
@@ -511,7 +510,7 @@ export class RouterParserUtil {
         for (const spreadElement of spreadElements) {
             // Loop through their parents nodes, and if one is a variableStatement and === 'routes'
             let foundParentVariableStatement = false;
-            const parent = spreadElement.getParentWhile(n => {
+            const _parent = spreadElement.getParentWhile(n => {
                 if (n.getKind() === SyntaxKind.VariableStatement) {
                     if (this.isVariableRoutes(n.compilerNode)) {
                         foundParentVariableStatement = true;
@@ -526,24 +525,24 @@ export class RouterParserUtil {
 
         // inline the ArrayLiteralExpression SpreadElements
         for (const spreadElement of spreadElementsInRoutesVariableStatement) {
-            let spreadElementIdentifier = spreadElement.getExpression().getText(),
-                searchedImport,
-                aliasOriginalName = '',
-                foundWithAliasInImports = false,
-                foundWithAlias = false;
+            const spreadElementIdentifier = spreadElement.getExpression().getText();
+            let searchedImport;
+            let aliasOriginalName = '';
+            let foundWithAliasInImports = false;
+            let foundWithAlias = false;
 
             // Try to find it in imports
             const imports = file.getImportDeclarations();
 
             imports.forEach(i => {
-                let namedImports = i.getNamedImports(),
-                    namedImportsLength = namedImports.length,
-                    j = 0;
+                const namedImports = i.getNamedImports();
+                const namedImportsLength = namedImports.length;
+                let j = 0;
 
                 if (namedImportsLength > 0) {
                     for (j; j < namedImportsLength; j++) {
-                        let importName = namedImports[j].getNameNode().getText() as string,
-                            importAlias;
+                        const importName = namedImports[j].getNameNode().getText();
+                        let importAlias;
 
                         if (namedImports[j].getAliasNode()) {
                             importAlias = namedImports[j].getAliasNode().getText();
@@ -574,12 +573,12 @@ export class RouterParserUtil {
 
                     const getIndicesOf = (searchStr, str, caseSensitive) => {
                         const searchStrLen = searchStr.length;
-                        if (searchStrLen == 0) {
+                        if (searchStrLen === 0) {
                             return [];
                         }
-                        let startIndex = 0,
-                            index,
-                            indices = [];
+                        let startIndex = 0;
+                        let index;
+                        const indices = [];
                         if (!caseSensitive) {
                             str = str.toLowerCase();
                             searchStr = searchStr.toLowerCase();
@@ -596,7 +595,7 @@ export class RouterParserUtil {
                     const leadingFilePath = searchedImportPath.split('/').shift();
 
                     let importPath = path.resolve(
-                        dirNamePath + '/' + searchedImport.getModuleSpecifierValue() + '.ts'
+                        `${dirNamePath}/${searchedImport.getModuleSpecifierValue()}.ts`
                     );
 
                     if (routePathIsBad(importPath)) {
@@ -609,8 +608,7 @@ export class RouterParserUtil {
                                 importPath.slice(0, startIndex) + importPath.slice(endIndex);
                         } else {
                             // Top level route fixes
-                            importPath =
-                                path.dirname(dirNamePath) + '/' + searchedImportPath + '.ts';
+                            importPath = `${path.dirname(dirNamePath)}/${searchedImportPath}.ts`;
                         }
                     }
                     const sourceFileImport =
@@ -667,7 +665,7 @@ export class RouterParserUtil {
         for (const propertyAccessExpression of propertyAccessExpressions) {
             // Loop through their parents nodes, and if one is a variableStatement and === 'routes'
             let foundParentVariableStatement = false;
-            const parent = propertyAccessExpression.getParentWhile(n => {
+            const _parent = propertyAccessExpression.getParentWhile(n => {
                 if (n.getKind() === SyntaxKind.VariableStatement) {
                     if (this.isVariableRoutes(n.compilerNode)) {
                         foundParentVariableStatement = true;
@@ -706,7 +704,7 @@ export class RouterParserUtil {
                             );
                         }
                     }
-                } catch (e) {}
+                } catch (_e) {}
             }
         }
 
@@ -765,13 +763,13 @@ export class RouterParserUtil {
      */
     public cleanRoutesDefinitionWithImport(
         initializer: ts.ArrayLiteralExpression,
-        node: ts.Node,
+        _node: ts.Node,
         sourceFile: ts.SourceFile
     ): ts.Node {
         initializer.elements.forEach((element: ts.ObjectLiteralExpression) => {
             element.properties.forEach((property: ts.PropertyAssignment) => {
-                const propertyName = property.name.getText(),
-                    propertyInitializer = property.initializer;
+                const propertyName = property.name.getText();
+                const propertyInitializer = property.initializer;
                 switch (propertyName) {
                     case 'path':
                     case 'redirectTo':
@@ -791,7 +789,7 @@ export class RouterParserUtil {
                                             '.' +
                                             lastObjectLiteralAttributeName,
                                         sourceFile
-                                    ); // tslint:disable-line
+                                    );
                                 if (result !== '') {
                                     propertyInitializer.kind = 9;
                                     propertyInitializer.text = result;

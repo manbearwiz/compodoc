@@ -1,21 +1,10 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class JsdocReturnsCommentHelper implements IHtmlEngineHelper {
-    public helperFunc(context: any, jsdocTags: Array<any>, options: IHandlebarsOptions) {
-        let i = 0;
-        let len = jsdocTags.length;
-        let result;
-        for (i; i < len; i++) {
-            if (jsdocTags[i].tagName) {
-                if (
-                    jsdocTags[i].tagName.text === 'returns' ||
-                    jsdocTags[i].tagName.text === 'return'
-                ) {
-                    result = jsdocTags[i].comment;
-                    break;
-                }
-            }
-        }
-        return result;
+    public helperFunc(_context: any, jsdocTags: any[], _options: IHandlebarsOptions) {
+        return (
+            jsdocTags.find(tag => tag.tagName?.text === 'returns' || tag.tagName?.text === 'return')
+                ?.comment || ''
+        );
     }
 }

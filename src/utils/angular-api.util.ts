@@ -1,6 +1,6 @@
-import { IApiSourceResult } from './api-source-result.interface';
+import type { IApiSourceResult } from './api-source-result.interface';
 
-const AngularAPIs: Array<IAngularMainApi> = require('../src/data/api-list.json');
+const AngularAPIs: IAngularMainApi[] = require('../src/data/api-list.json');
 
 export class AngularApiUtil {
     private static instance: AngularApiUtil;

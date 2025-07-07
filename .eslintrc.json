@@ -1,37 +1,57 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true
-    },
-    "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended"
-    ],
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
-    },
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion": 2018,
-        "sourceType": "module"
-    },
-    "plugins": [
-        "@typescript-eslint"
-    ],
-    "rules": {
-        "indent": [
-            0
-        ],
-        "linebreak-style": [
-            "error",
-            "unix"
-        ],
-        "quotes": [
-            0
-        ],
-        "no-extra-semi": [
-            0
-        ]
-    }
+    "root": true,
+    "overrides": [
+        {
+            "files": ["*.ts"],
+            "plugins": ["tsdoc"],
+            "env": {
+                "browser": true,
+                "es6": true
+            },
+            "extends": [
+                "eslint:recommended",
+                "plugin:@typescript-eslint/strict-type-checked",
+                "plugin:@typescript-eslint/stylistic-type-checked",
+                "plugin:sonarjs/recommended-legacy",
+                "prettier"
+            ],
+            "globals": {
+                "Atomics": "readonly",
+                "SharedArrayBuffer": "readonly"
+            },
+            "parserOptions": {
+                "project": true,
+                "ecmaVersion": 2018,
+                "sourceType": "module"
+            },
+            "rules": {
+                "@typescript-eslint/no-explicit-any": "off",
+                "@typescript-eslint/no-require-imports": "off",
+                "@typescript-eslint/no-unnecessary-condition": "off",
+                "@typescript-eslint/no-unsafe-argument": "off",
+                "@typescript-eslint/no-unsafe-assignment": "off",
+                "@typescript-eslint/no-unsafe-call": "off",
+                "@typescript-eslint/no-unsafe-enum-comparison": "off",
+                "@typescript-eslint/no-unsafe-member-access": "off",
+                "@typescript-eslint/no-unused-vars": "off",
+                "@typescript-eslint/restrict-plus-operands": "off",
+                "@typescript-eslint/prefer-for-of": "off",
+                "@typescript-eslint/unbound-method": "off",
+                "@typescript-eslint/no-unsafe-return": "off",
+                "@typescript-eslint/prefer-promise-reject-errors": "off",
+                "@typescript-eslint/prefer-optional-chain": "off",
+                "indent": [0],
+                "linebreak-style": ["error", "unix"],
+                "quotes": [0],
+                "no-extra-semi": [0]
+            }
+        },
+        {
+            "files": ["*.{config,test}.ts"],
+            "extends": ["plugin:@typescript-eslint/disable-type-checked"],
+            "parserOptions": {
+                "createDefaultProgram": true
+            }
+        }
+    ]
 }

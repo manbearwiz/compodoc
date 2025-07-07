@@ -1,10 +1,8 @@
-import { IHtmlEngineHelper } from './html-engine-helper.interface';
 import Configuration from '../../configuration';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class IsNotToggleHelper implements IHtmlEngineHelper {
-    constructor() {}
-
-    public helperFunc(context: any, type: string, options: any) {
+    public helperFunc(context: string, type: string, options: IHandlebarsOptions) {
         if (Configuration.mainData.toggleMenuItems.includes('all')) {
             return options.inverse(context);
         } else if (Configuration.mainData.toggleMenuItems.includes(type)) {

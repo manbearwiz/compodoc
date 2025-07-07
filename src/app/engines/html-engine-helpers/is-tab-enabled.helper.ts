@@ -1,7 +1,12 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class IsTabEnabledHelper implements IHtmlEngineHelper {
-    public helperFunc(context: any, tabs: Array<any> | null | undefined, tabId: String, options: IHandlebarsOptions) {
+    public helperFunc(
+        context: string,
+        tabs: any[] | null | undefined,
+        tabId: string,
+        options: IHandlebarsOptions
+    ) {
         return tabs?.some(tab => tab.id === tabId) ? options.fn(context) : options.inverse(context);
     }
 }

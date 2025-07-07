@@ -11,12 +11,8 @@ export class AngularJSDependencies extends FrameworkDependencies {
     private jsDocHelper = new JsDocHelper();
     private symbolHelper = new SymbolHelper();
 
-    constructor(files: string[], options: any) {
-        super(files, options);
-    }
-
     public getDependencies() {
-        let deps = {
+        return {
             modules: [],
             modulesForGraph: [],
             components: [],
@@ -35,6 +31,5 @@ export class AngularJSDependencies extends FrameworkDependencies {
             },
             routesTree: undefined
         };
-        return deps;
     }
 }
