@@ -1,6 +1,6 @@
 import ConfigurationRepository from './core/repositories/config.repository';
 
-import { CLIProgram } from './core/entities/cli-program';
+import type { CLIProgram } from './core/entities/cli-program';
 
 import DisplayEnvironmentVersions from './core/use-cases/display-environment-versions';
 import HandleConfigFile from './core/use-cases/handle-config';
@@ -48,7 +48,7 @@ export class CliApplication {
         if (configExplorerResult) {
             Logger.info(`Using configuration file : ${HandleConfigFile.configFilePath}`);
         } else {
-            Logger.warn(`No configuration file found, switching to CLI flags.`);
+            Logger.warn('No configuration file found, switching to CLI flags.');
         }
 
         if (currentProgram.language && !I18nEngine.supportLanguage(currentProgram.language)) {

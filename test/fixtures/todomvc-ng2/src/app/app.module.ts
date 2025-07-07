@@ -1,7 +1,7 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ModuleWithProviders } from '@angular/core';
+import { type ModuleWithProviders, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { HomeModule } from './home/';
 
@@ -9,9 +9,9 @@ import { AppComponent } from './app.component';
 
 import { TodoStore } from './shared/services/todo.store';
 
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 /* Routing Module */
 import { AppRoutingModule } from './app-routing.module';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { NoopInterceptor } from './shared/interceptors/noopinterceptor.interceptor';
 /**

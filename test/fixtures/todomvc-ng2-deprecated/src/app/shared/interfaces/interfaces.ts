@@ -1,6 +1,6 @@
 import { HostBinding, HostListener, Input, Output } from '@angular/core';
 
-import { ClockInterface } from './clock.interface';
+import type { ClockInterface } from './clock.interface';
 
 /**
  * An interface just for documentation purpose
@@ -8,14 +8,14 @@ import { ClockInterface } from './clock.interface';
  */
 interface LabelledTodo {
     title: string;
-    completed: Boolean;
-    editing?: Boolean;
+    completed: boolean;
+    editing?: boolean;
     readonly x: number;
 }
 
 export interface ValueInRes {
-    ['__allAnd']: boolean;
-    ['__allOr']: boolean;
+    __allAnd: boolean;
+    __allOr: boolean;
     [property: string]: any;
 }
 
@@ -72,7 +72,6 @@ class Clock implements ClockInterface {
         this._emptyAccessor = val;
     }
     private _emptyAccessor = '';
-    constructor(h: number, m: number) {}
 
     /**
      * @example

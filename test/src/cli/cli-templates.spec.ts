@@ -1,16 +1,18 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI handlebars templates', () => {
-    const distFolder = tmp.name + '-templates';
+    const distFolder = `${tmp.name}-templates`;
 
     describe('with alternative handlebar template files', () => {
-        let indexFile, barComponentFile, fooComponentFile;
-        before(function (done) {
+        let indexFile;
+        let barComponentFile;
+        let fooComponentFile;
+        before(done => {
             tmp.create(distFolder);
 
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',

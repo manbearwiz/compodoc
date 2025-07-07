@@ -26,9 +26,9 @@ export const formatDiagnosticsHost: ts.FormatDiagnosticsHost = {
  * Read and parse tsconfig file with tsc APIs
  */
 export function readTsconfigFile(tsconfigFile: string): any {
-    let result = ts.readConfigFile(tsconfigFile, ts.sys.readFile);
+    const result = ts.readConfigFile(tsconfigFile, ts.sys.readFile);
     if (result.error) {
-        let message = ts.formatDiagnostics([result.error], formatDiagnosticsHost);
+        const message = ts.formatDiagnostics([result.error], formatDiagnosticsHost);
         throw new Error(message);
     }
     return result.config;

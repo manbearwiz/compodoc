@@ -13,9 +13,5 @@ import { AnotherComponent } from './another-component.component';
     styleUrls: ['./app.component.css']
 })
 export class AppComponent extends AnotherComponent {
-    constructor() {
-        super();
-    }
-
     @Input() public internalLabel: string;
 }

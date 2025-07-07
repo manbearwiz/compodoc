@@ -1,18 +1,18 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI Deprecated', () => {
-    const tmpFolder = tmp.name + '-deprecated';
-    const distFolder = tmpFolder + '/documentation';
+    const tmpFolder = `${tmp.name}-deprecated`;
+    const distFolder = `${tmpFolder}/documentation`;
 
     let menuFile;
 
     describe('Angular app', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(tmpFolder);
             tmp.copy('./test/fixtures/todomvc-ng2-deprecated/', tmpFolder);
-            let ls = shell(
+            const ls = shell(
                 'node',
                 ['../bin/index-cli.js', '-p', './tsconfig.doc.json', '-d', 'documentation'],
                 { cwd: tmpFolder }
@@ -127,10 +127,10 @@ describe('CLI Deprecated', () => {
     });
 
     describe('Nestjs app', () => {
-        before(function (done) {
+        before(done => {
             tmp.clean(tmpFolder);
             tmp.copy('./test/fixtures/nest-app/', tmpFolder);
-            let ls = shell(
+            const ls = shell(
                 'node',
                 ['../bin/index-cli.js', '-p', './tsconfig.json', '-d', 'documentation'],
                 { cwd: tmpFolder }

@@ -46,16 +46,12 @@
     },
     "watch": {
         "build": {
-            "patterns": [
-                "src/**/*.ts"
-            ],
+            "patterns": ["src/**/*.ts"],
             "extensions": "js,ts",
             "quiet": true
         },
         "build-refactoring": {
-            "patterns": [
-                "src-refactored/**/*.ts"
-            ],
+            "patterns": ["src-refactored/**/*.ts"],
             "extensions": "js,ts",
             "quiet": true
         }
@@ -136,14 +132,18 @@
         "@types/node": "22.13.10",
         "@types/semver": "7.5.8",
         "@types/traverse": "0.6.37",
-        "@typescript-eslint/eslint-plugin": "7.11.0",
-        "@typescript-eslint/parser": "7.11.0",
+        "@typescript-eslint/eslint-plugin": "^8.7.0",
+        "@typescript-eslint/parser": "^8.7.0",
         "auto-changelog": "2.5.0",
         "chai": "4.4.1",
         "codecov": "3.8.3",
         "cpx2": "^8.0.0",
         "cross-env": "7.0.3",
-        "eslint": "8.56.0",
+        "eslint": "^8.57.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-jsdoc": "^48.5.2",
+        "eslint-plugin-sonarjs": "^1.0.0",
+        "eslint-plugin-tsdoc": "^0.4.0",
         "husky": "9.1.7",
         "lcov-result-merger": "5.0.1",
         "madge": "8.0.0",

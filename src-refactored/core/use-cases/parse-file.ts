@@ -1,4 +1,4 @@
-import { ts, Project, ScriptTarget } from 'ts-morph';
+import { Project, ScriptTarget, ts } from 'ts-morph';
 
 export class ParseFile {
     public project: Project;

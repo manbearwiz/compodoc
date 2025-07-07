@@ -1,7 +1,6 @@
 import i18next from 'i18next';
 
 import {
-    TRANSLATION_BG_BG,
     TRANSLATION_DE_DE,
     TRANSLATION_EN_US,
     TRANSLATION_ES_ES,
@@ -9,6 +8,7 @@ import {
     TRANSLATION_HU_HU,
     TRANSLATION_IT_IT,
     TRANSLATION_JA_JP,
+    TRANSLATION_KA_GE,
     TRANSLATION_KO_KR,
     TRANSLATION_NL_NL,
     TRANSLATION_PL_PL,
@@ -16,8 +16,7 @@ import {
     TRANSLATION_RU_RU,
     TRANSLATION_SK_SK,
     TRANSLATION_ZH_CN,
-    TRANSLATION_ZH_TW,
-    TRANSLATION_KA_GE
+    TRANSLATION_ZH_TW
 } from '../../locales';
 
 class I18nEngine {

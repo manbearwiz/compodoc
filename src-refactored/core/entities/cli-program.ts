@@ -1,6 +1,6 @@
-import { Command } from 'commander';
+import type { Command } from 'commander';
 
-import { InternalConfiguration } from './internal-configuration';
+import type { InternalConfiguration } from './internal-configuration';
 
 export interface CLIProgram extends InternalConfiguration, Command {
     option(

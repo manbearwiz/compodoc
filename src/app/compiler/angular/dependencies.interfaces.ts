@@ -7,8 +7,8 @@ export interface IDep {
 
 export interface IInjectableDep extends IDep {
     file: any;
-    properties: Array<any>;
-    methods: Array<any>;
+    properties: any[];
+    methods: any[];
     deprecated: boolean;
     deprecationMessage: string;
     description: string;
@@ -17,37 +17,37 @@ export interface IInjectableDep extends IDep {
     exampleUrls?;
     extends?;
 
-    accessors?: Object;
-    constructorObj?: Object;
-    jsdoctags?: Array<string>;
+    accessors?: object;
+    constructorObj?: object;
+    jsdoctags?: string[];
 }
 
 export interface IInterceptorDep extends IDep {
     file: any;
-    properties: Array<any>;
-    methods: Array<any>;
+    properties: any[];
+    methods: any[];
     deprecated: boolean;
     deprecationMessage: string;
     description: string;
     sourceCode: string;
 
-    accessors?: Object;
-    constructorObj?: Object;
-    jsdoctags?: Array<string>;
+    accessors?: object;
+    constructorObj?: object;
+    jsdoctags?: string[];
 }
 
 export interface IGuardDep extends IDep {
     file: any;
-    properties: Array<any>;
-    methods: Array<any>;
+    properties: any[];
+    methods: any[];
     deprecated: boolean;
     deprecationMessage: string;
     description: string;
     sourceCode: string;
 
-    accessors?: Object;
-    constructorObj?: Object;
-    jsdoctags?: Array<string>;
+    accessors?: object;
+    constructorObj?: object;
+    jsdoctags?: string[];
 }
 
 export interface IPipeDep extends IDep {
@@ -61,27 +61,27 @@ export interface IPipeDep extends IDep {
 
     standalone: boolean;
 
-    methods: Array<any>;
-    properties: Array<any>;
+    methods: any[];
+    properties: any[];
     pure: string;
     ngname: string;
 
-    jsdoctags?: Array<string>;
+    jsdoctags?: string[];
 }
 
 export interface IInterfaceDep extends IDep {
     file: any;
     sourceCode: string;
 
-    properties?: Array<any>;
+    properties?: any[];
     indexSignatures?: any;
     kind?: any;
     deprecated: boolean;
     deprecationMessage: string;
     description?: string;
     rawdescription?: string;
-    methods?: Array<any>;
-    extends?: Array<any>;
+    methods?: any[];
+    extends?: any[];
 }
 
 export interface IFunctionDecDep extends IDep {
@@ -92,12 +92,12 @@ export interface IFunctionDecDep extends IDep {
     description: string;
 
     returnType?: string;
-    args?: Array<any>;
+    args?: any[];
     jsdoctags?: string;
 }
 
 export interface IEnumDecDep extends IDep {
-    childs: Array<any>;
+    childs: any[];
     subtype: string;
     deprecated: boolean;
     deprecationMessage: string;
@@ -154,13 +154,13 @@ export interface Deps {
     implements?;
     extends?;
 
-    inputsClass?: Object[];
-    outputsClass?: Object[];
-    propertiesClass?: Object[];
-    methodsClass?: Object[];
+    inputsClass?: object[];
+    outputsClass?: object[];
+    propertiesClass?: object[];
+    methodsClass?: object[];
 
-    hostBindings?: Object[];
-    hostListeners?: Object[];
+    hostBindings?: object[];
+    hostListeners?: object[];
 
     // common
     providers?: Deps[];

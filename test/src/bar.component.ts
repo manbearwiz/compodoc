@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, type OnInit } from '@angular/core';
 import { BarService } from './bar.service';
 
 @Component({
     selector: 'app-bar',
-    templateUrl: `bar.template.html`,
+    templateUrl: 'bar.template.html',
     styleUrl: ['bar.style.scss'],
     providers: [BarService]
 })

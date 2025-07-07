@@ -1,4 +1,4 @@
-import { PipeTransform, Pipe } from '@angular/core';
+import { Pipe, type PipeTransform } from '@angular/core';
 
 const name = 'firstUpper';
 const pure = true;
@@ -23,7 +23,7 @@ export class FirstUpperPipe implements PipeTransform {
     /**
      * Example property
      */
-    private cachedUrl: string = '';
+    private cachedUrl = '';
 
     /**
      * the transform function

@@ -1,6 +1,6 @@
-const eol = require('os').EOL;
+const eol = require('node:os').EOL;
 import { expect } from 'chai';
-import { temporaryDir, shell, spawn, exists, read, exec } from '../helpers';
+import { exec, exists, read, shell, spawn, temporaryDir } from '../helpers';
 
 const tmp = temporaryDir();
 
@@ -8,11 +8,11 @@ describe('CLI Additional documentation', () => {
     let stdoutString = undefined;
     let fooMenuFile;
 
-    const distFolder = tmp.name + '-additional';
+    const distFolder = `${tmp.name}-additional`;
 
     before(done => {
         tmp.create(distFolder);
-        let ls = shell('node', [
+        const ls = shell('node', [
             './bin/index-cli.js',
             '-p',
             './test/fixtures/todomvc-ng2/src/tsconfig.json',
@@ -91,26 +91,25 @@ describe('CLI Additional documentation', () => {
 describe('CLI Additional documentation - wrong folder', () => {
     let exitCode = 0;
 
-    const distFolder = tmp.name + '-additional-wrong-folder';
+    const distFolder = `${tmp.name}-additional-wrong-folder`;
 
     before(done => {
         tmp.create(distFolder);
         const ls = exec(
-            'node' +
-                [
-                    '',
-                    './bin/index-cli.js',
-                    '-p',
-                    './test/fixtures/todomvc-ng2/src/tsconfig.json',
-                    '-d',
-                    distFolder,
-                    '-a',
-                    './test/fixtures/todomvc-ng2/screenshots',
-                    '--includes',
-                    './test/fixtures/todomvc-ng2/additional-doc-wrong',
-                    '--includesName',
-                    '"Additional documentation"'
-                ].join(' ')
+            `node${[
+                '',
+                './bin/index-cli.js',
+                '-p',
+                './test/fixtures/todomvc-ng2/src/tsconfig.json',
+                '-d',
+                distFolder,
+                '-a',
+                './test/fixtures/todomvc-ng2/screenshots',
+                '--includes',
+                './test/fixtures/todomvc-ng2/additional-doc-wrong',
+                '--includesName',
+                '"Additional documentation"'
+            ].join(' ')}`
         );
         ls.on('close', code => {
             exitCode = code;

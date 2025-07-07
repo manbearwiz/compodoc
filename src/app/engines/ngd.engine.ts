@@ -24,19 +24,18 @@ export class NgdEngine {
         });
     }
 
-    public renderGraph(filepath: string, outputpath: string, type: string, name?: string) {
+    public renderGraph(_filepath: string, outputpath: string, type: string, name?: string) {
         this.engine.updateOutput(outputpath);
 
         if (type === 'f') {
             return this.engine.generateGraph([DependenciesEngine.getRawModule(name)]);
-        } else {
-            return this.engine.generateGraph(DependenciesEngine.rawModulesForOverview);
         }
+        return this.engine.generateGraph(DependenciesEngine.rawModulesForOverview);
     }
 
     public readGraph(filepath: string, name: string): Promise<string> {
-        return FileEngine.get(filepath).catch(err =>
-            Promise.reject('Error during graph read ' + name)
+        return FileEngine.get(filepath).catch(_err =>
+            Promise.reject(`Error during graph read ${name}`)
         );
     }
 }

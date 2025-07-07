@@ -1,5 +1,5 @@
-import { Get, Controller } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get } from '@nestjs/common';
+import type { AppService } from './app.service';
 import { ControllerBase } from './controller.base';
 
 /**

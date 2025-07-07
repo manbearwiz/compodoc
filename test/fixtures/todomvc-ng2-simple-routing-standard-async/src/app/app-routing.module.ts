@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, type Routes } from '@angular/router';
 
 export const APP_ROUTES: Routes = [
     { path: 'about', loadChildren: async () => (await import('./about/about.module')).AboutModule },
-    { path: 'toto', loadChildren: async () => (await import(`./toto/toto.module`)).TotoModule },
+    { path: 'toto', loadChildren: async () => (await import('./toto/toto.module')).TotoModule },
     { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: '**', redirectTo: 'home', pathMatch: 'full' }
 ];

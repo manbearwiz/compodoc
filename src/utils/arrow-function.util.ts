@@ -1,14 +1,14 @@
 import { SyntaxKind } from 'ts-morph';
 
 export function StringifyArrowFunction(af) {
-    let i = 0,
-        result = '(';
+    let i = 0;
+    let result = '(';
     const len = af.parameters.length;
     if (len === 1) {
         result = '';
     }
     for (i; i < len; i++) {
-        if (af.parameters[i].name && af.parameters[i].name.escapedText) {
+        if (af.parameters[i].name?.escapedText) {
             result += af.parameters[i].name.escapedText;
         }
         if (i < len - 1) {
@@ -29,7 +29,7 @@ export function StringifyArrowFunction(af) {
             af.body.name
         ) {
             result += af.body.expression.escapedText;
-            result += '.' + af.body.name.escapedText;
+            result += `.${af.body.name.escapedText}`;
         } else if (af.body.kind === SyntaxKind.StringLiteral && af.body.text) {
             result += af.body.text;
         }

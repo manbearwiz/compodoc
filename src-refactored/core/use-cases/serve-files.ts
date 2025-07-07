@@ -2,14 +2,12 @@ import FileEngine from '../../infrastructure/files/file.engine';
 import Logger from '../../infrastructure/logging/logger';
 import ServeService from '../../infrastructure/serving/serve';
 
-import { InternalConfiguration } from '../entities/internal-configuration';
+import type { InternalConfiguration } from '../entities/internal-configuration';
 
 export class ServeFiles {
     private static instance: ServeFiles;
 
     private server;
-
-    constructor() {}
 
     public static getInstance() {
         if (!ServeFiles.instance) {

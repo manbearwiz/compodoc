@@ -1,15 +1,15 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI disable flags', () => {
-    const distFolder = tmp.name + '-disable-options';
+    const distFolder = `${tmp.name}-disable-options`;
 
     describe('disabling excluding methods with --disablePrivate', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -44,16 +44,16 @@ describe('CLI disable flags', () => {
         });
 
         it('should exclude miscellaneous function marked as @private', () => {
-            let file = read(distFolder + '/miscellaneous/functions.html');
+            const file = read(`${distFolder}/miscellaneous/functions.html`);
             expect(file).not.to.contain('private function');
         });
     });
 
     describe('disabling excluding methods with --disableProtected', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -90,9 +90,9 @@ describe('CLI disable flags', () => {
 
     describe('disabling excluding methods with --disableInternal', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -135,16 +135,16 @@ describe('CLI disable flags', () => {
         });
 
         it('correct supports @internal + link', () => {
-            let file = read(distFolder + '/directives/QueryParamNameDirective.html');
+            const file = read(`${distFolder}/directives/QueryParamNameDirective.html`);
             expect(file).to.contain('code>constructor(groupService: QueryParamGroupService');
         });
     });
 
     describe('disabling excluding methods with --disableLifeCycleHooks', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -187,9 +187,9 @@ describe('CLI disable flags', () => {
 
     describe('disabling excluding methods with --disableLifeCycleHooks for component inheritance', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files-extends/src/tsconfig.json',
@@ -214,9 +214,9 @@ describe('CLI disable flags', () => {
 
     describe('disabling excluding methods with --disableLifeCycleHooks --disableInternal --disableProtected --disablePrivate', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -256,9 +256,9 @@ describe('CLI disable flags', () => {
 
     describe('disabling excluding methods with --disableConstructors', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -289,9 +289,9 @@ describe('CLI disable flags', () => {
 
     describe('disabling excluding methods with --disableConstructors for component inheritance', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files-extends/src/tsconfig.json',
@@ -315,9 +315,9 @@ describe('CLI disable flags', () => {
     });
 
     describe('disabling search with --disableSearch', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -335,20 +335,20 @@ describe('CLI disable flags', () => {
         after(() => tmp.clean(distFolder));
 
         it('should not generate search JS files', () => {
-            let file = read(`${distFolder}/index.html`);
+            const file = read(`${distFolder}/index.html`);
             expect(file).not.to.contain('lunr.min.js');
-            const index = exists(distFolder + '/js/search/search_index.js');
+            const index = exists(`${distFolder}/js/search/search_index.js`);
             expect(index).to.be.false;
         });
 
         it('should not generate search input', () => {
-            let file = read(`${distFolder}/js/menu-wc.js`);
+            const file = read(`${distFolder}/js/menu-wc.js`);
             expect(file).not.to.contain('book-search-input');
         });
     });
 
     describe('disabling dependencies with --disableDependencies', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -374,7 +374,7 @@ describe('CLI disable flags', () => {
     });
 
     describe('disabling properties with --disableProperties', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -402,9 +402,9 @@ describe('CLI disable flags', () => {
     describe('minimal with --minimal', () => {
         let fileContents;
 
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -422,14 +422,14 @@ describe('CLI disable flags', () => {
         after(() => tmp.clean(distFolder));
 
         it('should not generate search JS files', () => {
-            let file = read(`${distFolder}/index.html`);
+            const file = read(`${distFolder}/index.html`);
             expect(file).not.to.contain('lunr.min.js');
-            const index = exists(distFolder + '/js/search/search_index.js');
+            const index = exists(`${distFolder}/js/search/search_index.js`);
             expect(index).to.be.false;
         });
 
         it('should not generate search input', () => {
-            let file = read(`${distFolder}/js/menu-wc.js`);
+            const file = read(`${distFolder}/js/menu-wc.js`);
             expect(file).not.to.contain('book-search-input');
         });
 

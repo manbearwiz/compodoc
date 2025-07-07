@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
-import { BarDirective } from './bar.directive';
 import { BarComponent } from './bar.component';
+import { BarDirective } from './bar.directive';
 import { BarService } from './bar.service';
 
 /**

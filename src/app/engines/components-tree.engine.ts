@@ -1,10 +1,8 @@
+import * as path from 'node:path';
+import * as cheerio from 'cheerio';
 import * as _ from 'lodash';
-import * as path from 'path';
-
 import { logger } from '../../utils/logger';
 import FileEngine from './file.engine';
-
-import * as cheerio from 'cheerio';
 
 class ComponentsTreeEngine {
     private components: any[] = [];
@@ -26,11 +24,11 @@ class ComponentsTreeEngine {
     private readTemplates() {
         return new Promise((resolve, reject) => {
             let i = 0;
-            let len = this.componentsForTree.length;
-            let loop = () => {
+            const len = this.componentsForTree.length;
+            const loop = () => {
                 if (i <= len - 1) {
                     if (this.componentsForTree[i].templateUrl) {
-                        let filePath =
+                        const filePath =
                             process.cwd() +
                             path.sep +
                             path.dirname(this.componentsForTree[i].file) +
@@ -61,12 +59,12 @@ class ComponentsTreeEngine {
     }
 
     private findChildrenAndParents() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve, _reject) => {
             _.forEach(this.componentsForTree, component => {
-                let $component = cheerio(component.templateData);
+                const $component = cheerio(component.templateData);
                 _.forEach(this.componentsForTree, componentToFind => {
                     if ($component.find(componentToFind.selector).length > 0) {
-                        console.log(componentToFind.name + ' found in ' + component.name);
+                        console.log(`${componentToFind.name} found in ${component.name}`);
                         component.children.push(componentToFind.name);
                     }
                 });
@@ -78,7 +76,7 @@ class ComponentsTreeEngine {
     private createTreesForComponents() {
         return new Promise((resolve, reject) => {
             _.forEach(this.components, component => {
-                let _component = {
+                const _component = {
                     name: component.name,
                     file: component.file,
                     selector: component.selector,

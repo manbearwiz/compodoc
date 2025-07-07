@@ -1,4 +1,4 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class FilterAngular2ModulesHelper implements IHtmlEngineHelper {
     public helperFunc(context: any, text: string, options: IHandlebarsOptions) {
@@ -8,18 +8,17 @@ export class FilterAngular2ModulesHelper implements IHtmlEngineHelper {
             'HttpModule',
             'RouterModule'
         ];
-        let len = NG2_MODULES.length;
+        const len = NG2_MODULES.length;
         let i = 0;
         let result = false;
         for (i; i < len; i++) {
-            if (text.indexOf(NG2_MODULES[i]) > -1) {
+            if (text.includes(NG2_MODULES[i])) {
                 result = true;
             }
         }
         if (result) {
             return options.fn(context);
-        } else {
-            return options.inverse(context);
         }
+        return options.inverse(context);
     }
 }

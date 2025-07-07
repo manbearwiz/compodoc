@@ -1,11 +1,10 @@
-import { Controller, Headers, Post, Res, HttpStatus, Delete } from '@nestjs/common';
+import { Controller, Delete, Headers, HttpStatus, Post, Res } from '@nestjs/common';
 
 /**
  * @deprecated This controller is deprecated
  */
 @Controller('auth')
 export class AuthDeprecatedController {
-    constructor() {}
 
     @Post()
     async login(@Headers() headers, @Res() res) {}

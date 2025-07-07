@@ -1,11 +1,11 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
-import { JsdocTagInterface } from '../../interfaces/jsdoc-tag.interface';
+import type { JsdocTagInterface } from '../../interfaces/jsdoc-tag.interface';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class JsdocParamsValidHelper implements IHtmlEngineHelper {
     public helperFunc(context: any, jsdocTags: JsdocTagInterface[], options: IHandlebarsOptions) {
         let i = 0;
-        let len = jsdocTags.length;
-        let tags = [];
+        const len = jsdocTags.length;
+        const _tags = [];
         let valid = false;
 
         for (i; i < len; i++) {
@@ -17,8 +17,7 @@ export class JsdocParamsValidHelper implements IHtmlEngineHelper {
         }
         if (valid) {
             return options.fn(context);
-        } else {
-            return options.inverse(context);
         }
+        return options.inverse(context);
     }
 }

@@ -1,7 +1,6 @@
 import { cloneDeep, concat, find } from 'lodash';
-
-import { cleanLifecycleHooksFromMethods } from '.';
 import Configuration from '../app/configuration';
+import { cleanLifecycleHooksFromMethods } from '.';
 
 export class ExtendsMerger {
     private components;

@@ -1,9 +1,9 @@
-import { IDep } from '../dependencies.interfaces';
-import { ComponentHelper } from './helpers/component-helper';
-import Configuration from '../../../configuration';
 import { cleanLifecycleHooksFromMethods } from '../../../../utils';
+import Configuration from '../../../configuration';
+import type { IDep } from '../dependencies.interfaces';
+import type { ComponentHelper } from './helpers/component-helper';
 
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 
 export class DirectiveDepFactory {
     constructor(private helper: ComponentHelper) {}
@@ -13,7 +13,7 @@ export class DirectiveDepFactory {
         const hash = crypto.createHash('sha512').update(sourceCode).digest('hex');
         const directiveDeps: IDirectiveDep = {
             name,
-            id: 'directive-' + name + '-' + hash,
+            id: `directive-${name}-${hash}`,
             file: file,
             type: 'directive',
             description: IO.description,
@@ -24,7 +24,7 @@ export class DirectiveDepFactory {
             exportAs: this.helper.getComponentExportAs(props, srcFile),
             hostDirectives: [...this.helper.getComponentHostDirectives(props)],
 
-            standalone: this.helper.getComponentStandalone(props, srcFile) ? true : false,
+            standalone: !!this.helper.getComponentStandalone(props, srcFile),
 
             inputsClass: IO.inputs,
             outputsClass: IO.outputs,
@@ -59,10 +59,12 @@ export class DirectiveDepFactory {
             directiveDeps.accessors = IO.accessors;
         }
         if (IO.properties) {
-            const {inputSignals, outputSignals, properties} = this.helper.getInputOutputSignals(IO.properties);
+            const { inputSignals, outputSignals, properties } = this.helper.getInputOutputSignals(
+                IO.properties
+            );
 
-            directiveDeps.inputsClass = directiveDeps.inputsClass.concat(inputSignals)
-            directiveDeps.outputsClass = directiveDeps.outputsClass.concat(outputSignals)
+            directiveDeps.inputsClass = directiveDeps.inputsClass.concat(inputSignals);
+            directiveDeps.outputsClass = directiveDeps.outputsClass.concat(outputSignals);
             directiveDeps.propertiesClass = properties;
         }
         return directiveDeps;
@@ -76,7 +78,7 @@ export interface IDirectiveDep extends IDep {
     sourceCode: string;
 
     selector: string;
-    providers: Array<any>;
+    providers: any[];
     exportAs: string;
 
     inputsClass: any;
@@ -93,11 +95,11 @@ export interface IDirectiveDep extends IDep {
 
     propertiesClass: any;
     methodsClass: any;
-    exampleUrls: Array<string>;
+    exampleUrls: string[];
 
-    constructorObj?: Object;
-    jsdoctags?: Array<string>;
+    constructorObj?: object;
+    jsdoctags?: string[];
     implements?: any;
-    accessors?: Object;
+    accessors?: object;
     extends?: any;
 }

@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, exists, read } from '../helpers';
+import { exists, read, shell, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI nest projects support', () => {
-    const distFolder = tmp.name + '-nest';
+    const distFolder = `${tmp.name}-nest`;
 
     describe('with simple app', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -37,7 +37,7 @@ describe('CLI nest projects support', () => {
             expect(file).to.contain(
                 '@ApiResponse({description: &#x27;Return all articles.&#x27;})<br'
             );
-            expect(file).to.contain(`@Post(&#x27;multiple&#x27;)<br`);
+            expect(file).to.contain('@Post(&#x27;multiple&#x27;)<br');
             expect(file).to.contain('The main app controller</p>');
         });
 

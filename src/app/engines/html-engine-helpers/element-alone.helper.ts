@@ -1,12 +1,10 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
 import DependenciesEngine from '../dependencies.engine';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class ElementAloneHelper implements IHtmlEngineHelper {
-    constructor() {}
-
     public helperFunc(context: any, elements, elementType: string, options: IHandlebarsOptions) {
-        let alones = [];
-        let modules = DependenciesEngine.modules;
+        const alones = [];
+        const modules = DependenciesEngine.modules;
 
         elements.forEach(element => {
             let foundInOneModule = false;

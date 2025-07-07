@@ -1,7 +1,8 @@
-import { IHtmlEngineHelper } from './html-engine-helper.interface';
+import type { IHtmlEngineHelper } from './html-engine-helper.interface';
+
 const Handlebars = require('handlebars');
 
-import { ts, SyntaxKind } from 'ts-morph';
+import { SyntaxKind } from 'ts-morph';
 
 export class ModifKindHelper implements IHtmlEngineHelper {
     /**
@@ -10,7 +11,7 @@ export class ModifKindHelper implements IHtmlEngineHelper {
      * @param  {SyntaxKind[]} kind  SyntaxKind concatenated
      * @return {string}                Parsed string
      */
-    public helperFunc(context: any, kind: SyntaxKind[]) {
+    public helperFunc(_context: any, kind: SyntaxKind[]) {
         let _kindText = '';
         switch (kind) {
             case SyntaxKind.PrivateKeyword:

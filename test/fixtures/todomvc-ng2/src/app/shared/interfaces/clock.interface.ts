@@ -1,4 +1,4 @@
-import { TimeInterface } from './time.interface';
+import type { TimeInterface } from './time.interface';
 
 /**
  * A class interface just for documentation purpose

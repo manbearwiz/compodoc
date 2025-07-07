@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanLoad } from '@angular/router';
+import type { CanLoad } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'

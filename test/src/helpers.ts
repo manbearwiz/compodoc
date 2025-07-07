@@ -1,11 +1,11 @@
 //import * as PDFJS from 'pdfjs-dist/legacy/build/pdf.mjs';
 
-export const shell = require('child_process').spawnSync;
-export const spawn = require('child_process').spawn;
-export const exec = require('child_process').exec;
-export const shellAsync = require('child_process').spawn;
+export const shell = require('node:child_process').spawnSync;
+export const spawn = require('node:child_process').spawn;
+export const exec = require('node:child_process').exec;
+export const shellAsync = require('node:child_process').spawn;
 export const fs = require('fs-extra');
-export const path = require('path');
+export const path = require('node:path');
 export const pkg = require('../../package.json');
 
 export function read(file: string, encoding = null): string {

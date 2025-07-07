@@ -1,14 +1,14 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI include with tsconfig', () => {
-    const distFolder = tmp.name + '-include';
+    const distFolder = `${tmp.name}-include`;
 
     describe('when specific files (glob) are included in tsconfig', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.include-glob.json',
@@ -35,9 +35,9 @@ describe('CLI include with tsconfig', () => {
     });
 
     describe('when specific file is included in tsconfig', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.include-file.json',
@@ -62,9 +62,9 @@ describe('CLI include with tsconfig', () => {
     });
 
     describe('when specific file is included in tsconfig with one level / cwd', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/todomvc-ng2/src/tsconfig.extended.json',
@@ -81,7 +81,7 @@ describe('CLI include with tsconfig', () => {
         after(() => tmp.clean(distFolder));
 
         it('should create file included', () => {
-            let isFileExists = exists(`${distFolder}/classes/GenTodo.html`);
+            const isFileExists = exists(`${distFolder}/classes/GenTodo.html`);
             expect(isFileExists).to.be.true;
         });
     });

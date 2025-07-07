@@ -1,13 +1,13 @@
-document.addEventListener('DOMContentLoaded', function() {
-    var lazyGraphs = [].slice.call(document.querySelectorAll('[lazy]'));
-    var active = false;
+document.addEventListener('DOMContentLoaded', () => {
+    let lazyGraphs = [].slice.call(document.querySelectorAll('[lazy]'));
+    let active = false;
 
-    var lazyLoad = function() {
+    const lazyLoad = () => {
         if (active === false) {
             active = true;
 
-            setTimeout(function() {
-                lazyGraphs.forEach(function(lazyGraph) {
+            setTimeout(() => {
+                lazyGraphs.forEach(lazyGraph => {
                     if (
                         lazyGraph.getBoundingClientRect().top <= window.innerHeight &&
                         lazyGraph.getBoundingClientRect().bottom >= 0 &&
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         lazyGraph.data = lazyGraph.getAttribute('lazy');
                         lazyGraph.removeAttribute('lazy');
 
-                        lazyGraphs = lazyGraphs.filter(function(image) { return image !== lazyGraph});
+                        lazyGraphs = lazyGraphs.filter(image => image !== lazyGraph);
 
                         if (lazyGraphs.length === 0) {
                             document.removeEventListener('scroll', lazyLoad);
@@ -34,11 +34,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // initial load
     lazyLoad();
 
-    var container = document.querySelector('.container-fluid.modules');
+    const container = document.querySelector('.container-fluid.modules');
     if (container) {
         container.addEventListener('scroll', lazyLoad);
         window.addEventListener('resize', lazyLoad);
         window.addEventListener('orientationchange', lazyLoad);
     }
-
 });

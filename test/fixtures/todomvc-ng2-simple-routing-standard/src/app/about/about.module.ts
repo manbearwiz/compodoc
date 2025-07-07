@@ -1,14 +1,14 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+import { BrowserModule } from '@angular/platform-browser';
 
-import { AboutComponent } from './about.component';
 import { AboutRoutingModule } from './about-routing.module';
+import { AboutComponent } from './about.component';
 
+import { FooterModule } from '../footer';
 import { HeaderModule } from '../header';
 import { ListModule } from '../list';
-import { FooterModule } from '../footer';
 
 /**
  * The header module

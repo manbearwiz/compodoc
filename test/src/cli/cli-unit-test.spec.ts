@@ -1,16 +1,16 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 
 const tmp = temporaryDir();
 
 describe('CLI Unit Test Report', () => {
-    const tmpFolder = tmp.name + '-unit-test';
-    const distFolder = tmpFolder + '/documentation';
+    const tmpFolder = `${tmp.name}-unit-test`;
+    const distFolder = `${tmpFolder}/documentation`;
 
     describe('full path in JSON', () => {
-        let stdoutString = undefined,
-            unitTestFile;
-        before(function (done) {
+        let stdoutString = undefined;
+        let unitTestFile;
+        before(done => {
             tmp.create(tmpFolder);
             tmp.copy('./test/fixtures/todomvc-ng2/', tmpFolder);
             const ls = shell(
@@ -60,9 +60,9 @@ describe('CLI Unit Test Report', () => {
     });
 
     describe('partial path in JSON', () => {
-        let stdoutString = undefined,
-            unitTestFile;
-        before(function (done) {
+        let stdoutString = undefined;
+        let unitTestFile;
+        before(done => {
             tmp.create(tmpFolder);
             tmp.copy('./test/fixtures/todomvc-ng2/', tmpFolder);
             const ls = shell(
@@ -112,12 +112,12 @@ describe('CLI Unit Test Report', () => {
     });
 
     describe('Windows style path in JSON', () => {
-        let stdoutString = undefined,
-            unitTestFile;
-        before(function (done) {
+        let stdoutString = undefined;
+        let unitTestFile;
+        before(done => {
             tmp.create(tmpFolder);
             tmp.copy('./test/fixtures/todomvc-ng2/', tmpFolder);
-            let ls = shell(
+            const ls = shell(
                 'node',
                 [
                     '../bin/index-cli.js',

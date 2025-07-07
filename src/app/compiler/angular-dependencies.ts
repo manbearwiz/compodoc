@@ -1,43 +1,27 @@
-import * as path from 'path';
+import * as path from 'node:path';
 
 import * as _ from 'lodash';
-import { Project, ts, SyntaxKind } from 'ts-morph';
-
-import { IsKindType, kindToType } from '../../utils/kind-to-type';
-import { logger } from '../../utils/logger';
-import { cleanLifecycleHooksFromMethods, markedtags, mergeTagsAndArgs } from '../../utils/utils';
-import ComponentsTreeEngine from '../engines/components-tree.engine';
-
-import { FrameworkDependencies } from './framework-dependencies';
-
-import ImportsUtil from '../../utils/imports.util';
-
+import { Project, SyntaxKind, ts } from 'ts-morph';
+import { v4 as uuidv4 } from 'uuid';
 import {
     getModuleWithProviders,
     isIgnore,
     isModuleWithProviders,
     JsdocParserUtil
 } from '../../utils';
-
 import ExtendsMerger from '../../utils/extends-merger.util';
+import ImportsUtil from '../../utils/imports.util';
+import { IsKindType, kindToType } from '../../utils/kind-to-type';
+import { logger } from '../../utils/logger';
+import { markedAcl } from '../../utils/marked.acl';
+import { getNodeDecorators, nodeHasDecorator } from '../../utils/node.util';
 
 import RouterParserUtil from '../../utils/router-parser.util';
-
-import { CodeGenerator } from './angular/code-generator';
-
-import { ComponentDepFactory } from './angular/deps/component-dep.factory';
-import { ControllerDepFactory } from './angular/deps/controller-dep.factory';
-import { DirectiveDepFactory } from './angular/deps/directive-dep.factory';
-import { ComponentCache } from './angular/deps/helpers/component-helper';
-import { JsDocHelper } from './angular/deps/helpers/js-doc-helper';
-import { ModuleHelper } from './angular/deps/helpers/module-helper';
-import { SymbolHelper } from './angular/deps/helpers/symbol-helper';
-import { ModuleDepFactory } from './angular/deps/module-dep.factory';
-import { EntityDepFactory } from './angular/deps/entity-dep.factory';
-
+import { cleanLifecycleHooksFromMethods, markedtags, mergeTagsAndArgs } from '../../utils/utils';
 import Configuration from '../configuration';
-
-import {
+import ComponentsTreeEngine from '../engines/components-tree.engine';
+import { CodeGenerator } from './angular/code-generator';
+import type {
     IDep,
     IEnumDecDep,
     IFunctionDecDep,
@@ -46,12 +30,18 @@ import {
     IPipeDep,
     ITypeAliasDecDep
 } from './angular/dependencies.interfaces';
+import { ComponentDepFactory } from './angular/deps/component-dep.factory';
+import { ControllerDepFactory } from './angular/deps/controller-dep.factory';
+import { DirectiveDepFactory } from './angular/deps/directive-dep.factory';
+import { EntityDepFactory } from './angular/deps/entity-dep.factory';
+import { ComponentCache } from './angular/deps/helpers/component-helper';
+import { JsDocHelper } from './angular/deps/helpers/js-doc-helper';
+import { ModuleHelper } from './angular/deps/helpers/module-helper';
+import { SymbolHelper } from './angular/deps/helpers/symbol-helper';
+import { ModuleDepFactory } from './angular/deps/module-dep.factory';
+import { FrameworkDependencies } from './framework-dependencies';
 
-import { v4 as uuidv4 } from 'uuid';
-import { getNodeDecorators, nodeHasDecorator } from '../../utils/node.util';
-import { markedAcl } from '../../utils/marked.acl';
-
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 const project = new Project();
 
 // TypeScript reference : https://github.com/Microsoft/TypeScript/blob/master/lib/typescript.d.ts
@@ -63,10 +53,6 @@ export class AngularDependencies extends FrameworkDependencies {
     private jsDocHelper = new JsDocHelper();
     private symbolHelper = new SymbolHelper();
     private jsdocParserUtil = new JsdocParserUtil();
-
-    constructor(files: string[], options: any) {
-        super(files, options);
-    }
 
     public getDependencies() {
         let deps = {
@@ -126,7 +112,7 @@ export class AngularDependencies extends FrameworkDependencies {
 
         if (deps.miscellaneous.variables.length > 0) {
             deps.miscellaneous.variables.forEach(_variable => {
-                let newVar = [];
+                const newVar = [];
 
                 // link ...VAR to VAR values, recursively
                 ((_var, _newVar) => {
@@ -240,7 +226,7 @@ export class AngularDependencies extends FrameworkDependencies {
         const hash = crypto.createHash('sha512').update(sourceCode).digest('hex');
         const deps: any = {
             name,
-            id: 'class-' + name + '-' + hash,
+            id: `class-${name}-${hash}`,
             file: file,
             deprecated: IO.deprecated,
             deprecationMessage: IO.deprecationMessage,
@@ -255,10 +241,11 @@ export class AngularDependencies extends FrameworkDependencies {
         deps.inputsClass = IO.inputs ?? [];
         deps.outputsClass = IO.outputs ?? [];
         if (IO.properties) {
-            const {inputSignals, outputSignals, properties} = this.componentHelper.getInputOutputSignals(IO.properties);
+            const { inputSignals, outputSignals, properties } =
+                this.componentHelper.getInputOutputSignals(IO.properties);
 
-            deps.inputsClass = deps.inputsClass.concat(inputSignals)
-            deps.outputsClass = deps.outputsClass.concat(outputSignals)
+            deps.inputsClass = deps.inputsClass.concat(inputSignals);
+            deps.outputsClass = deps.outputsClass.concat(outputSignals);
             deps.properties = properties;
         }
         if (IO.description) {
@@ -328,7 +315,7 @@ export class AngularDependencies extends FrameworkDependencies {
                     if (namedImports && namedImports.length > 0) {
                         namedImports.forEach(namedImport => {
                             if (namedImport.getAliasNode()) {
-                                if (outputSymbols.aliases.hasOwnProperty(namedImport.getName())) {
+                                if (Object.hasOwn(outputSymbols.aliases, namedImport.getName())) {
                                     outputSymbols.aliases[namedImport.getName()].push(
                                         namedImport.getAliasNode().getText()
                                     );
@@ -362,7 +349,7 @@ export class AngularDependencies extends FrameworkDependencies {
                             namedExports.forEach(namedExport => {
                                 if (namedExport.getAliasNode()) {
                                     if (
-                                        outputSymbols.aliases.hasOwnProperty(namedExport.getName())
+                                        Object.hasOwn(outputSymbols.aliases, namedExport.getName())
                                     ) {
                                         outputSymbols.aliases[namedExport.getName()].push(
                                             namedExport.getAliasNode().getText()
@@ -400,7 +387,7 @@ export class AngularDependencies extends FrameworkDependencies {
             // Clean file for spread and dynamics inside routes definitions
             variableRoutesStatements.forEach(s => {
                 const variableDeclarations = s.getDeclarations();
-                let len = variableDeclarations.length;
+                const len = variableDeclarations.length;
                 let i = 0;
                 for (i; i < len; i++) {
                     if (variableDeclarations[i].compilerNode.type) {
@@ -442,7 +429,7 @@ export class AngularDependencies extends FrameworkDependencies {
                 if (nodeHasDecorator(node)) {
                     let classWithCustomDecorator = false;
                     const nodeDecorators = getNodeDecorators(node);
-                    const visitDecorator = (visitedDecorator, index) => {
+                    const visitDecorator = (visitedDecorator, _index) => {
                         let deps: IDep;
 
                         const name = this.getSymboleName(node);
@@ -516,7 +503,7 @@ export class AngularDependencies extends FrameworkDependencies {
                         } else if (this.isInjectable(visitedDecorator)) {
                             const injectableDeps: IInjectableDep = {
                                 name,
-                                id: 'injectable-' + name + '-' + hash,
+                                id: `injectable-${name}-${hash}`,
                                 file: file,
                                 properties: IO.properties,
                                 methods: IO.methods,
@@ -565,7 +552,7 @@ export class AngularDependencies extends FrameworkDependencies {
                         } else if (this.isPipe(visitedDecorator)) {
                             const pipeDeps: IPipeDep = {
                                 name,
-                                id: 'pipe-' + name + '-' + hash,
+                                id: `pipe-${name}-${hash}`,
                                 file: file,
                                 type: 'pipe',
                                 deprecated: IO.deprecated,
@@ -574,12 +561,10 @@ export class AngularDependencies extends FrameworkDependencies {
                                 rawdescription: IO.rawdescription,
                                 properties: IO.properties,
                                 methods: IO.methods,
-                                standalone: this.componentHelper.getComponentStandalone(
+                                standalone: !!this.componentHelper.getComponentStandalone(
                                     props,
                                     srcFile
-                                )
-                                    ? true
-                                    : false,
+                                ),
                                 pure: this.componentHelper.getComponentPure(props, srcFile),
                                 ngname: this.componentHelper.getComponentName(props, srcFile),
                                 sourceCode: srcFile.getText(),
@@ -627,7 +612,7 @@ export class AngularDependencies extends FrameworkDependencies {
                     };
 
                     const filterByDecorators = filteredNode => {
-                        if (filteredNode.expression && filteredNode.expression.expression) {
+                        if (filteredNode.expression?.expression) {
                             let _test = /(NgModule|Component|Injectable|Pipe|Directive)/.test(
                                 filteredNode.expression.expression.text
                             );
@@ -651,7 +636,7 @@ export class AngularDependencies extends FrameworkDependencies {
                         const IO = this.getInterfaceIO(file, srcFile, node, fileBody, astFile);
                         const interfaceDeps: IInterfaceDep = {
                             name,
-                            id: 'interface-' + name + '-' + hash,
+                            id: `interface-${name}-${hash}`,
                             file: file,
                             deprecated: IO.deprecated,
                             deprecationMessage: IO.deprecationMessage,
@@ -793,8 +778,7 @@ export class AngularDependencies extends FrameworkDependencies {
                         let newRoutes;
                         try {
                             newRoutes = RouterParserUtil.cleanRawRouteParsed(IO.routes);
-                        } catch (e) {
-                            // tslint:disable-next-line:max-line-length
+                        } catch (_e) {
                             logger.error(
                                 'Routes parsing error, maybe a trailing comma or an external variable, trying to fix that later after sources scanning.'
                             );
@@ -835,7 +819,7 @@ export class AngularDependencies extends FrameworkDependencies {
                                     node.thenStatement.statements &&
                                     node.thenStatement.statements.length > 0
                                 ) {
-                                    let firstStatement = node.thenStatement.statements[0];
+                                    const firstStatement = node.thenStatement.statements[0];
                                     resultNode = this.findExpressionByNameInExpressions(
                                         firstStatement.expression,
                                         'bootstrapModule'
@@ -844,8 +828,7 @@ export class AngularDependencies extends FrameworkDependencies {
                             }
                             if (!resultNode) {
                                 if (
-                                    node.expression &&
-                                    node.expression.arguments &&
+                                    node.expression?.arguments &&
                                     node.expression.arguments.length > 0
                                 ) {
                                     resultNode = this.findExpressionByNameInExpressionArguments(
@@ -1082,7 +1065,7 @@ export class AngularDependencies extends FrameworkDependencies {
 
     private debug(deps: IDep) {
         if (deps) {
-            logger.debug('found', `${deps.name}`);
+            logger.debug('found', deps.name);
         } else {
             return;
         }
@@ -1100,15 +1083,15 @@ export class AngularDependencies extends FrameworkDependencies {
 
     private ignore(deps: IDep) {
         if (deps) {
-            logger.warn('ignore', `${deps.name}`);
+            logger.warn('ignore', deps.name);
         } else {
             return;
         }
     }
 
-    private checkForDeprecation(tags: any[], result: { [key in string | number]: any }) {
+    private checkForDeprecation(tags: any[], result: Record<string | number, any>) {
         _.forEach(tags, tag => {
-            if (tag.tagName && tag.tagName.text && tag.tagName.text.indexOf('deprecated') > -1) {
+            if (tag.tagName?.text && tag.tagName.text.indexOf('deprecated') > -1) {
                 result.deprecated = true;
                 result.deprecationMessage = tag.comment || '';
             }
@@ -1117,12 +1100,12 @@ export class AngularDependencies extends FrameworkDependencies {
 
     private findExpressionByNameInExpressions(entryNode, name) {
         let result;
-        const loop = function (node, z) {
+        const loop = (node, z) => {
             if (node) {
                 if (node.expression && !node.expression.name) {
                     loop(node.expression, z);
                 }
-                if (node.expression && node.expression.name) {
+                if (node.expression?.name) {
                     if (node.expression.name.text === z) {
                         result = node;
                     } else {
@@ -1137,16 +1120,15 @@ export class AngularDependencies extends FrameworkDependencies {
 
     private findExpressionByNameInExpressionArguments(arg, name) {
         let result;
-        const that = this;
         let i = 0;
-        let len = arg.length;
-        const loop = function (node, z) {
+        const len = arg.length;
+        const loop = (node, z) => {
             if (node.body) {
                 if (node.body.statements && node.body.statements.length > 0) {
                     let j = 0;
                     const leng = node.body.statements.length;
                     for (j; j < leng; j++) {
-                        result = that.findExpressionByNameInExpressions(node.body.statements[j], z);
+                        result = this.findExpressionByNameInExpressions(node.body.statements[j], z);
                     }
                 }
             }
@@ -1160,7 +1142,7 @@ export class AngularDependencies extends FrameworkDependencies {
     private parseDecorators(decorators, type: string): boolean {
         let result = false;
         if (decorators.length > 1) {
-            _.forEach(decorators, function (decorator: any) {
+            _.forEach(decorators, (decorator: any) => {
                 if (decorator.expression.expression) {
                     if (decorator.expression.expression.text === type) {
                         result = true;
@@ -1244,22 +1226,18 @@ export class AngularDependencies extends FrameworkDependencies {
     private findProperties(
         visitedNode: ts.Decorator,
         sourceFile: ts.SourceFile
-    ): ReadonlyArray<ts.ObjectLiteralElementLike> {
-        if (
-            visitedNode.expression &&
-            visitedNode.expression.arguments &&
-            visitedNode.expression.arguments.length > 0
-        ) {
+    ): readonly ts.ObjectLiteralElementLike[] {
+        if (visitedNode.expression?.arguments && visitedNode.expression.arguments.length > 0) {
             const pop = visitedNode.expression.arguments[0];
 
-            if (pop && pop.properties && pop.properties.length >= 0) {
+            if (pop?.properties && pop.properties.length >= 0) {
                 return pop.properties;
-            } else if (pop && pop.kind && pop.kind === SyntaxKind.StringLiteral) {
-                return [pop];
-            } else {
-                logger.warn('Empty metadatas, trying to find it with imports.');
-                return ImportsUtil.findValueInImportOrLocalVariables(pop.text, sourceFile);
             }
+            if (pop?.kind && pop.kind === SyntaxKind.StringLiteral) {
+                return [pop];
+            }
+            logger.warn('Empty metadatas, trying to find it with imports.');
+            return ImportsUtil.findValueInImportOrLocalVariables(pop.text, sourceFile);
         }
 
         return [];
@@ -1283,7 +1261,7 @@ export class AngularDependencies extends FrameworkDependencies {
             'registerOnTouched',
             'setDisabledState'
         ];
-        return ANGULAR_LIFECYCLE_METHODS.indexOf(methodName) >= 0;
+        return ANGULAR_LIFECYCLE_METHODS.includes(methodName);
     }
 
     private visitTypeDeclaration(node: ts.TypeAliasDeclaration) {
@@ -1295,7 +1273,7 @@ export class AngularDependencies extends FrameworkDependencies {
         };
         const jsdoctags = this.jsdocParserUtil.getJSDocs(node);
 
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags && jsdoctags.length > 0 && jsdoctags[0].tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
             result.jsdoctags = markedtags(jsdoctags[0].tags);
         }
@@ -1303,7 +1281,7 @@ export class AngularDependencies extends FrameworkDependencies {
     }
 
     private visitArgument(arg) {
-        if (arg.name && arg.name.kind == SyntaxKind.ObjectBindingPattern) {
+        if (arg.name && arg.name.kind === SyntaxKind.ObjectBindingPattern) {
             let results = [];
 
             const destrucuredGroupId = uuidv4();
@@ -1315,7 +1293,7 @@ export class AngularDependencies extends FrameworkDependencies {
                 return result;
             });
 
-            if (arg.name.elements && arg.type && arg.type.members) {
+            if (arg.name.elements && arg.type?.members) {
                 if (arg.name.elements.length === arg.type.members.length) {
                     for (let i = 0; i < arg.name.elements.length; i++) {
                         results[i].type = this.classHelper.visitType(arg.type.members[i]);
@@ -1323,46 +1301,45 @@ export class AngularDependencies extends FrameworkDependencies {
                 }
             }
 
-            if (arg.name.elements && arg.type && arg.type.typeName) {
+            if (arg.name.elements && arg.type?.typeName) {
                 results[0].type = this.classHelper.visitType(arg.type);
             }
 
             return results;
-        } else {
-            const result: any = {
-                name: arg.name.text,
-                type: this.classHelper.visitType(arg),
-                deprecated: false,
-                deprecationMessage: ''
-            };
+        }
+        const result: any = {
+            name: arg.name.text,
+            type: this.classHelper.visitType(arg),
+            deprecated: false,
+            deprecationMessage: ''
+        };
 
-            if (arg.dotDotDotToken) {
-                result.dotDotDotToken = true;
-            }
-            if (arg.questionToken) {
-                result.optional = true;
-            }
-            if (arg.initializer) {
-                result.defaultValue = arg.initializer
-                    ? this.classHelper.stringifyDefaultValue(arg.initializer)
-                    : undefined;
-            }
-            if (arg.type) {
-                result.type = this.mapType(arg.type.kind);
-                if (arg.type.kind === SyntaxKind.TypeReference) {
-                    // try replace TypeReference with typeName
-                    if (arg.type.typeName) {
-                        result.type = arg.type.typeName.text;
-                    }
+        if (arg.dotDotDotToken) {
+            result.dotDotDotToken = true;
+        }
+        if (arg.questionToken) {
+            result.optional = true;
+        }
+        if (arg.initializer) {
+            result.defaultValue = arg.initializer
+                ? this.classHelper.stringifyDefaultValue(arg.initializer)
+                : undefined;
+        }
+        if (arg.type) {
+            result.type = this.mapType(arg.type.kind);
+            if (arg.type.kind === SyntaxKind.TypeReference) {
+                // try replace TypeReference with typeName
+                if (arg.type.typeName) {
+                    result.type = arg.type.typeName.text;
                 }
             }
-            const jsdoctags = this.jsdocParserUtil.getJSDocs(arg);
-
-            if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
-                this.checkForDeprecation(jsdoctags[0].tags, result);
-            }
-            return result;
         }
+        const jsdoctags = this.jsdocParserUtil.getJSDocs(arg);
+
+        if (jsdoctags && jsdoctags.length > 0 && jsdoctags[0].tags) {
+            this.checkForDeprecation(jsdoctags[0].tags, result);
+        }
+        return result;
     }
 
     private mapType(type): string | undefined {
@@ -1390,7 +1367,7 @@ export class AngularDependencies extends FrameworkDependencies {
         let result = false;
         if (tags) {
             tags.forEach(tag => {
-                if (tag.tagName && tag.tagName.text && tag.tagName.text === 'private') {
+                if (tag.tagName?.text && tag.tagName.text === 'private') {
                     result = true;
                 }
             });
@@ -1446,7 +1423,7 @@ export class AngularDependencies extends FrameworkDependencies {
                 }
             }
         }
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags && jsdoctags.length > 0 && jsdoctags[0].tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
             result.jsdoctags = markedtags(jsdoctags[0].tags);
             _.forEach(jsdoctags[0].tags, tag => {
@@ -1468,7 +1445,7 @@ export class AngularDependencies extends FrameworkDependencies {
     }
 
     private visitVariableDeclaration(node) {
-        if (node.declarationList && node.declarationList.declarations) {
+        if (node.declarationList?.declarations) {
             let i = 0;
             const len = node.declarationList.declarations.length;
             for (i; i < len; i++) {
@@ -1496,7 +1473,7 @@ export class AngularDependencies extends FrameworkDependencies {
                 const jsdoctags = this.jsdocParserUtil.getJSDocs(
                     node.declarationList.declarations[i]
                 );
-                if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+                if (jsdoctags && jsdoctags.length > 0 && jsdoctags[0].tags) {
                     this.checkForDeprecation(jsdoctags[0].tags, result);
                 }
                 return result;
@@ -1505,7 +1482,7 @@ export class AngularDependencies extends FrameworkDependencies {
     }
 
     private visitEnumTypeAliasFunctionDeclarationDescription(node): string {
-        let description: string = '';
+        let description = '';
         if (node.jsDoc) {
             if (node.jsDoc.length > 0) {
                 if (typeof node.jsDoc[0].comment !== 'undefined') {
@@ -1526,7 +1503,7 @@ export class AngularDependencies extends FrameworkDependencies {
         };
         if (node.members) {
             let i = 0;
-            let len = node.members.length;
+            const len = node.members.length;
             let memberjsdoctags = [];
             for (i; i < len; i++) {
                 const member: any = {
@@ -1541,14 +1518,14 @@ export class AngularDependencies extends FrameworkDependencies {
                         : node.members[i].initializer.text;
                 }
                 memberjsdoctags = this.jsdocParserUtil.getJSDocs(node.members[i]);
-                if (memberjsdoctags && memberjsdoctags.length >= 1 && memberjsdoctags[0].tags) {
+                if (memberjsdoctags && memberjsdoctags.length > 0 && memberjsdoctags[0].tags) {
                     this.checkForDeprecation(memberjsdoctags[0].tags, member);
                 }
                 result.members.push(member);
             }
         }
         const jsdoctags = this.jsdocParserUtil.getJSDocs(node);
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags && jsdoctags.length > 0 && jsdoctags[0].tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
         }
         return result;
@@ -1557,7 +1534,7 @@ export class AngularDependencies extends FrameworkDependencies {
     private visitEnumDeclarationForRoutes(fileName, node) {
         if (node.declarationList.declarations) {
             let i = 0;
-            let len = node.declarationList.declarations.length;
+            const len = node.declarationList.declarations.length;
             for (i; i < len; i++) {
                 const routesInitializer = node.declarationList.declarations[i].initializer;
                 const data = new CodeGenerator().generate(routesInitializer);
@@ -1591,9 +1568,8 @@ export class AngularDependencies extends FrameworkDependencies {
                 return directive;
             }, []);
             return res[0] || {};
-        } else {
-            return {};
         }
+        return {};
     }
 
     private getClassIO(

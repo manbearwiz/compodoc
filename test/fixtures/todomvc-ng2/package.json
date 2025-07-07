@@ -14,10 +14,7 @@
         "typescript": "~3.1.1"
     },
     "description": "Demo for project",
-    "keywords": [
-        "documentation",
-        "angular"
-    ],
+    "keywords": ["documentation", "angular"],
     "homepage": "https://github.com/just-a-repo",
     "bugs": "https://github.com/just-a-repo/issues",
     "url": "https://github.com/just-a-repo",

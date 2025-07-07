@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI Routes graph', () => {
-    const distFolder = tmp.name + '-routes-graph';
+    const distFolder = `${tmp.name}-routes-graph`;
 
     describe('disable it', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -32,7 +32,7 @@ describe('CLI Routes graph', () => {
     });
 
     describe('should support forRoot/forChild', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -51,13 +51,13 @@ describe('CLI Routes graph', () => {
         after(() => tmp.clean(distFolder));
 
         it('should clean forRoot and forChild in modules imports', () => {
-            const file = read(distFolder + '/modules/AppModule.html');
+            const file = read(`${distFolder}/modules/AppModule.html`);
             expect(file).to.contain('<a href="../modules/HomeModule.html">HomeModule</a>');
         });
     });
 
     describe('should support routing without routing module', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -84,7 +84,7 @@ describe('CLI Routes graph', () => {
     });
 
     describe('should support lazy-loaded modules with loadChildren syntax (containing possible trailing commas)', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -111,7 +111,7 @@ describe('CLI Routes graph', () => {
     });
 
     describe('should support lazy-loaded modules with new loadChildren syntax / async', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -138,7 +138,7 @@ describe('CLI Routes graph', () => {
     });
 
     describe('should support if statement for bootstrapModule', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',
@@ -165,7 +165,7 @@ describe('CLI Routes graph', () => {
     });
 
     describe('should support route in external file', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             const ls = shell('node', [
                 './bin/index-cli.js',

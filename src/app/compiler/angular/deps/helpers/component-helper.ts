@@ -1,7 +1,7 @@
 import { SyntaxKind, ts } from 'ts-morph';
 import { detectIndent } from '../../../../../utils';
-import { ClassHelper } from './class-helper';
-import { IParseDeepIdentifierResult, SymbolHelper } from './symbol-helper';
+import type { ClassHelper } from './class-helper';
+import { type IParseDeepIdentifierResult, SymbolHelper } from './symbol-helper';
 
 export class ComponentHelper {
     constructor(
@@ -10,43 +10,41 @@ export class ComponentHelper {
     ) {}
 
     public getComponentChangeDetection(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'changeDetection', srcFile).pop();
     }
 
     public getComponentEncapsulation(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
-    ): Array<string> {
+    ): string[] {
         return this.symbolHelper.getSymbolDeps(props, 'encapsulation', srcFile);
     }
 
     public getComponentPure(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'pure', srcFile).pop();
     }
 
     public getComponentName(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'name', srcFile).pop();
     }
 
     public getComponentExportAs(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'exportAs', srcFile).pop();
     }
 
-    public getComponentHostDirectives(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>
-    ): Array<any> {
+    public getComponentHostDirectives(props: readonly ts.ObjectLiteralElementLike[]): any[] {
         const hostDirectiveSymbolParsed = this.symbolHelper.getSymbolDepsRaw(
             props,
             'hostDirectives'
@@ -60,9 +58,7 @@ export class ComponentHelper {
         const result = [];
 
         if (
-            hostDirectiveSymbol &&
-            hostDirectiveSymbol.initializer &&
-            hostDirectiveSymbol.initializer.elements &&
+            hostDirectiveSymbol?.initializer?.elements &&
             hostDirectiveSymbol.initializer.elements.length > 0
         ) {
             hostDirectiveSymbol.initializer.elements.forEach(element => {
@@ -86,8 +82,7 @@ export class ComponentHelper {
                             parsedDirective.name = property.initializer.escapedText;
                         } else if (property.name.escapedText === 'inputs') {
                             if (
-                                property.initializer &&
-                                property.initializer.elements &&
+                                property.initializer?.elements &&
                                 property.initializer.elements.length > 0
                             ) {
                                 property.initializer.elements.forEach(propertyElement => {
@@ -96,8 +91,7 @@ export class ComponentHelper {
                             }
                         } else if (property.name.escapedText === 'outputs') {
                             if (
-                                property.initializer &&
-                                property.initializer.elements &&
+                                property.initializer?.elements &&
                                 property.initializer.elements.length > 0
                             ) {
                                 property.initializer.elements.forEach(propertyElement => {
@@ -115,23 +109,21 @@ export class ComponentHelper {
         return result;
     }
 
-    public getComponentHost(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>
-    ): Map<string, string> {
+    public getComponentHost(props: readonly ts.ObjectLiteralElementLike[]): Map<string, string> {
         return this.getSymbolDepsObject(props, 'host');
     }
 
     public getComponentTag(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'tag', srcFile).pop();
     }
 
     public getComponentInputsMetadata(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
-    ): Array<string> {
+    ): string[] {
         return this.symbolHelper.getSymbolDeps(props, 'inputs', srcFile);
     }
 
@@ -143,20 +135,20 @@ export class ComponentHelper {
         props.forEach(prop => {
             const inputSignal = this.getInputSignal(prop);
             if (inputSignal) {
-                inputSignals.push(inputSignal)
+                inputSignals.push(inputSignal);
             }
 
             const outputSignal = this.getOutputSignal(prop);
             if (outputSignal) {
-                outputSignals.push(outputSignal)
+                outputSignals.push(outputSignal);
             }
 
             if (!inputSignal && !outputSignal) {
-                properties.push(prop)
+                properties.push(prop);
             }
         });
 
-        return {inputSignals, outputSignals, properties}
+        return { inputSignals, outputSignals, properties };
     }
 
     public getInputSignal(prop) {
@@ -165,7 +157,7 @@ export class ComponentHelper {
             this.getSignalConfig('model', prop.defaultValue);
 
         if (config) {
-            return  {
+            return {
                 ...prop,
                 ...config
             };
@@ -180,7 +172,7 @@ export class ComponentHelper {
             this.getSignalConfig('model', prop.defaultValue);
 
         if (config) {
-            return  {
+            return {
                 ...prop,
                 ...config
             };
@@ -198,7 +190,7 @@ export class ComponentHelper {
             `(${capture ? '' : '?:'}[^()]*(?:\\([^()]*\\)[^()]*)*)`;
 
         // Matches an optional space
-        const spacePattern = `(?: )*`;
+        const spacePattern = '(?: )*';
 
         // Matches the input's type
         const typesPattern = `(?:<((?:${valuePattern(false)}(?:${spacePattern}\\|${spacePattern})?)+)>)?`;
@@ -216,7 +208,7 @@ export class ComponentHelper {
         if (matches) {
             const [_match, required, type, defaultValue, options] = matches;
 
-            const name = options?.match(aliasRegExp)?.[1];
+            const name = aliasRegExp.exec(options)?.[1];
 
             const result = {
                 required: !!required,
@@ -243,11 +235,11 @@ export class ComponentHelper {
         // adjust union string expression like: 'foo' | 'bar' | 'test'
         // which should be outputed as: "foo" | "bar" | "test"
 
-        const unionTypeRegex = /^'([\w-]+)'\s?\|\s?('([\w-]+)'|.*)$/
+        const unionTypeRegex = /^'([\w-]+)'\s?\|\s?('([\w-]+)'|.*)$/;
         let typeRest = type;
-        let newType = "";
+        let newType = '';
         let typeMatch: RegExpMatchArray;
-        while ((typeMatch = typeRest.match(unionTypeRegex))) {
+        while ((typeMatch = unionTypeRegex.exec(typeRest))) {
             const [, first, rest, second] = typeMatch;
             if (second) {
                 newType += `"${first}" | "${second}"`;
@@ -262,7 +254,7 @@ export class ComponentHelper {
     }
 
     public getComponentStandalone(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): boolean {
         let result = null;
@@ -275,7 +267,7 @@ export class ComponentHelper {
     }
 
     public getComponentTemplate(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         let t = this.symbolHelper.getSymbolDeps(props, 'template', srcFile, true).pop();
@@ -288,139 +280,137 @@ export class ComponentHelper {
     }
 
     public getComponentStyleUrls(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string[] {
         return this.symbolHelper.getSymbolDeps(props, 'styleUrls', srcFile);
     }
 
     public getComponentStyleUrl(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'styleUrl', srcFile).pop();
     }
 
     public getComponentShadow(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'shadow', srcFile).pop();
     }
 
     public getComponentScoped(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'scoped', srcFile).pop();
     }
 
     public getComponentAssetsDir(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'assetsDir', srcFile).pop();
     }
 
     public getComponentAssetsDirs(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string[] {
         return this.sanitizeUrls(this.symbolHelper.getSymbolDeps(props, 'assetsDir', srcFile));
     }
 
     public getComponentStyles(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string[] {
         return this.symbolHelper.getSymbolDeps(props, 'styles', srcFile);
     }
 
     public getComponentModuleId(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'moduleId', srcFile).pop();
     }
 
     public getComponentOutputs(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string[] {
         return this.symbolHelper.getSymbolDeps(props, 'outputs', srcFile);
     }
 
     public getComponentProviders(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
-    ): Array<IParseDeepIdentifierResult> {
+    ): IParseDeepIdentifierResult[] {
         return this.symbolHelper
             .getSymbolDeps(props, 'providers', srcFile)
             .map(name => this.symbolHelper.parseDeepIndentifier(name));
     }
 
     public getComponentImports(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
-    ): Array<IParseDeepIdentifierResult> {
+    ): IParseDeepIdentifierResult[] {
         return this.symbolHelper
             .getSymbolDeps(props, 'imports', srcFile)
             .map(name => this.symbolHelper.parseDeepIndentifier(name));
     }
 
     public getComponentEntryComponents(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
-    ): Array<IParseDeepIdentifierResult> {
+    ): IParseDeepIdentifierResult[] {
         return this.symbolHelper
             .getSymbolDeps(props, 'entryComponents', srcFile)
             .map(name => this.symbolHelper.parseDeepIndentifier(name));
     }
 
     public getComponentViewProviders(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
-    ): Array<IParseDeepIdentifierResult> {
+    ): IParseDeepIdentifierResult[] {
         return this.symbolHelper
             .getSymbolDeps(props, 'viewProviders', srcFile)
             .map(name => this.symbolHelper.parseDeepIndentifier(name));
     }
 
     public getComponentTemplateUrl(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
-    ): Array<string> {
+    ): string[] {
         return this.symbolHelper.getSymbolDeps(props, 'templateUrl', srcFile);
     }
 
-    public getComponentExampleUrls(text: string): Array<string> | undefined {
-        let exampleUrlsMatches = text.match(/<example-url>(.*?)<\/example-url>/g);
-        let exampleUrls = undefined;
-        if (exampleUrlsMatches && exampleUrlsMatches.length) {
-            exampleUrls = exampleUrlsMatches.map(function (val) {
-                return val.replace(/<\/?example-url>/g, '');
-            });
+    public getComponentExampleUrls(text: string): string[] | undefined {
+        const exampleUrlsMatches = text.match(/<example-url>(.*?)<\/example-url>/g);
+        let exampleUrls;
+        if (exampleUrlsMatches?.length > 0) {
+            exampleUrls = exampleUrlsMatches.map(val => val.replace(/<\/?example-url>/g, ''));
         }
         return exampleUrls;
     }
 
     public getComponentPreserveWhitespaces(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'preserveWhitespaces', srcFile).pop();
     }
 
     public getComponentSelector(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         srcFile: ts.SourceFile
     ): string {
         return this.symbolHelper.getSymbolDeps(props, 'selector', srcFile).pop();
     }
 
-    private parseProperties(node: ReadonlyArray<ts.ObjectLiteralElementLike>): Map<string, string> {
-        let obj = new Map<string, string>();
-        let properties = node.initializer.properties || [];
+    private parseProperties(node: readonly ts.ObjectLiteralElementLike[]): Map<string, string> {
+        const obj = new Map<string, string>();
+        const properties = node.initializer.properties || [];
         properties.forEach(prop => {
             obj.set(prop.name.text, prop.initializer.text);
         });
@@ -428,13 +418,13 @@ export class ComponentHelper {
     }
 
     public getSymbolDepsObject(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         type: string,
-        multiLine?: boolean
+        _multiLine?: boolean
     ): Map<string, string> {
-        let i = 0,
-            len = props.length,
-            filteredProps = [];
+        let i = 0;
+        const len = props.length;
+        const filteredProps = [];
 
         for (i; i < len; i++) {
             if (props[i].name && props[i].name.text === type) {
@@ -454,8 +444,8 @@ export class ComponentHelper {
         /**
          * Copyright https://github.com/ng-bootstrap/ng-bootstrap
          */
-        let reducedSource = fileBody ? fileBody.statements : sourceFile.statements;
-        let res = reducedSource.reduce((directive, statement) => {
+        const reducedSource = fileBody ? fileBody.statements : sourceFile.statements;
+        const res = reducedSource.reduce((directive, statement) => {
             if (ts.isClassDeclaration(statement)) {
                 if (statement.pos === node.pos && statement.end === node.end) {
                     return directive.concat(
@@ -475,13 +465,13 @@ export class ComponentHelper {
         return res[0] || {};
     }
 
-    private sanitizeUrls(urls: Array<string>): Array<string> {
+    private sanitizeUrls(urls: string[]): string[] {
         return urls.map(url => url.replace('./', ''));
     }
 }
 
 export class ComponentCache {
-    private cache: Map<string, any> = new Map();
+    private cache = new Map<string, any>();
 
     public get(key: string): any {
         return this.cache.get(key);

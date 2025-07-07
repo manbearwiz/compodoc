@@ -1,9 +1,9 @@
-import { GameCharacterInterface } from './../models/characters.model';
-import { Http, Response } from '@angular/http';
 import { Injectable } from '@angular/core';
+import type { Http, Response } from '@angular/http';
+import type { GameCharacterInterface } from './../models/characters.model';
 
+import type { ActionInterface } from '../models/action.model';
 import { AbstractService } from './abstract.service';
-import { ActionInterface } from '../models/action.model';
 
 @Injectable()
 export class CharactersService extends AbstractService {
@@ -21,7 +21,7 @@ export class CharactersService extends AbstractService {
             .get(`${this.ENDPOINT}gameCharacters`)
             .toPromise()
             .then((res: Response) => {
-                let body = res.json();
+                const body = res.json();
                 if (body._embedded.gameCharacters) {
                     this.characters = body._embedded.gameCharacters;
                 }
@@ -34,31 +34,29 @@ export class CharactersService extends AbstractService {
     getCharacter(characterId: number): Promise<GameCharacterInterface> {
         if (this.characters.length > 0) {
             return Promise.resolve(this.characters.find(c => c.id === characterId));
-        } else {
-            return this.loadCharacters()
-                .then((characters: GameCharacterInterface[]) => {
-                    return characters.find(c => c.id === characterId);
-                })
-                .catch(this.handleError);
         }
+        return this.loadCharacters()
+            .then((characters: GameCharacterInterface[]) => {
+                return characters.find(c => c.id === characterId);
+            })
+            .catch(this.handleError);
     }
 
     getActions(characterId: number): Promise<ActionInterface[]> {
-        let character = this.characters.find(c => c.id === characterId);
+        const character = this.characters.find(c => c.id === characterId);
         if (character.actions) {
             return Promise.resolve(character.actions);
-        } else {
-            return this.http
-                .get(`${this.ENDPOINT}gameCharacters/${characterId}/actions`)
-                .toPromise()
-                .then((res: Response) => {
-                    let body = res.json(),
-                        actions = body._embedded.actions;
-                    character.actions = actions;
-                    return actions;
-                })
-                .catch(this.handleError);
         }
+        return this.http
+            .get(`${this.ENDPOINT}gameCharacters/${characterId}/actions`)
+            .toPromise()
+            .then((res: Response) => {
+                const body = res.json();
+                const actions = body._embedded.actions;
+                character.actions = actions;
+                return actions;
+            })
+            .catch(this.handleError);
     }
 
     submitAction(gameToken, playerKey, actionName): void {
@@ -69,7 +67,7 @@ export class CharactersService extends AbstractService {
             )
             .toPromise()
             .then((res: Response) => {
-                let body = res.json();
+                const body = res.json();
                 console.log(res);
             })
             .catch(this.handleError);

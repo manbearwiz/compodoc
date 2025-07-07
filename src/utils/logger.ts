@@ -1,11 +1,11 @@
-let log = require('fancy-log');
-let c = require('picocolors');
+const log = require('fancy-log');
+const c = require('picocolors');
 
 enum LEVEL {
-    INFO,
-    DEBUG,
-    ERROR,
-    WARN
+    INFO = 0,
+    DEBUG = 1,
+    ERROR = 2,
+    WARN = 3
 }
 
 class Logger {
@@ -43,7 +43,7 @@ class Logger {
     }
 
     private format(level, ...args) {
-        let pad = (s, l, z = '') => {
+        const pad = (s, l, z = '') => {
             return s + Array(Math.max(0, l - s.length + 1)).join(z);
         };
 
@@ -74,4 +74,4 @@ class Logger {
     }
 }
 
-export let logger = new Logger();
+export const logger = new Logger();

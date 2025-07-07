@@ -5,7 +5,7 @@ interface Foo<T> {
 }
 
 @Component({
-    selector: 'app-generic',
+    selector: 'app-generic'
 })
 export class GenericComponent {
     title = 'generic-component';

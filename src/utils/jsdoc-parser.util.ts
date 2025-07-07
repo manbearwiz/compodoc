@@ -1,9 +1,7 @@
 import * as _ from 'lodash';
-import { ts, SyntaxKind } from 'ts-morph';
-
+import { SyntaxKind, ts } from 'ts-morph';
+import type { JSDocParameterTagExt } from '../app/nodes/jsdoc-parameter-tag.node';
 import * as _ts from './ts-internal';
-
-import { JSDocParameterTagExt } from '../app/nodes/jsdoc-parameter-tag.node';
 
 export class JsdocParserUtil {
     public isVariableLike(node: ts.Node): node is ts.VariableLikeDeclaration {
@@ -25,7 +23,7 @@ export class JsdocParserUtil {
 
     isTopmostModuleDeclaration(node: ts.ModuleDeclaration): boolean {
         if (node.nextContainer && node.nextContainer.kind === ts.SyntaxKind.ModuleDeclaration) {
-            let next = <ts.ModuleDeclaration>node.nextContainer;
+            const next = node.nextContainer as ts.ModuleDeclaration;
             if (node.name.end + 1 === next.name.pos) {
                 return false;
             }
@@ -36,7 +34,7 @@ export class JsdocParserUtil {
 
     getRootModuleDeclaration(node: ts.ModuleDeclaration): ts.Node {
         while (node.parent && node.parent.kind === ts.SyntaxKind.ModuleDeclaration) {
-            let parent = <ts.ModuleDeclaration>node.parent;
+            const parent = node.parent as ts.ModuleDeclaration;
             if (node.name.pos === parent.name.end + 1) {
                 node = parent;
             } else {
@@ -48,20 +46,19 @@ export class JsdocParserUtil {
     }
 
     public getMainCommentOfNode(node: ts.Node, sourceFile?: ts.SourceFile): string {
-        let description: string = '';
+        let description = '';
 
         if (node.parent && node.parent.kind === ts.SyntaxKind.VariableDeclarationList) {
             node = node.parent.parent;
         } else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
-            if (!this.isTopmostModuleDeclaration(<ts.ModuleDeclaration>node)) {
+            if (!this.isTopmostModuleDeclaration(node as ts.ModuleDeclaration)) {
                 return null;
-            } else {
-                node = this.getRootModuleDeclaration(<ts.ModuleDeclaration>node);
             }
+            node = this.getRootModuleDeclaration(node as ts.ModuleDeclaration);
         }
 
         const comments = _ts.getJSDocCommentRanges(node, sourceFile.text);
-        if (comments && comments.length) {
+        if (comments?.length > 0) {
             let comment: ts.CommentRange;
             if (node.kind === ts.SyntaxKind.SourceFile) {
                 if (comments.length === 1) {
@@ -82,7 +79,7 @@ export class JsdocParserUtil {
         let shortText = 0;
 
         function readBareLine(line: string) {
-            comment += '\n' + line;
+            comment += `\n${line}`;
             if (line === '' && shortText === 0) {
                 // Ignore
             } else if (line === '' && shortText === 1) {
@@ -97,8 +94,8 @@ export class JsdocParserUtil {
         const CODE_FENCE = /^\s*```(?!.*```)/;
         let inCode = false;
         let inExample = false; // first line with @example, end line with empty string or string or */
-        let nbLines = 0;
-        function readLine(line: string, index: number) {
+        let _nbLines = 0;
+        function readLine(line: string, _index: number) {
             line = line.replace(/^\s*\*? ?/, '');
             line = line.replace(/\s*$/, '');
 
@@ -106,7 +103,7 @@ export class JsdocParserUtil {
                 inCode = !inCode;
             }
 
-            if (line.indexOf('@example') !== -1) {
+            if (line.includes('@example')) {
                 inExample = true;
                 line = '```html';
             }
@@ -135,7 +132,7 @@ export class JsdocParserUtil {
         text = text.replace(/^\s*\/\*+/, '');
         text = text.replace(/\*+\/\s*$/, '');
 
-        nbLines = text.split(/\r\n?|\n/).length;
+        _nbLines = text.split(/\r\n?|\n/).length;
 
         text.split(/\r\n?|\n/).forEach(readLine);
 
@@ -161,9 +158,9 @@ export class JsdocParserUtil {
         }
     }
 
-    public getJSDocs(node: ts.Node): ReadonlyArray<ts.JSDoc | ts.JSDocTag> {
+    public getJSDocs(node: ts.Node): readonly (ts.JSDoc | ts.JSDocTag)[] {
         // TODO: jsDocCache is internal, see if there's a way around it
-        let cache: ReadonlyArray<ts.JSDoc | ts.JSDocTag> = (node as any).jsDocCache;
+        let cache: readonly (ts.JSDoc | ts.JSDocTag)[] = (node as any).jsDocCache;
         if (!cache) {
             cache = this.getJSDocsWorker(node, []).filter(x => x);
             (node as any).jsDocCache = cache;
@@ -178,7 +175,7 @@ export class JsdocParserUtil {
     //   * @returns {number}
     //   */
     // var x = function(name) { return name.length; }
-    private getJSDocsWorker(node: ts.Node, cache): ReadonlyArray<any> {
+    private getJSDocsWorker(node: ts.Node, cache): readonly any[] {
         const parent = node.parent;
         const isInitializerOfVariableDeclarationInStatement =
             this.isVariableLike(parent) &&
@@ -189,16 +186,15 @@ export class JsdocParserUtil {
         const variableStatementNode = isInitializerOfVariableDeclarationInStatement
             ? parent.parent.parent
             : isVariableOfVariableDeclarationStatement
-            ? parent.parent
-            : undefined;
+              ? parent.parent
+              : undefined;
         if (variableStatementNode) {
             cache = this.getJSDocsWorker(variableStatementNode, cache);
         }
 
         // Also recognize when the node is the RHS of an assignment expression
         const isSourceOfAssignmentExpressionStatement =
-            parent &&
-            parent.parent &&
+            parent?.parent &&
             ts.isBinaryExpression(parent) &&
             parent.operatorToken.kind === SyntaxKind.EqualsToken &&
             ts.isExpressionStatement(parent.parent);
@@ -227,9 +223,7 @@ export class JsdocParserUtil {
         return cache;
     }
 
-    private getJSDocParameterTags(
-        param: ts.ParameterDeclaration
-    ): ReadonlyArray<ts.JSDocParameterTag> {
+    private getJSDocParameterTags(param: ts.ParameterDeclaration): readonly ts.JSDocParameterTag[] {
         const func = param.parent as ts.FunctionLikeDeclaration;
         const tags = this.getJSDocTags(
             func,
@@ -247,11 +241,12 @@ export class JsdocParserUtil {
         } else if (ts.isIdentifier(param.name)) {
             const name = param.name.text;
             return _.filter(tags, tag => {
-                if (ts && ts.isJSDocParameterTag(tag)) {
-                    let t: JSDocParameterTagExt = tag;
+                if (ts?.isJSDocParameterTag(tag)) {
+                    const t: JSDocParameterTagExt = tag;
                     if (typeof t.parameterName !== 'undefined') {
                         return t.parameterName.text === name;
-                    } else if (typeof t.name !== 'undefined') {
+                    }
+                    if (typeof t.name !== 'undefined') {
                         if (typeof t.name.escapedText !== 'undefined') {
                             return t.name.escapedText === name;
                         }
@@ -291,12 +286,9 @@ export class JsdocParserUtil {
                                     JSDocNode.name.left &&
                                     JSDocNode.name.right
                                 ) {
-                                    text =
-                                        JSDocNode.name.left.escapedText +
-                                        '.' +
-                                        JSDocNode.name.right.escapedText;
+                                    text = `${JSDocNode.name.left.escapedText}.${JSDocNode.name.right.escapedText}`;
                                 }
-                                rawDescription += JSDocNode.text + '{@link ' + text + '}';
+                                rawDescription += `${JSDocNode.text}{@link ${text}}`;
                             }
                             break;
                         default:

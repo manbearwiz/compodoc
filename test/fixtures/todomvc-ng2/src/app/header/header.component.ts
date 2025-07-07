@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { TodoStore } from '../shared/services/todo.store';
+import type { TodoStore } from '../shared/services/todo.store';
 
 import { HeaderComponentSchema as MyAlias } from './header-component.metadata';
 
@@ -12,7 +12,7 @@ export class HeaderComponent {
     /**
      * Application main title
      */
-    title: string = 'todos';
+    title = 'todos';
 
     /**
      * Local reference of TodoStore
@@ -22,7 +22,7 @@ export class HeaderComponent {
     /**
      * The data-binding value of the input tag, added on enter to the todo store
      */
-    newTodoText: string = '';
+    newTodoText = '';
 
     constructor(todoStore: TodoStore) {
         this.todoStore = todoStore;

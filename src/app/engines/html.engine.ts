@@ -1,5 +1,6 @@
 const Handlebars = require('handlebars');
-import * as path from 'path';
+
+import * as path from 'node:path';
 
 import { logger } from '../../utils/logger';
 import FileEngine from './file.engine';
@@ -67,10 +68,7 @@ export class HtmlEngine {
             'package-properties'
         ];
         if (templatePath) {
-            if (
-                FileEngine.existsSync(path.resolve(process.cwd() + path.sep + templatePath)) ===
-                false
-            ) {
+            if (!FileEngine.existsSync(path.resolve(process.cwd() + path.sep + templatePath))) {
                 logger.warn(
                     'Template path specificed but does not exist...using default templates'
                 );
@@ -81,7 +79,7 @@ export class HtmlEngine {
             partials.map(partial => {
                 const partialPath = this.determineTemplatePath(
                     templatePath,
-                    'partials/' + partial + '.hbs'
+                    `partials/${partial}.hbs`
                 );
                 return FileEngine.get(partialPath).then(data =>
                     Handlebars.registerPartial(partial, data)
@@ -132,7 +130,7 @@ export class HtmlEngine {
         });
     }
     private determineTemplatePath(templatePath: string, filePath: string): string {
-        let outPath = path.resolve(__dirname + '/../src/templates/' + filePath);
+        let outPath = path.resolve(`${__dirname}/../src/templates/${filePath}`);
         if (templatePath) {
             const testPath = path.resolve(
                 process.cwd() + path.sep + templatePath + path.sep + filePath
@@ -144,7 +142,7 @@ export class HtmlEngine {
 
     public generateCoverageBadge(outputFolder, label, coverageData) {
         return FileEngine.get(
-            path.resolve(__dirname + '/../src/templates/partials/coverage-badge.hbs')
+            path.resolve(`${__dirname}/../src/templates/partials/coverage-badge.hbs`)
         ).then(
             data => {
                 const template: any = Handlebars.compile(data);
@@ -158,14 +156,14 @@ export class HtmlEngine {
                 }
 
                 return FileEngine.write(
-                    outputFolder + path.sep + '/images/coverage-badge-' + label + '.svg',
+                    `${outputFolder + path.sep}/images/coverage-badge-${label}.svg`,
                     result
                 ).catch(err => {
-                    logger.error('Error during coverage badge ' + label + ' file generation ', err);
+                    logger.error(`Error during coverage badge ${label} file generation `, err);
                     return Promise.reject(err);
                 });
             },
-            err => Promise.reject('Error during coverage badge generation')
+            _err => Promise.reject('Error during coverage badge generation')
         );
     }
 }

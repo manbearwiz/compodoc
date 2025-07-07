@@ -1,15 +1,15 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
-import { JsdocTagInterface } from '../../interfaces/jsdoc-tag.interface';
+import type { JsdocTagInterface } from '../../interfaces/jsdoc-tag.interface';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class JsdocCodeExampleHelper implements IHtmlEngineHelper {
     private cleanTag(comment: string): string {
-        if (comment.charAt(0) === '*') {
+        if (comment.startsWith('*')) {
             comment = comment.substring(1, comment.length);
         }
-        if (comment.charAt(0) === ' ') {
+        if (comment.startsWith(' ')) {
             comment = comment.substring(1, comment.length);
         }
-        if (comment.indexOf('<p>') === 0) {
+        if (comment.startsWith('<p>')) {
             comment = comment.substring(3, comment.length);
         }
         if (comment.substr(-1) === '\n') {
@@ -31,8 +31,8 @@ export class JsdocCodeExampleHelper implements IHtmlEngineHelper {
 
     public helperFunc(context: any, jsdocTags: JsdocTagInterface[], options: IHandlebarsOptions) {
         let i = 0;
-        let len = jsdocTags.length;
-        let tags = [];
+        const len = jsdocTags.length;
+        const tags = [];
         let type = 'html';
 
         if (options.hash.type) {
@@ -42,17 +42,14 @@ export class JsdocCodeExampleHelper implements IHtmlEngineHelper {
         for (i; i < len; i++) {
             if (jsdocTags[i].tagName) {
                 if (jsdocTags[i].tagName.text === 'example') {
-                    let tag = {} as JsdocTagInterface;
+                    const tag = {} as JsdocTagInterface;
                     if (jsdocTags[i].comment) {
-                        if (jsdocTags[i].comment.indexOf('<caption>') !== -1) {
+                        if (jsdocTags[i].comment.includes('<caption>')) {
                             tag.comment = jsdocTags[i].comment
                                 .replace(/<caption>/g, '<b><i>')
                                 .replace(/\/caption>/g, '/b></i>');
                         } else {
-                            tag.comment =
-                                `<pre class="line-numbers"><code class="language-${type}">` +
-                                this.getHtmlEntities(this.cleanTag(jsdocTags[i].comment)) +
-                                `</code></pre>`;
+                            tag.comment = `<pre class="line-numbers"><code class="language-${type}">${this.getHtmlEntities(this.cleanTag(jsdocTags[i].comment))}</code></pre>`;
                         }
                         tags.push(tag);
                     }

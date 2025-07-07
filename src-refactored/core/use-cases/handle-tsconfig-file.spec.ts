@@ -2,7 +2,7 @@ const sinon = require('sinon');
 
 import { expect } from 'chai';
 
-import { CLIProgram } from '../../core/entities/cli-program';
+import type { CLIProgram } from '../../core/entities/cli-program';
 import ConfigurationRepository from '../../core/repositories/config.repository';
 
 import Logger from '../../infrastructure/logging/logger';

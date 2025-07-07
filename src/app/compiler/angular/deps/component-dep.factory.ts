@@ -1,9 +1,9 @@
 import { cleanLifecycleHooksFromMethods } from '../../../../utils';
 import Configuration from '../../../configuration';
-import { IDep } from '../dependencies.interfaces';
-import { ComponentHelper } from './helpers/component-helper';
+import type { IDep } from '../dependencies.interfaces';
+import type { ComponentHelper } from './helpers/component-helper';
 
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 
 export class ComponentDepFactory {
     constructor(private helper: ComponentHelper) {}
@@ -14,7 +14,7 @@ export class ComponentDepFactory {
         const hash = crypto.createHash('sha512').update(sourceCode).digest('hex');
         const componentDep: IComponentDep = {
             name,
-            id: 'component-' + name + '-' + hash,
+            id: `component-${name}-${hash}`,
             file: file,
             // animations?: string[]; // TODO
             changeDetection: this.helper.getComponentChangeDetection(props, srcFile),
@@ -46,7 +46,7 @@ export class ComponentDepFactory {
             hostBindings: IO.hostBindings,
             hostListeners: IO.hostListeners,
 
-            standalone: this.helper.getComponentStandalone(props, srcFile) ? true : false,
+            standalone: !!this.helper.getComponentStandalone(props, srcFile),
             imports: this.helper.getComponentImports(props, srcFile),
 
             description: IO.description,
@@ -89,10 +89,12 @@ export class ComponentDepFactory {
             componentDep.accessors = IO.accessors;
         }
         if (IO.properties) {
-            const {inputSignals, outputSignals, properties} = this.helper.getInputOutputSignals(IO.properties);
+            const { inputSignals, outputSignals, properties } = this.helper.getInputOutputSignals(
+                IO.properties
+            );
 
-            componentDep.inputsClass = componentDep.inputsClass.concat(inputSignals)
-            componentDep.outputsClass = componentDep.outputsClass.concat(outputSignals)
+            componentDep.inputsClass = componentDep.inputsClass.concat(inputSignals);
+            componentDep.outputsClass = componentDep.outputsClass.concat(outputSignals);
             componentDep.propertiesClass = properties;
         }
 
@@ -106,52 +108,52 @@ export interface IComponentDep extends IDep {
     encapsulation: any;
     exportAs: any;
     host: any;
-    inputs: Array<any>;
-    outputs: Array<any>;
-    providers: Array<any>;
+    inputs: any[];
+    outputs: any[];
+    providers: any[];
     moduleId: string;
     selector: string;
-    styleUrls: Array<string>;
+    styleUrls: string[];
     styleUrlsData: string;
-    styles: Array<string>;
+    styles: string[];
     stylesData: string;
     template: string;
-    templateUrl: Array<string>;
-    viewProviders: Array<any>;
-    inputsClass: Array<any>;
-    outputsClass: Array<any>;
-    propertiesClass: Array<any>;
-    methodsClass: Array<any>;
+    templateUrl: string[];
+    viewProviders: any[];
+    inputsClass: any[];
+    outputsClass: any[];
+    propertiesClass: any[];
+    methodsClass: any[];
 
     deprecated: boolean;
     deprecationMessage: string;
 
     standalone: boolean;
-    imports: Array<any>;
+    imports: any[];
 
-    entryComponents: Array<any>;
+    entryComponents: any[];
 
-    hostBindings: Array<any>;
-    hostDirectives: Array<any>;
-    hostListeners: Array<any>;
+    hostBindings: any[];
+    hostDirectives: any[];
+    hostListeners: any[];
 
     description: string;
     rawdescription: string;
     sourceCode: string;
-    exampleUrls: Array<string>;
+    exampleUrls: string[];
 
-    constructorObj?: Object;
-    jsdoctags?: Array<string>;
+    constructorObj?: object;
+    jsdoctags?: string[];
     extends?: any;
     implements?: any;
-    accessors?: Object;
+    accessors?: object;
 
     tag?: string;
     styleUrl?: string;
     shadow?: string;
     scoped?: string;
     assetsDir?: string;
-    assetsDirs?: Array<string>;
+    assetsDirs?: string[];
 
     preserveWhitespaces?: any;
 }

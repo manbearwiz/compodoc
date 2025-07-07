@@ -1,11 +1,11 @@
 import SetupFlags from '../../core/use-cases/setup-flags';
 
-import { CLIProgram } from '../../core/entities/cli-program';
+import type { CLIProgram } from '../../core/entities/cli-program';
 
 import ConfigurationRepository from '../../core/repositories/config.repository';
 
-import ServeFiles from './serve-files';
 import Logger from '../../infrastructure/logging/logger';
+import ServeFiles from './serve-files';
 
 const sinon = require('sinon');
 

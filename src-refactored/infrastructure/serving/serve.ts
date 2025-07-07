@@ -1,6 +1,6 @@
 import * as LiveServer from '@compodoc/live-server';
 
-import { InternalConfiguration } from '../../core/entities/internal-configuration';
+import type { InternalConfiguration } from '../../core/entities/internal-configuration';
 
 interface LiveServerConfiguration {
     root?: string;

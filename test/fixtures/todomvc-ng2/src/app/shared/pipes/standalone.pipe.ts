@@ -1,8 +1,8 @@
-import { PipeTransform, Pipe } from '@angular/core';
+import { Pipe, type PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'standalone',
-    standalone: true,
+    standalone: true
 })
 export class StandAlonePipe implements PipeTransform {
     transform(value, args) {

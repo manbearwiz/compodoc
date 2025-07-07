@@ -1,5 +1,5 @@
-import { BooInterface } from './boo.interface';
-import { TimeInterface } from './time.interface';
+import type { BooInterface } from './boo.interface';
+import type { TimeInterface } from './time.interface';
 
 /**
  * A class interface just for documentation purpose

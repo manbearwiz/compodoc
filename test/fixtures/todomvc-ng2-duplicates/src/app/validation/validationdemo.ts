@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Validators, FormControl, FormGroup, FormBuilder } from '@angular/forms';
-import { Message, SelectItem } from '../../../components/common/api';
+import { Component, type OnInit } from '@angular/core';
+import { type FormBuilder, FormControl, type FormGroup, Validators } from '@angular/forms';
+import type { Message, SelectItem } from '../../../components/common/api';
 
 @Component({
     templateUrl: './validationdemo.html'

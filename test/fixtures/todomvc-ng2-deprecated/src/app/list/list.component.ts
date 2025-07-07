@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 
-import { TodoStore } from '../shared/services/todo.store';
+import type { TodoStore } from '../shared/services/todo.store';
 
 import { EmitterService } from '../shared/services/emitter.service';
 
-import { Todo } from '../shared/models/todo.model';
+import type { Todo } from '../shared/models/todo.model';
 
 /**
  * The list of todos component
@@ -32,7 +32,6 @@ export class ListComponent {
     watchTest;
 
     constructor(todoStore: TodoStore) {
-        let that = this;
         this.todoStore = todoStore;
         this.todos = todoStore.getAll();
         this.watchTest = Observable.of(todoStore.todos);
@@ -40,13 +39,13 @@ export class ListComponent {
             console.log(value);
             switch (value) {
                 case 'displayCompleted':
-                    that.todos = todoStore.getCompleted();
+                    this.todos = todoStore.getCompleted();
                     break;
                 case 'displayAll':
-                    that.todos = todoStore.getAll();
+                    this.todos = todoStore.getAll();
                     break;
                 case 'displayRemaining':
-                    that.todos = todoStore.getRemaining();
+                    this.todos = todoStore.getRemaining();
                     break;
             }
         });

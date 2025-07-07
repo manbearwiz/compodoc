@@ -1,18 +1,19 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 
 const tmp = temporaryDir();
 
 describe('CLI simple generation - extends app', () => {
     let stdoutString = undefined;
 
-    let appComponentFile, myInitialClassFile;
+    let appComponentFile;
+    let myInitialClassFile;
 
-    const distFolder = tmp.name + '-big-app-extends';
+    const distFolder = `${tmp.name}-big-app-extends`;
 
     before(done => {
         tmp.create(distFolder);
-        let ls = shell('node', [
+        const ls = shell('node', [
             './bin/index-cli.js',
             '-p',
             './test/fixtures/sample-files-extends/src/tsconfig.json',
@@ -39,7 +40,7 @@ describe('CLI simple generation - extends app', () => {
     });
 
     it('DoNothingDirective extends ADirective', () => {
-        const file = read(distFolder + '/directives/DoNothingDirective.html');
+        const file = read(`${distFolder}/directives/DoNothingDirective.html`);
         expect(file).to.contain('Extends');
         expect(file).to.contain(
             '<a href="../directives/ADirective.html" target="_self" >ADirective'
@@ -58,14 +59,14 @@ describe('CLI simple generation - extends app', () => {
     });
 
     it('CharactersService extends AbstractService', () => {
-        const file = read(distFolder + '/injectables/CharactersService.html');
+        const file = read(`${distFolder}/injectables/CharactersService.html`);
         expect(file).to.contain(
             'code><a href="../injectables/AbstractService.html" target="_self" >AbstractService'
         );
     });
 
     it('ClockInterface multiple extends', () => {
-        const file = read(distFolder + '/interfaces/ClockInterface.html');
+        const file = read(`${distFolder}/interfaces/ClockInterface.html`);
         expect(file).to.contain(
             'code><a href="../interfaces/TimeInterface.html" target="_self" >TimeInterface'
         );

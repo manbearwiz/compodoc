@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
         "lib": ["es6", "es7"],
-        "downlevelIteration": true
+        "downlevelIteration": true,
+        "strictNullChecks": true
     },
     "exclude": ["test"]
 }

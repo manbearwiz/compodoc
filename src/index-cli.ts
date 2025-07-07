@@ -1,24 +1,19 @@
+import * as path from 'node:path';
+import { cosmiconfigSync } from 'cosmiconfig';
 import * as fs from 'fs-extra';
-import * as path from 'path';
-
 import { ts } from 'ts-morph';
-
 import { Application } from './app/application';
 import Configuration from './app/configuration';
 import FileEngine from './app/engines/file.engine';
 import I18nEngine from './app/engines/i18n.engine';
-
-import { ConfigurationFileInterface } from './app/interfaces/configuration-file.interface';
+import type { ConfigurationFileInterface } from './app/interfaces/configuration-file.interface';
 import AngularVersionUtil from './utils/angular-version.util';
 import { COMPODOC_DEFAULTS } from './utils/defaults';
 import { logger } from './utils/logger';
-
-import { readConfig, EXCLUDE_PATTERNS, INCLUDE_PATTERNS } from './utils/utils';
-
-import { cosmiconfigSync } from 'cosmiconfig';
+import { EXCLUDE_PATTERNS, INCLUDE_PATTERNS, readConfig } from './utils/utils';
 
 const fg = require('fast-glob');
-const os = require('os');
+const os = require('node:os');
 const osName = require('os-name');
 const pkg = require('../package.json');
 const { program } = require('commander');
@@ -202,7 +197,7 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
             .allowExcessArguments()
             .parse(process.argv);
 
-        let outputHelp = () => {
+        const outputHelp = () => {
             program.outputHelp();
             process.exit(1);
         };
@@ -217,7 +212,7 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
 
         if (programOptions.config) {
             let configFilePath = programOptions.config;
-            let testConfigFilePath = configFilePath.match(process.cwd());
+            const testConfigFilePath = configFilePath.match(process.cwd());
             if (testConfigFilePath && testConfigFilePath.length > 0) {
                 configFilePath = configFilePath.replace(process.cwd() + path.sep, '');
             }
@@ -390,14 +385,14 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
             Configuration.mainData.coverageTest = true;
             Configuration.mainData.coverageTestThreshold =
                 typeof configFile.coverageTest === 'string'
-                    ? parseInt(configFile.coverageTest, 10)
+                    ? Number.parseInt(configFile.coverageTest, 10)
                     : COMPODOC_DEFAULTS.defaultCoverageThreshold;
         }
         if (programOptions.coverageTest) {
             Configuration.mainData.coverageTest = true;
             Configuration.mainData.coverageTestThreshold =
                 typeof programOptions.coverageTest === 'string'
-                    ? parseInt(programOptions.coverageTest, 10)
+                    ? Number.parseInt(programOptions.coverageTest, 10)
                     : COMPODOC_DEFAULTS.defaultCoverageThreshold;
         }
 
@@ -405,24 +400,24 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
             Configuration.mainData.coverageTestPerFile = true;
             Configuration.mainData.coverageMinimumPerFile =
                 typeof configFile.coverageMinimumPerFile === 'string'
-                    ? parseInt(configFile.coverageMinimumPerFile, 10)
+                    ? Number.parseInt(configFile.coverageMinimumPerFile, 10)
                     : COMPODOC_DEFAULTS.defaultCoverageMinimumPerFile;
         }
         if (programOptions.coverageMinimumPerFile) {
             Configuration.mainData.coverageTestPerFile = true;
             Configuration.mainData.coverageMinimumPerFile =
                 typeof programOptions.coverageMinimumPerFile === 'string'
-                    ? parseInt(programOptions.coverageMinimumPerFile, 10)
+                    ? Number.parseInt(programOptions.coverageMinimumPerFile, 10)
                     : COMPODOC_DEFAULTS.defaultCoverageMinimumPerFile;
         }
 
         if (configFile.coverageTestThresholdFail) {
             Configuration.mainData.coverageTestThresholdFail =
-                configFile.coverageTestThresholdFail === 'false' ? false : true;
+                configFile.coverageTestThresholdFail !== 'false';
         }
         if (programOptions.coverageTestThresholdFail) {
             Configuration.mainData.coverageTestThresholdFail =
-                programOptions.coverageTestThresholdFail === 'false' ? false : true;
+                programOptions.coverageTestThresholdFail !== 'false';
         }
 
         if (configFile.coverageTestShowOnlyFailed) {
@@ -597,12 +592,12 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
                 console.log(`TypeScript version used by Compodoc : ${ts.version}`);
                 console.log('');
 
-                if (FileEngine.existsSync(cwd + path.sep + 'package.json')) {
-                    const packageData = FileEngine.getSync(cwd + path.sep + 'package.json');
+                if (FileEngine.existsSync(`${cwd + path.sep}package.json`)) {
+                    const packageData = FileEngine.getSync(`${cwd + path.sep}package.json`);
                     if (packageData) {
                         const parsedData = JSON.parse(packageData);
                         const projectDevDependencies = parsedData.devDependencies;
-                        if (projectDevDependencies && projectDevDependencies.typescript) {
+                        if (projectDevDependencies?.typescript) {
                             const tsProjectVersion = AngularVersionUtil.cleanVersion(
                                 projectDevDependencies.typescript
                             );
@@ -627,7 +622,7 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
         }
 
         if (!configExplorerResult) {
-            logger.warn(`No configuration file found, switching to CLI flags.`);
+            logger.warn('No configuration file found, switching to CLI flags.');
         }
 
         if (programOptions.language && !I18nEngine.supportLanguage(programOptions.language)) {
@@ -637,7 +632,7 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
         }
 
         if (programOptions.tsconfig && typeof programOptions.tsconfig === 'boolean') {
-            logger.error(`Please provide a tsconfig file.`);
+            logger.error('Please provide a tsconfig file.');
             process.exit(1);
         }
 
@@ -666,7 +661,7 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
          * Check --files argument call
          */
         const argv = require('minimist')(process.argv.slice(2));
-        if (argv && argv.files) {
+        if (argv?.files) {
             Configuration.mainData.hasFilesToCoverage = true;
             if (typeof argv.files === 'string') {
                 super.setFiles([argv.files]);
@@ -780,7 +775,7 @@ Note: Certain tabs will only be shown if applicable to a given dependency`,
                         includeFiles = [...includeFiles, ...scannedFiles];
                     }
 
-                    if (!includeFiles.length) {
+                    if (includeFiles.length === 0) {
                         includeFiles = INCLUDE_PATTERNS;
                     }
 

@@ -1,15 +1,15 @@
 import { Component, Input, Output } from '@angular/core';
 
-import { TodoStore } from '../shared/services/todo.store';
+import type { TodoStore } from '../shared/services/todo.store';
 
 import { EmitterService } from '../shared/services/emitter.service';
 
 import {
+    LogClass,
+    LogClassWithArgs,
     LogMethod,
     LogProperty,
-    LogPropertyWithArgs,
-    LogClass,
-    LogClassWithArgs
+    LogPropertyWithArgs
 } from '../shared/decorators/log.decorator';
 
 import { FooterComponentSchema } from './footer-component.metadata';
@@ -27,12 +27,12 @@ export class FooterComponent {
     /**
      * Local id for EmitterService
      */
-    @LogProperty id: string = 'FooterComponent';
+    @LogProperty id = 'FooterComponent';
 
     /**
      * Starting filter param
      */
-    @LogPropertyWithArgs('theCurrentFilter') currentFilter: string = 'all';
+    @LogPropertyWithArgs('theCurrentFilter') currentFilter = 'all';
 
     /**
      * The "constructor"

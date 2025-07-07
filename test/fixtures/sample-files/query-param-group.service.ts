@@ -1,6 +1,6 @@
-import { Inject, Injectable, isDevMode, OnDestroy, Optional } from '@angular/core';
-import { Params } from '@angular/router';
-import { EMPTY, from, Observable, Subject } from 'rxjs';
+import { Inject, Injectable, type OnDestroy, Optional, isDevMode } from '@angular/core';
+import type { Params } from '@angular/router';
+import { EMPTY, type Observable, Subject, from } from 'rxjs';
 import {
     catchError,
     concatMap,
@@ -13,17 +13,17 @@ import {
     takeUntil,
     tap
 } from 'rxjs/operators';
-import { compareParamMaps, filterParamMap, isMissing, isPresent, NOP } from '../util';
-import { Unpack } from '../types';
-import { QueryParamGroup } from '../model/query-param-group';
-import { QueryParam } from '../model/query-param';
+import type { QueryParam } from '../model/query-param';
+import type { QueryParamGroup } from '../model/query-param-group';
 import {
     NGQP_ROUTER_ADAPTER,
     NGQP_ROUTER_OPTIONS,
-    RouterAdapter,
-    RouterOptions
+    type RouterAdapter,
+    type RouterOptions
 } from '../router-adapter/router-adapter.interface';
-import { QueryParamAccessor } from './query-param-accessor.interface';
+import type { Unpack } from '../types';
+import { NOP, compareParamMaps, filterParamMap, isMissing, isPresent } from '../util';
+import type { QueryParamAccessor } from './query-param-accessor.interface';
 
 /** @internal */
 function isMultiQueryParam<T>(
@@ -50,7 +50,7 @@ function hasArraySerialization(
 
 /** @internal */
 class NavigationData {
-    constructor(public params: Params, public synthetic: boolean = false) {}
+    constructor(public params: Params, public synthetic = false) {}
 }
 
 /**
@@ -110,7 +110,7 @@ export class QueryParamGroupService implements OnDestroy {
         //        some cleanup first.
         if (this.queryParamGroup) {
             throw new Error(
-                `A QueryParamGroup has already been setup. Changing the group is currently not supported.`
+                'A QueryParamGroup has already been setup. Changing the group is currently not supported.'
             );
         }
 
@@ -134,7 +134,7 @@ export class QueryParamGroupService implements OnDestroy {
         }
         if (!directive.valueAccessor) {
             throw new Error(
-                `No value accessor found for the form control. Please make sure to implement ControlValueAccessor on this component.`
+                'No value accessor found for the form control. Please make sure to implement ControlValueAccessor on this component.'
             );
         }
 
@@ -311,7 +311,7 @@ export class QueryParamGroupService implements OnDestroy {
             return false;
         }
 
-        return navigation.extras && navigation.extras.state && navigation.extras.state['synthetic'];
+        return navigation.extras?.state?.synthetic;
     }
 
     /** Subscribes to the parameter queue and executes navigations in sequence. */
@@ -333,7 +333,7 @@ export class QueryParamGroupService implements OnDestroy {
         ).pipe(
             catchError((err: any) => {
                 if (isDevMode()) {
-                    console.error(`There was an error while navigating`, err);
+                    console.error('There was an error while navigating', err);
                 }
 
                 return EMPTY;
@@ -370,9 +370,8 @@ export class QueryParamGroupService implements OnDestroy {
     private serialize<T>(queryParam: QueryParam<any>, value: T): string | string[] {
         if (hasArrayValue(queryParam, value)) {
             return (value || []).map(queryParam.serialize);
-        } else {
-            return queryParam.serialize(value);
         }
+            return queryParam.serialize(value);
     }
 
     private deserialize<T>(
@@ -381,9 +380,8 @@ export class QueryParamGroupService implements OnDestroy {
     ): Unpack<T> | Unpack<T>[] {
         if (hasArraySerialization(queryParam, values)) {
             return values.map(queryParam.deserialize);
-        } else {
-            return queryParam.deserialize(values);
         }
+            return queryParam.deserialize(values);
     }
 
     /**

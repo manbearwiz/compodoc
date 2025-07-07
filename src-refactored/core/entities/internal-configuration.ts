@@ -1,4 +1,4 @@
-import { CoverageData } from './coverageData.interface';
+import type { CoverageData } from './coverageData.interface';
 import { PublicConfiguration } from './public-configuration';
 
 export class InternalConfiguration extends PublicConfiguration {

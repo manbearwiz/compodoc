@@ -1,11 +1,11 @@
-import { Directive, ElementRef, HostListener, Input, OnInit } from '@angular/core';
+import { Directive, type ElementRef, HostListener, Input, type OnInit } from '@angular/core';
 
 @Directive({
     selector: '[appBorder]',
-    standalone: true,
+    standalone: true
 })
 export class BorderDirective implements OnInit {
-    @Input() color: string = 'red';
+    @Input() color = 'red';
 
     constructor(private el: ElementRef) {}
 

@@ -11,8 +11,6 @@ export abstract class MotherComponent {
      */
     abstract myProp: string;
 
-    constructor() {}
-
     /**
      * @deprecated This method is deprecated
      */
@@ -23,10 +21,6 @@ export abstract class MotherComponent {
 export class SonComponent extends MotherComponent {
     myProp: string;
 
-    constructor() {
-        super();
-    }
-
     myMethod(): string {
         return 'Implementation A';
     }
@@ -34,10 +28,6 @@ export class SonComponent extends MotherComponent {
 
 @Component({ template: '' })
 export class GrandsonComponent extends SonComponent {
-    constructor() {
-        super();
-    }
-
     myMethod(): string {
         return 'Implementation B';
     }

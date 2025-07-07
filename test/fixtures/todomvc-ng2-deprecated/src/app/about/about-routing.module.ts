@@ -1,17 +1,17 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, type Routes } from '@angular/router';
 
 import { AboutComponent } from './about.component';
-import { TodoMVCComponent } from './todomvc/todomvc.component';
 import { CompodocComponent } from './compodoc/compodoc.component';
+import { TodoMVCComponent } from './todomvc/todomvc.component';
 
 import { ABOUT_ENUMS } from './about-routes.enum';
 
 import { pathMatchStrategy } from './path-match';
 
-import { utils, oneFunction } from './utils';
+import { oneFunction, utils } from './utils';
 
-const extract = function(s: string) {};
+const extract = (s: string) => {};
 
 const ABOUT_ROUTES: Routes = [
     {

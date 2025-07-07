@@ -1,15 +1,15 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 
 const tmp = temporaryDir();
 
 describe('CLI generation - TypeDoc examples', () => {
     let stdoutString = undefined;
-    const distFolder = tmp.name + '-typedoc';
+    const distFolder = `${tmp.name}-typedoc`;
 
     before(done => {
         tmp.create(distFolder);
-        let ls = shell('node', [
+        const ls = shell('node', [
             './bin/index-cli.js',
             '-p',
             './test/fixtures/typedoc-examples/tsconfig.json',

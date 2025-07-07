@@ -3,12 +3,12 @@ import { exec, shell, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI silent flag', () => {
-    const distFolder = tmp.name + '-silent';
+    const distFolder = `${tmp.name}-silent`;
     let stdoutString = '';
 
-    before(function (done) {
+    before(done => {
         tmp.create(distFolder);
-        let ls = shell('node', [
+        const ls = shell('node', [
             './bin/index-cli.js',
             '-p',
             './test/fixtures/sample-files/tsconfig.simple.json',
@@ -36,23 +36,22 @@ describe('CLI silent flag - error', () => {
     let exitCode = 0;
     let stdoutString = '';
 
-    const distFolder = tmp.name + '-silent-error';
+    const distFolder = `${tmp.name}-silent-error`;
 
     before(done => {
         tmp.create(distFolder);
         const ls = exec(
-            'node' +
-                [
-                    '',
-                    './bin/index-cli.js',
-                    '-p',
-                    './test/fixtures/sample-files/tsconfig.simple.json',
-                    '-d',
-                    distFolder,
-                    '--silent',
-                    '--includes',
-                    './test/fixtures/todomvc-ng2/additional-doc-wrong'
-                ].join(' '),
+            `node${[
+                '',
+                './bin/index-cli.js',
+                '-p',
+                './test/fixtures/sample-files/tsconfig.simple.json',
+                '-d',
+                distFolder,
+                '--silent',
+                '--includes',
+                './test/fixtures/todomvc-ng2/additional-doc-wrong'
+            ].join(' ')}`,
             (error, stdout) => {
                 stdoutString = stdout;
             }

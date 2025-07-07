@@ -1,6 +1,6 @@
-import { SymbolHelper } from './symbol-helper';
-import { ts, SyntaxKind } from 'ts-morph';
 import { expect } from 'chai';
+import { SyntaxKind, ts } from 'ts-morph';
+import { SymbolHelper } from './symbol-helper';
 
 describe(SymbolHelper.name, () => {
     let helper: SymbolHelper;

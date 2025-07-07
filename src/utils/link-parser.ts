@@ -1,11 +1,11 @@
 export function extractLeadingText(string, completeTag) {
-    let tagIndex = string.indexOf(completeTag);
-    let leadingText = undefined;
-    let leadingTextRegExp = /\[(.+?)\]/g;
+    const tagIndex = string.indexOf(completeTag);
+    let leadingText;
+    const leadingTextRegExp = /\[(.+?)\]/g;
     let leadingTextInfo = leadingTextRegExp.exec(string);
 
     // did we find leading text, and if so, does it immediately precede the tag?
-    while (leadingTextInfo && leadingTextInfo.length) {
+    while (leadingTextInfo?.length > 0) {
         if (leadingTextInfo.index + leadingTextInfo[0].length === tagIndex) {
             string = string.replace(leadingTextInfo[0], '');
             leadingText = leadingTextInfo[1];
@@ -45,13 +45,13 @@ export function splitLinkText(text) {
     };
 }
 
-export let LinkParser = (function() {
-    let processTheLink = function(string, tagInfo, leadingText) {
-        let leading = extractLeadingText(string, tagInfo.completeTag),
-            linkText,
-            split,
-            target,
-            stringtoReplace;
+export const LinkParser = (() => {
+    const processTheLink = (string, tagInfo, leadingText) => {
+        const leading = extractLeadingText(string, tagInfo.completeTag);
+        let linkText;
+        let split;
+        let target;
+        let stringtoReplace;
 
         linkText = leadingText ? leadingText : leading.leadingText || '';
 
@@ -59,7 +59,7 @@ export let LinkParser = (function() {
         target = split.target;
 
         if (leading.leadingText !== undefined) {
-            stringtoReplace = '[' + leading.leadingText + ']' + tagInfo.completeTag;
+            stringtoReplace = `[${leading.leadingText}]${tagInfo.completeTag}`;
         } else if (typeof split.linkText !== 'undefined') {
             stringtoReplace = tagInfo.completeTag;
             linkText = split.linkText;
@@ -68,7 +68,7 @@ export let LinkParser = (function() {
             return string;
         }
 
-        return string.replace(stringtoReplace, '[' + linkText + '](' + target + ')');
+        return string.replace(stringtoReplace, `[${linkText}](${target})`);
     };
 
     /**
@@ -76,7 +76,7 @@ export let LinkParser = (function() {
      * {@link http://www.google.com|Google} or {@link https://github.com GitHub} or [Github]{@link https://github.com} to [Github](https://github.com)
      */
 
-    let replaceLinkTag = function(str: string) {
+    const replaceLinkTag = (str: string) => {
         if (typeof str === 'undefined') {
             return {
                 newString: ''
@@ -86,17 +86,17 @@ export let LinkParser = (function() {
         // new RegExp('\\[((?:.|\n)+?)]\\{@link\\s+((?:.|\n)+?)\\}', 'i').exec('ee [TO DO]{@link Todo} fo') -> "[TO DO]{@link Todo}", "TO DO", "Todo"
         // new RegExp('\\{@link\\s+((?:.|\n)+?)\\}', 'i').exec('ee [TODO]{@link Todo} fo') -> "{@link Todo}", "Todo"
 
-        let tagRegExpLight = new RegExp('\\{@link\\s+((?:.|\n)+?)\\}', 'i'),
-            tagRegExpFull = new RegExp('\\{@link\\s+((?:.|\n)+?)\\}', 'i'),
-            tagRegExp,
-            matches,
-            previousString,
-            tagInfo = [];
+        const tagRegExpLight = /\{@link\s+((?:.|\n)+?)\}/i;
+        const tagRegExpFull = /\{@link\s+((?:.|\n)+?)\}/i;
+        let tagRegExp;
+        let matches;
+        let previousString;
+        const tagInfo = [];
 
-        tagRegExp = str.indexOf(']{') !== -1 ? tagRegExpFull : tagRegExpLight;
+        tagRegExp = str.includes(']{') ? tagRegExpFull : tagRegExpLight;
 
         function replaceMatch(replacer, tag, match, text, linkText?) {
-            let matchedTag = {
+            const matchedTag = {
                 completeTag: match,
                 tag: tag,
                 text: text
@@ -104,9 +104,8 @@ export let LinkParser = (function() {
             tagInfo.push(matchedTag);
             if (linkText) {
                 return replacer(str, matchedTag, linkText);
-            } else {
-                return replacer(str, matchedTag);
             }
+            return replacer(str, matchedTag);
         }
 
         do {
@@ -127,9 +126,7 @@ export let LinkParser = (function() {
         };
     };
 
-    let _resolveLinks = function(str: string) {
-        return replaceLinkTag(str).newString;
-    };
+    const _resolveLinks = (str: string) => replaceLinkTag(str).newString;
 
     return {
         resolveLinks: _resolveLinks

@@ -1,6 +1,6 @@
 import setupFlags from '../../core/use-cases/setup-flags';
 
-import { CLIProgram } from '../../core/entities/cli-program';
+import type { CLIProgram } from '../../core/entities/cli-program';
 
 import ConfigurationRepository from '../../core/repositories/config.repository';
 

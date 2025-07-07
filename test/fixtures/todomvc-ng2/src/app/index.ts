@@ -1,6 +1,6 @@
 export * from './app.module';
 
-interface Aa {}
+type Aa = {};
 
 // The prefix of class name matches the interface name
 class AaBb {}

@@ -1,8 +1,7 @@
-import { Controller, Headers, Post, Res, HttpStatus, Delete } from '@nestjs/common';
+import { Controller, Delete, Headers, HttpStatus, Post, Res } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
-    constructor() {}
 
     @Post()
     async login(@Headers() headers, @Res() res) {}

@@ -1,7 +1,7 @@
 const { Command } = require('commander');
 
-import { Flag, PUBLIC_FLAGS } from '../entities/public-flags';
-import { CLIProgram } from '../entities/cli-program';
+import type { CLIProgram } from '../entities/cli-program';
+import { type Flag, PUBLIC_FLAGS } from '../entities/public-flags';
 
 export class SetupFlags {
     private static instance: SetupFlags;

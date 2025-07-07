@@ -1,5 +1,5 @@
 export const LOGIN = [
     {
-        path: 'login',
-    },
+        path: 'login'
+    }
 ];

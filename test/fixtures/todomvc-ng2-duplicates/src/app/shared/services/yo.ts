@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 export function MyDecorator(type: new () => any) {
-    return function(target) {
+    return target => {
         _reflect.defineMetadata('type', type, target);
     };
 }

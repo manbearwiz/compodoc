@@ -1,4 +1,4 @@
-import { PipeTransform, Pipe } from '@angular/core';
+import { Pipe, type PipeTransform } from '@angular/core';
 
 /**
  * Uppercase the first letter of the string

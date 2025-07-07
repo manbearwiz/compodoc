@@ -1,10 +1,6 @@
 {
-  "compilerOptions": {
-    "module": "commonjs"
-  },
-  "files": [
-    "app.module.ts",
-    "foo.component.ts",
-    "foo.module.ts"
-  ]
+    "compilerOptions": {
+        "module": "commonjs"
+    },
+    "files": ["app.module.ts", "foo.component.ts", "foo.module.ts"]
 }

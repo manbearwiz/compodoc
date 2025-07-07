@@ -1,4 +1,4 @@
-(function (compodoc) {
+(compodoc => {
     function LunrSearchEngine() {
         this.index = undefined;
         this.store = {};
@@ -6,24 +6,22 @@
     }
 
     LunrSearchEngine.prototype.init = function () {
-        var that = this,
-            d = new promise.Promise();
+        const d = new promise.Promise();
 
-        that.index = lunr.Index.load(COMPODOC_SEARCH_INDEX.index);
-        that.store = COMPODOC_SEARCH_INDEX.store;
+        this.index = lunr.Index.load(COMPODOC_SEARCH_INDEX.index);
+        this.store = COMPODOC_SEARCH_INDEX.store;
         d.done();
 
         return d;
     };
 
     LunrSearchEngine.prototype.search = function (q, offset, length) {
-        var that = this,
-            results = [],
-            d = new promise.Promise();
+        let results = [];
+        const d = new promise.Promise();
 
         if (this.index) {
-            results = this.index.search('*' + q + '*').map(function (result) {
-                var doc = that.store[result.ref];
+            results = this.index.search(`*${q}*`).map(result => {
+                const doc = this.store[result.ref];
 
                 return {
                     title: doc.title,
@@ -42,9 +40,9 @@
         return d;
     };
 
-    compodoc.addEventListener(compodoc.EVENTS.READY, function (event) {
-        var engine = new LunrSearchEngine(),
-            initialized = false;
+    compodoc.addEventListener(compodoc.EVENTS.READY, event => {
+        const engine = new LunrSearchEngine();
+        let initialized = false;
 
         function query(q, offset, length) {
             if (!initialized) throw new Error('Search has not been initialized');
@@ -55,7 +53,7 @@
             query: query
         };
 
-        engine.init().then(function () {
+        engine.init().then(() => {
             initialized = true;
             compodoc.dispatchEvent({
                 type: compodoc.EVENTS.SEARCH_READY

@@ -1,5 +1,5 @@
-import { Nothing } from '../decorators/nothing.decorator';
 import { LogClass } from '../decorators/log.decorator';
+import { Nothing } from '../decorators/nothing.decorator';
 
 @Nothing()
 export class DoNothing {

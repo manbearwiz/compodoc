@@ -1,14 +1,13 @@
-import { IHtmlEngineHelper } from './html-engine-helper.interface';
+import type { IHtmlEngineHelper } from './html-engine-helper.interface';
+
 const Handlebars = require('handlebars');
 
-import DependenciesEngine from '../dependencies.engine';
 import AngularVersionUtil from '../../../utils/angular-version.util';
 import BasicTypeUtil from '../../../utils/basic-type.util';
 import Configuration from '../../configuration';
+import DependenciesEngine from '../dependencies.engine';
 
 export class FunctionSignatureHelper implements IHtmlEngineHelper {
-    constructor() {}
-
     private handleFunction(arg): string {
         if (arg.function.length === 0) {
             return `${arg.name}${this.getOptionalString(arg)}: () => void`;
@@ -25,31 +24,28 @@ export class FunctionSignatureHelper implements IHtmlEngineHelper {
                     return `${argu.name}${this.getOptionalString(arg)}: <a href="../${path}s/${
                         _result.data.name
                     }.html">${argu.type}</a>`;
-                } else {
-                    const path = AngularVersionUtil.getApiLink(
-                        _result.data,
-                        Configuration.mainData.angularVersion
-                    );
-                    return `${argu.name}${this.getOptionalString(
-                        arg
-                    )}: <a href="${path}" target="_blank">${argu.type}</a>`;
                 }
-            } else if (BasicTypeUtil.isKnownType(argu.type)) {
+                const path = AngularVersionUtil.getApiLink(
+                    _result.data,
+                    Configuration.mainData.angularVersion
+                );
+                return `${argu.name}${this.getOptionalString(
+                    arg
+                )}: <a href="${path}" target="_blank">${argu.type}</a>`;
+            }
+            if (BasicTypeUtil.isKnownType(argu.type)) {
                 const path = BasicTypeUtil.getTypeUrl(argu.type);
                 return `${argu.name}${this.getOptionalString(
                     arg
                 )}: <a href="${path}" target="_blank">${argu.type}</a>`;
-            } else {
-                if (argu.name && argu.type) {
-                    return `${argu.name}${this.getOptionalString(arg)}: ${argu.type}`;
-                } else {
-                    if (argu.name) {
-                        return `${argu.name.text}`;
-                    } else {
-                        return '';
-                    }
-                }
             }
+            if (argu.name && argu.type) {
+                return `${argu.name}${this.getOptionalString(arg)}: ${argu.type}`;
+            }
+            if (argu.name) {
+                return `${argu.name.text}`;
+            }
+            return '';
         });
         return `${arg.name}${this.getOptionalString(arg)}: (${argums}) => void`;
     }
@@ -58,7 +54,7 @@ export class FunctionSignatureHelper implements IHtmlEngineHelper {
         return arg.optional ? '?' : '';
     }
 
-    public helperFunc(context: any, method) {
+    public helperFunc(_context: any, method) {
         let args = '';
 
         let argDestructuredCounterInitial = 0;
@@ -89,7 +85,7 @@ export class FunctionSignatureHelper implements IHtmlEngineHelper {
                             _result.data.name
                         }.html" target="_self">${Handlebars.escapeExpression(arg.type)}</a>`;
                     } else {
-                        let path = AngularVersionUtil.getApiLink(
+                        const path = AngularVersionUtil.getApiLink(
                             _result.data,
                             Configuration.mainData.angularVersion
                         );
@@ -130,8 +126,7 @@ export class FunctionSignatureHelper implements IHtmlEngineHelper {
 
         if (method.name) {
             return `${method.name}(${args})`;
-        } else {
-            return `(${args})`;
         }
+        return `(${args})`;
     }
 }

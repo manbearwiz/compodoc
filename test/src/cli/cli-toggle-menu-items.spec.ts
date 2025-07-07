@@ -1,16 +1,16 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI toggle menu items', () => {
     describe('with a list', () => {
-        const distFolder = tmp.name + '-toggle';
-        let stdoutString = undefined,
-            fooIndexFile,
-            fooServiceFile;
-        before(function (done) {
+        const distFolder = `${tmp.name}-toggle`;
+        let stdoutString = undefined;
+        let fooIndexFile;
+        let fooServiceFile;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/todomvc-ng2/src/tsconfig.json',

@@ -1,9 +1,9 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class JsdocReturnsCommentHelper implements IHtmlEngineHelper {
-    public helperFunc(context: any, jsdocTags: Array<any>, options: IHandlebarsOptions) {
+    public helperFunc(_context: any, jsdocTags: any[], _options: IHandlebarsOptions) {
         let i = 0;
-        let len = jsdocTags.length;
+        const len = jsdocTags.length;
         let result;
         for (i; i < len; i++) {
             if (jsdocTags[i].tagName) {

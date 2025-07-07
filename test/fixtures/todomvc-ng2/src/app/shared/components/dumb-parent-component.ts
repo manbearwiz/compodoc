@@ -1,4 +1,4 @@
-import { Input, Output, output, input } from '@angular/core';
+import { Input, Output, input, output } from '@angular/core';
 
 /**
  * Empty parent component for inheritance demo

@@ -1,10 +1,10 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 
 const tmp = temporaryDir();
 
 describe('CLI simple flags', () => {
-    const distFolder = tmp.name + '-simple-flags';
+    const distFolder = `${tmp.name}-simple-flags`;
 
     describe('when no tsconfig.json provided', () => {
         let command = undefined;
@@ -105,10 +105,10 @@ describe('CLI simple flags', () => {
 
     describe('showing the output type', () => {
         let componentFile;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
             tmp.copy('./test/fixtures/sample-files/', distFolder);
-            let ls = shell(
+            const ls = shell(
                 'node',
                 ['../bin/index-cli.js', '-p', 'tsconfig.entry.json', '-d', 'documentation'],
                 { cwd: distFolder }

@@ -4,14 +4,14 @@
  */
 export const PI: number = 3.14;
 
-export let PIT = 4;
+export const PIT = 4;
 
 /**
  * A foo bar function. Test link for other class {@link ListComponent}
  *
  * @param {string} status A status
  */
-export function foo(status: string = 'toto'): string {
+export function foo(status = 'toto'): string {
     console.log('bar');
     return 'yo';
 }
@@ -28,10 +28,10 @@ export interface TOTsdosds<T> {
  * Directions of the app
  */
 export enum Direction {
-    Up,
-    Down,
-    Left,
-    Right
+    Up = 0,
+    Down = 1,
+    Left = 2,
+    Right = 3
 }
 
 /*
@@ -51,7 +51,7 @@ export type TableColumnTarget = number | string | (number | string)[];
 
 export type TableSyncRenderer = Type<TableCellRendererBase> | TemplateRef<any>;
 
-import { Todo } from '../models/todo.model';
+import type { Todo } from '../models/todo.model';
 
 export type LinearDomain = [number, number];
 
@@ -73,4 +73,4 @@ function sumFunction(trackId, { a, b, c }: { a: number; b: number; c: number }, 
     return a + b + c;
 }
 
-var [first, second, third] = ['Laide', 'Gabriel', 'Jets'];
+const [first, second, third] = ['Laide', 'Gabriel', 'Jets'];

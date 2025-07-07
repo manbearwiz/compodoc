@@ -1,8 +1,8 @@
 import { Component, Input } from '@angular/core';
 
-import { Todo } from '../../shared/models/todo.model';
+import type { Todo } from '../../shared/models/todo.model';
 
-import { TodoStore } from '../../shared/services/todo.store';
+import type { TodoStore } from '../../shared/services/todo.store';
 
 /**
  * The todo component

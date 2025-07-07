@@ -1,25 +1,21 @@
 // @ts-nocheck
 
-import * as _ from 'lodash';
-
-import { ts, SyntaxKind } from 'ts-morph';
-
-import { TsPrinterUtil } from '../../../../../utils/ts-printer.util';
-
+import { SyntaxKind, ts } from 'ts-morph';
 import ImportsUtil from '../../../../../utils/imports.util';
+import { TsPrinterUtil } from '../../../../../utils/ts-printer.util';
 
 enum AngularProviderConfigProperties {
     Useclass = 'useClass',
     UseValue = 'useValue',
     UseFactory = 'useFactory',
-    UseExisting = 'useExisting',
-};
+    UseExisting = 'useExisting'
+}
 
 export class SymbolHelper {
     private readonly unknown = '???';
 
     public parseDeepIndentifier(name: string, srcFile?: ts.SourceFile): IParseDeepIdentifierResult {
-        let result = {
+        const result = {
             name: '',
             type: ''
         };
@@ -27,8 +23,8 @@ export class SymbolHelper {
         if (typeof name === 'undefined') {
             return result;
         }
-        let nsModule = name.split('.');
-        let type = this.getType(name);
+        const nsModule = name.split('.');
+        const type = this.getType(name);
 
         if (nsModule.length > 1) {
             result.ns = nsModule[0];
@@ -46,19 +42,19 @@ export class SymbolHelper {
 
     public getType(name: string): string {
         let type;
-        if (name.toLowerCase().indexOf('component') !== -1) {
+        if (name.toLowerCase().includes('component')) {
             type = 'component';
-        } else if (name.toLowerCase().indexOf('pipe') !== -1) {
+        } else if (name.toLowerCase().includes('pipe')) {
             type = 'pipe';
-        } else if (name.toLowerCase().indexOf('controller') !== -1) {
+        } else if (name.toLowerCase().includes('controller')) {
             type = 'controller';
-        } else if (name.toLowerCase().indexOf('module') !== -1) {
+        } else if (name.toLowerCase().includes('module')) {
             type = 'module';
-        } else if (name.toLowerCase().indexOf('directive') !== -1) {
+        } else if (name.toLowerCase().includes('directive')) {
             type = 'directive';
         } else if (
-            name.toLowerCase().indexOf('injectable') !== -1 ||
-            name.toLowerCase().indexOf('service') !== -1
+            name.toLowerCase().includes('injectable') ||
+            name.toLowerCase().includes('service')
         ) {
             type = 'injectable';
         }
@@ -108,16 +104,18 @@ export class SymbolHelper {
      */
     public parseProviderConfiguration(node: ts.ObjectLiteralExpression): string {
         if (node.kind && node.kind === SyntaxKind.ObjectLiteralExpression) {
-            const provideProperty = node.properties.find((props) => props.name.getText() === 'provide');
+            const provideProperty = node.properties.find(
+                props => props.name.getText() === 'provide'
+            );
 
             if (!provideProperty) {
-                throw new Error("provide property not found in provider object config");
+                throw new Error('provide property not found in provider object config');
             }
 
-            const providerObjectProps = Object.values(AngularProviderConfigProperties)
+            const providerObjectProps = Object.values(AngularProviderConfigProperties);
             for (let i = 0; i < providerObjectProps.length; i++) {
                 const providerProp = providerObjectProps[i];
-                const prop = node.properties.find((props) => props.name.getText() === providerProp);
+                const prop = node.properties.find(props => props.name.getText() === providerProp);
                 if (prop) {
                     return prop.getLastToken().getText();
                 }
@@ -147,19 +145,20 @@ export class SymbolHelper {
             (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) ||
             (ts.isNewExpression(node) && ts.isElementAccessExpression(node.expression))
         ) {
-            let className = this.buildIdentifierName(node.expression);
+            const className = this.buildIdentifierName(node.expression);
 
             // function arguments could be really complex. There are so
             // many use cases that we can't handle. Just print "args" to indicate
             // that we have arguments.
 
-            let functionArgs = node.arguments.length > 0 ? 'args' : '';
-            let text = `${className}(${functionArgs})`;
-            return text;
-        } else if (ts.isPropertyAccessExpression(node)) {
+            const functionArgs = node.arguments.length > 0 ? 'args' : '';
+            return `${className}(${functionArgs})`;
+        }
+        if (ts.isPropertyAccessExpression(node)) {
             // parse expressions such as: Shared.Module
             return this.buildIdentifierName(node);
-        } else if (ts.isIdentifier(node)) {
+        }
+        if (ts.isIdentifier(node)) {
             // parse expressions such as: MyComponent
             if (node.text) {
                 return node.text;
@@ -170,7 +169,7 @@ export class SymbolHelper {
         } else if (ts.isSpreadElement(node)) {
             // parse expressions such as: ...MYARRAY
             // Resolve MYARRAY in imports or local file variables after full scan, just return the name of the variable
-            if (node.expression && node.expression.text) {
+            if (node.expression?.text) {
                 return node.expression.text;
             }
         }
@@ -188,7 +187,7 @@ export class SymbolHelper {
         node: ts.ObjectLiteralElement,
         srcFile: ts.SourceFile,
         decoratorType: string
-    ): Array<string | boolean> {
+    ): (string | boolean)[] {
         let localNode = node;
 
         if (ts.isShorthandPropertyAssignment(localNode) && decoratorType !== 'template') {
@@ -209,7 +208,8 @@ export class SymbolHelper {
 
         if (localNode.initializer && ts.isArrayLiteralExpression(localNode.initializer)) {
             return localNode.initializer.elements.map(x => this.parseSymbolElements(x));
-        } else if (
+        }
+        if (
             (localNode.initializer && ts.isStringLiteral(localNode.initializer)) ||
             (localNode.initializer && ts.isTemplateLiteral(localNode.initializer)) ||
             (localNode.initializer &&
@@ -217,39 +217,37 @@ export class SymbolHelper {
                 localNode.initializer.text)
         ) {
             return [localNode.initializer.text];
-        } else if (
-            localNode.initializer &&
-            localNode.initializer.kind &&
+        }
+        if (
+            localNode.initializer?.kind &&
             (localNode.initializer.kind === SyntaxKind.TrueKeyword ||
                 localNode.initializer.kind === SyntaxKind.FalseKeyword)
         ) {
-            return [localNode.initializer.kind === SyntaxKind.TrueKeyword ? true : false];
-        } else if (localNode.initializer && ts.isPropertyAccessExpression(localNode.initializer)) {
-            let identifier = this.parseSymbolElements(localNode.initializer);
+            return [localNode.initializer.kind === SyntaxKind.TrueKeyword];
+        }
+        if (localNode.initializer && ts.isPropertyAccessExpression(localNode.initializer)) {
+            const identifier = this.parseSymbolElements(localNode.initializer);
             return [identifier];
-        } else if (
-            localNode.initializer &&
-            localNode.initializer.elements &&
-            localNode.initializer.elements.length > 0
-        ) {
+        }
+        if (localNode.initializer?.elements && localNode.initializer.elements.length > 0) {
             // Node replaced by ts-simple-ast & kind = 265
             return localNode.initializer.elements.map(x => this.parseSymbolElements(x));
         }
     }
 
     public getSymbolDeps(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         decoratorType: string,
         srcFile: ts.SourceFile,
-        multiLine?: boolean
-    ): Array<string> {
+        _multiLine?: boolean
+    ): string[] {
         if (props.length === 0) {
             return [];
         }
 
-        let i = 0,
-            len = props.length,
-            filteredProps = [];
+        let i = 0;
+        const len = props.length;
+        const filteredProps = [];
 
         for (i; i < len; i++) {
             if (props[i].name && props[i].name.text === decoratorType) {
@@ -261,10 +259,10 @@ export class SymbolHelper {
     }
 
     public getSymbolDepsRaw(
-        props: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        props: readonly ts.ObjectLiteralElementLike[],
         type: string,
-        multiLine?: boolean
-    ): Array<ts.ObjectLiteralElementLike> {
+        _multiLine?: boolean
+    ): ts.ObjectLiteralElementLike[] {
         return props.filter(node => node.name.getText() === type);
     }
 }

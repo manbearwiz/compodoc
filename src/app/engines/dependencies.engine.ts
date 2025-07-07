@@ -1,14 +1,8 @@
 import * as _ from 'lodash';
-
-import { MiscellaneousData } from '../interfaces/miscellaneous-data.interface';
-import { ParsedData } from '../interfaces/parsed-data.interface';
-import { RouteInterface } from '../interfaces/routes.interface';
-
 import AngularApiUtil from '../../utils/angular-api.util';
-import { IApiSourceResult } from '../../utils/api-source-result.interface';
+import type { IApiSourceResult } from '../../utils/api-source-result.interface';
 import { getNamesCompareFn } from '../../utils/utils';
-
-import {
+import type {
     IEnumDecDep,
     IFunctionDecDep,
     IGuardDep,
@@ -18,30 +12,32 @@ import {
     IPipeDep,
     ITypeAliasDecDep
 } from '../compiler/angular/dependencies.interfaces';
-
-import { IComponentDep } from '../compiler/angular/deps/component-dep.factory';
-import { IControllerDep } from '../compiler/angular/deps/controller-dep.factory';
-import { IDirectiveDep } from '../compiler/angular/deps/directive-dep.factory';
-import { IModuleDep } from '../compiler/angular/deps/module-dep.factory';
+import type { IComponentDep } from '../compiler/angular/deps/component-dep.factory';
+import type { IControllerDep } from '../compiler/angular/deps/controller-dep.factory';
+import type { IDirectiveDep } from '../compiler/angular/deps/directive-dep.factory';
+import type { IModuleDep } from '../compiler/angular/deps/module-dep.factory';
+import type { MiscellaneousData } from '../interfaces/miscellaneous-data.interface';
+import type { ParsedData } from '../interfaces/parsed-data.interface';
+import type { RouteInterface } from '../interfaces/routes.interface';
 
 const traverse = require('neotraverse/legacy');
 
 export class DependenciesEngine {
     public rawData: ParsedData;
-    public modules: Object[];
-    public rawModules: Object[];
-    public rawModulesForOverview: Object[];
-    public components: Object[];
-    public controllers: Object[];
-    public entities: Object[];
-    public directives: Object[];
-    public injectables: Object[];
-    public interceptors: Object[];
-    public guards: Object[];
-    public interfaces: Object[];
+    public modules: object[];
+    public rawModules: object[];
+    public rawModulesForOverview: object[];
+    public components: object[];
+    public controllers: object[];
+    public entities: object[];
+    public directives: object[];
+    public injectables: object[];
+    public interceptors: object[];
+    public guards: object[];
+    public interfaces: object[];
     public routes: RouteInterface;
-    public pipes: Object[];
-    public classes: Object[];
+    public pipes: object[];
+    public classes: object[];
     public miscellaneous: MiscellaneousData = {
         variables: [],
         functions: [],
@@ -105,13 +101,13 @@ export class DependenciesEngine {
     }
 
     public init(data: ParsedData) {
-        traverse(data).forEach(function (node) {
+        traverse(data).forEach(node => {
             if (node) {
                 if (node.parent) {
-                    delete node.parent;
+                    node.parent = undefined;
                 }
                 if (node.initializer) {
-                    delete node.initializer;
+                    node.initializer = undefined;
                 }
             }
         });
@@ -217,18 +213,17 @@ export class DependenciesEngine {
     }
 
     private manageDuplicatesName() {
-        const processDuplicates = (element, index, array) => {
+        const processDuplicates = (element, _index, array) => {
             const elementsWithSameName = _.filter(array, { name: element.name });
             if (elementsWithSameName.length > 1) {
                 // First element is the reference for duplicates
                 for (let i = 1; i < elementsWithSameName.length; i++) {
-                    let elementToEdit = elementsWithSameName[i];
+                    const elementToEdit = elementsWithSameName[i];
                     if (typeof elementToEdit.isDuplicate === 'undefined') {
                         elementToEdit.isDuplicate = true;
                         elementToEdit.duplicateId = i;
-                        elementToEdit.duplicateName =
-                            elementToEdit.name + '-' + elementToEdit.duplicateId;
-                        elementToEdit.id = elementToEdit.id + '-' + elementToEdit.duplicateId;
+                        elementToEdit.duplicateName = `${elementToEdit.name}-${elementToEdit.duplicateId}`;
+                        elementToEdit.id = `${elementToEdit.id}-${elementToEdit.duplicateId}`;
                     }
                 }
             }
@@ -248,7 +243,7 @@ export class DependenciesEngine {
     }
 
     public find(name: string): IApiSourceResult<any> | undefined {
-        const searchFunctions: Array<() => IApiSourceResult<any>> = [
+        const searchFunctions: (() => IApiSourceResult<any>)[] = [
             () => this.findInCompodocDependencies(name, this.modules),
             () => this.findInCompodocDependencies(name, this.injectables),
             () => this.findInCompodocDependencies(name, this.interceptors),
@@ -267,9 +262,9 @@ export class DependenciesEngine {
         ];
 
         let bestScore = 0;
-        let bestResult = undefined;
+        let bestResult;
 
-        for (let searchFunction of searchFunctions) {
+        for (const searchFunction of searchFunctions) {
             const result = searchFunction();
 
             if (result.data && result.score > bestScore) {

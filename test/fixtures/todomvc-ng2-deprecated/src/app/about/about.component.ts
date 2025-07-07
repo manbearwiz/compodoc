@@ -1,6 +1,6 @@
 import { Component, HostListener, Input } from '@angular/core';
 
-import { Subscription } from 'rxjs/Subscription';
+import type { Subscription } from 'rxjs/Subscription';
 
 /**
  * The about component

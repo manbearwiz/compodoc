@@ -1,14 +1,14 @@
+import * as crypto from 'node:crypto';
+import { IsEmail, Validate } from 'class-validator';
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
     BeforeInsert,
+    Column,
+    Entity,
     JoinTable,
     ManyToMany,
-    OneToMany
+    OneToMany,
+    PrimaryGeneratedColumn
 } from 'typeorm';
-import { IsEmail, Validate } from 'class-validator';
-import * as crypto from 'crypto';
 import { ArticleEntity } from '../article/article.entity';
 
 @Entity('user')
@@ -41,6 +41,9 @@ export class UserEntity {
     @JoinTable()
     favorites: ArticleEntity[];
 
-    @OneToMany(type => ArticleEntity, article => article.author)
+    @OneToMany(
+        type => ArticleEntity,
+        article => article.author
+    )
     articles: ArticleEntity[];
 }

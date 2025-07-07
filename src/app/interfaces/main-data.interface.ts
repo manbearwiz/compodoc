@@ -1,4 +1,4 @@
-import { CoverageData } from './coverageData.interface';
+import type { CoverageData } from './coverageData.interface';
 
 export interface MainDataInterface {
     output: string;
@@ -68,15 +68,15 @@ export interface MainDataInterface {
     coverageMinimumPerFile: number;
     coverageTestShowOnlyFailed: boolean;
     unitTestCoverage: string;
-    unitTestData: Object;
+    unitTestData: object;
     routesLength: number;
     angularVersion: string;
     exportFormat: string;
     coverageData: CoverageData;
     customFavicon: string;
     customLogo: string;
-    packageDependencies: Object[];
-    packagePeerDependencies: Object[];
+    packageDependencies: object[];
+    packagePeerDependencies: object[];
     packageProperties: any;
     gaID: string;
     gaSite: string;

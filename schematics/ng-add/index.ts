@@ -1,4 +1,9 @@
-import { Rule, SchematicContext, Tree, SchematicsException } from '@angular-devkit/schematics';
+import {
+    type Rule,
+    type SchematicContext,
+    SchematicsException,
+    type Tree
+} from '@angular-devkit/schematics';
 import { NodePackageInstallTask } from '@angular-devkit/schematics/tasks';
 
 const TSCONFIG_DATA = {
@@ -8,7 +13,7 @@ const TSCONFIG_DATA = {
 
 function safeReadJSON(path: string, tree: Tree) {
     try {
-        return JSON.parse(tree.read(path)!.toString());
+        return JSON.parse(tree.read(path)?.toString() || '');
     } catch (e) {
         throw new SchematicsException(`Error when parsing ${path}: ${e.message}`);
     }
@@ -31,8 +36,8 @@ export function ngAdd(): Rule {
         }
 
         let packageScripts = {};
-        if (packageJson['scripts']) {
-            packageScripts = packageJson['scripts'];
+        if (packageJson.scripts) {
+            packageScripts = packageJson.scripts;
         } else {
             packageScripts = {};
         }

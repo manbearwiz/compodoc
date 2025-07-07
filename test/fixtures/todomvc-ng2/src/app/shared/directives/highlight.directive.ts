@@ -1,8 +1,8 @@
-import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+import { Directive, type ElementRef, HostListener, Input } from '@angular/core';
 
 @Directive({
     selector: '[appHighlight]',
-    standalone: true,
+    standalone: true
 })
 export class HighlightDirective {
     @Input() color = 'yellow';

@@ -1,9 +1,9 @@
+import * as path from 'node:path';
 import * as fs from 'fs-extra';
-import * as path from 'path';
 
 import { ts } from 'ts-morph';
 
-const os = require('os');
+const os = require('node:os');
 const osName = require('os-name');
 
 import AngularVersionUtil from '../../infrastructure/angular/angular-version.util';
@@ -12,8 +12,6 @@ import Logger from '../../infrastructure/logging/logger';
 
 export class DisplayEnvironmentVersions {
     private static instance: DisplayEnvironmentVersions;
-
-    constructor() {}
 
     public static getInstance() {
         if (!DisplayEnvironmentVersions.instance) {
@@ -42,12 +40,12 @@ export class DisplayEnvironmentVersions {
             console.log(`TypeScript version used by Compodoc : ${ts.version}`);
             console.log('');
 
-            if (FileEngine.existsSync(cwd + path.sep + 'package.json')) {
-                const packageData = FileEngine.getSync(cwd + path.sep + 'package.json');
+            if (FileEngine.existsSync(`${cwd + path.sep}package.json`)) {
+                const packageData = FileEngine.getSync(`${cwd + path.sep}package.json`);
                 if (packageData) {
                     const parsedData = JSON.parse(packageData);
                     const projectDevDependencies = parsedData.devDependencies;
-                    if (projectDevDependencies && projectDevDependencies.typescript) {
+                    if (projectDevDependencies?.typescript) {
                         const tsProjectVersion = AngularVersionUtil.cleanVersion(
                             projectDevDependencies.typescript
                         );

@@ -1,23 +1,23 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
-const path = require('path'),
-    tmp = temporaryDir();
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
+const path = require('node:path');
+const tmp = temporaryDir();
 
 describe('CLI simple generation', () => {
-    const distFolder = tmp.name + '-simple-generation';
+    const distFolder = `${tmp.name}-simple-generation`;
 
     describe('when generation with d flag - relative folder', () => {
-        let stdoutString = undefined,
-            fooComponentFile,
-            fooServiceFile,
-            componentFile,
-            moduleFile,
-            emptyModuleFile,
-            barModuleFile,
-            emptyModuleRawFile;
-        before(function (done) {
+        let stdoutString = undefined;
+        let fooComponentFile;
+        let fooServiceFile;
+        let componentFile;
+        let moduleFile;
+        let emptyModuleFile;
+        let barModuleFile;
+        let emptyModuleRawFile;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -149,7 +149,7 @@ describe('CLI simple generation', () => {
          * inputs outputs
          */
         it('should generate inputs', () => {
-           expect(fooComponentFile).to.contain(`<h3 id="inputs">Inputs</h3>
+            expect(fooComponentFile).to.contain(`<h3 id="inputs">Inputs</h3>
         <table class="table table-sm table-bordered">
             <tbody>
                 <tr>
@@ -421,7 +421,7 @@ describe('CLI simple generation', () => {
                     </td>
                 </tr>
             </tbody>
-        </table>`)
+        </table>`);
         });
 
         it('should generate outputs', () => {
@@ -548,7 +548,7 @@ describe('CLI simple generation', () => {
                     </td>
                 </tr>
             </tbody>
-        </table>`)
+        </table>`);
         });
 
         /**
@@ -587,9 +587,9 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with d flag without / at the end - relative folder', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -619,21 +619,21 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with d flag - absolute folder', () => {
-        let stdoutString = undefined,
-            fooComponentFile,
-            fooServiceFile,
-            componentFile,
-            moduleFile;
-        before(function (done) {
+        let stdoutString = undefined;
+        let fooComponentFile;
+        let fooServiceFile;
+        let componentFile;
+        let moduleFile;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell(
+            const ls = shell(
                 'node',
                 [
                     '../bin/index-cli.js',
                     '-p',
                     '../test/fixtures/sample-files/tsconfig.simple.json',
                     '-d',
-                    '/tmp/' + distFolder + '/'
+                    `/tmp/${distFolder}/`
                 ],
                 { cwd: distFolder }
             );
@@ -753,9 +753,9 @@ describe('CLI simple generation', () => {
     });*/
 
     describe('when generation with d and a flags', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -780,9 +780,9 @@ describe('CLI simple generation', () => {
     });
 
     describe('when passing a deep path on a flag', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -808,9 +808,9 @@ describe('CLI simple generation', () => {
 
     describe('when generation with d flag and src arg', () => {
         let stdoutString = undefined;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 './test/fixtures/sample-files/',
                 '-p',
@@ -847,8 +847,8 @@ describe('CLI simple generation', () => {
 
     describe('when generation without d flag', () => {
         let stdoutString = undefined;
-        before(function (done) {
-            let ls = shell('node', [
+        before(done => {
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json'
@@ -893,9 +893,9 @@ describe('CLI simple generation', () => {
 
     describe('when generation with -t flag', () => {
         let stdoutString = undefined;
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -919,12 +919,12 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with --theme flag', () => {
-        let stdoutString = undefined,
-            baseTheme = 'laravel',
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        const baseTheme = 'laravel';
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -945,17 +945,17 @@ describe('CLI simple generation', () => {
 
         it('should add theme css', () => {
             index = read(`${distFolder}/index.html`);
-            expect(index).to.contain('href="./styles/' + baseTheme + '.css"');
+            expect(index).to.contain(`href="./styles/${baseTheme}.css"`);
         });
     });
 
     describe('when generation with -n flag', () => {
-        let stdoutString = undefined,
-            name = 'TodoMVC-angular2-application',
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        const name = 'TodoMVC-angular2-application';
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -981,11 +981,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with --hideGenerator flag', () => {
-        let stdoutString = undefined,
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1010,11 +1010,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with --hideDarkModeToggle flag', () => {
-        let stdoutString = undefined,
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1039,11 +1039,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with --disableSourceCode flag', () => {
-        let stdoutString = undefined,
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1068,11 +1068,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with --disableDomTree flag', () => {
-        let stdoutString = undefined,
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1097,11 +1097,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation of component dependency doc with --navTabConfig option', () => {
-        let stdoutString = undefined,
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1143,11 +1143,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation of module dependency doc with --navTabConfig option', () => {
-        let stdoutString = undefined,
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1177,11 +1177,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with --disableTemplateTab flag', () => {
-        let stdoutString = undefined,
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1206,11 +1206,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with --disableStyleTab flag', () => {
-        let stdoutString = undefined,
-            index = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let index = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1235,11 +1235,11 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with --disableGraph flag', () => {
-        let stdoutString = undefined,
-            fileContents = undefined;
-        before(function (done) {
+        let stdoutString = undefined;
+        let fileContents = undefined;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/sample-files/tsconfig.simple.json',
@@ -1282,12 +1282,12 @@ describe('CLI simple generation', () => {
     });
 
     describe('when generation with -r flag', () => {
-        let stdoutString = '',
-            port = 6666,
-            child;
-        before(function (done) {
+        let stdoutString = '';
+        const port = 6666;
+        let child;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell(
+            const ls = shell(
                 'node',
                 ['./bin/index-cli.js', '-s', '-r', '-r', port, '-d', distFolder],
                 { timeout: 10000 }
@@ -1303,7 +1303,7 @@ describe('CLI simple generation', () => {
         });
         after(() => tmp.clean(distFolder));
 
-        it('should contain port ' + port, () => {
+        it(`should contain port ${port}`, () => {
             expect(stdoutString).to.contain('Serving documentation');
             expect(stdoutString).to.contain(port);
         });
@@ -1311,13 +1311,13 @@ describe('CLI simple generation', () => {
 
     describe('when generation with -p flag - absolute folder', () => {
         let stdoutString = '';
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
 
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
-                path.join(process.cwd() + path.sep + 'test/fixtures/todomvc-ng2/src/tsconfig.json'),
+                path.join(`${process.cwd() + path.sep}test/fixtures/todomvc-ng2/src/tsconfig.json`),
                 '-d',
                 distFolder
             ]);

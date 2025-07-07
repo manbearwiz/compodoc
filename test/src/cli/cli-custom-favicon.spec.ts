@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync, stats } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, stats, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 interface Image {
@@ -7,12 +7,12 @@ interface Image {
 }
 
 describe('CLI custom favicon', () => {
-    const distFolder = tmp.name + '-favicon';
+    const distFolder = `${tmp.name}-favicon`;
 
     describe('when specifying a custom favicon', () => {
-        before(function (done) {
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', [
+            const ls = shell('node', [
                 './bin/index-cli.js',
                 '-p',
                 './test/fixtures/todomvc-ng2/src/tsconfig.json',
@@ -32,10 +32,10 @@ describe('CLI custom favicon', () => {
         after(() => tmp.clean(distFolder));
 
         it('should have copied the customFavicon', () => {
-            let isFileExists = exists(`${distFolder}/images/favicon.ico`);
+            const isFileExists = exists(`${distFolder}/images/favicon.ico`);
             expect(isFileExists).to.be.true;
-            let originalFileSize = (stats('test/fixtures/todomvc-ng2/favicon.ico') as Image).size,
-                copiedFileSize = (stats(`${distFolder}/images/favicon.ico`) as Image).size;
+            const originalFileSize = (stats('test/fixtures/todomvc-ng2/favicon.ico') as Image).size;
+            const copiedFileSize = (stats(`${distFolder}/images/favicon.ico`) as Image).size;
             expect(originalFileSize).to.equal(copiedFileSize);
         });
     });

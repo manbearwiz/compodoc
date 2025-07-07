@@ -1,6 +1,6 @@
-import * as path from 'path';
+import * as path from 'node:path';
 
-import { CLIProgram } from '../entities/cli-program';
+import type { CLIProgram } from '../entities/cli-program';
 
 import { cosmiconfig } from 'cosmiconfig';
 
@@ -14,7 +14,7 @@ export class HandleConfigFile {
     private configExplorer;
     private configExplorerResult;
 
-    public configFilePath: string = '';
+    public configFilePath = '';
 
     constructor() {
         this.configExplorer = cosmiconfig(this.cosmiconfigModuleName);
@@ -33,7 +33,7 @@ export class HandleConfigFile {
                 if (currentProgram.config) {
                     let configFilePath = currentProgram.config;
                     this.configFilePath = configFilePath;
-                    let testConfigFilePath = configFilePath.match(process.cwd());
+                    const testConfigFilePath = configFilePath.match(process.cwd());
                     if (testConfigFilePath && testConfigFilePath.length > 0) {
                         configFilePath = configFilePath.replace(process.cwd() + path.sep, '');
                     }

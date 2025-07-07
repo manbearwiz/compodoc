@@ -1,4 +1,4 @@
-import { ElementRef } from '@angular/core';
+import type { ElementRef } from '@angular/core';
 
 import { Direction } from '../miscellaneous/miscellaneous';
 
@@ -35,7 +35,7 @@ export class Todo extends Tada {
     /**
      * Another private property
      */
-    #newprivateproperty: boolean = false;
+    #newprivateproperty = false;
 
     private optionalProperty?: boolean;
 

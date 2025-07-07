@@ -1,13 +1,13 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class OneParameterHasHelper implements IHtmlEngineHelper {
     public helperFunc(context: any, tags, typeToCheck): string {
         let result = false;
-        let len = arguments.length - 1;
-        let options: IHandlebarsOptions = arguments[len];
+        const len = arguments.length - 1;
+        const options: IHandlebarsOptions = arguments[len];
 
-        let i = 0,
-            leng = tags.length;
+        let i = 0;
+        const leng = tags.length;
 
         for (i; i < leng; i++) {
             if (typeof tags[i][typeToCheck] !== 'undefined' && tags[i][typeToCheck] !== '') {
@@ -17,8 +17,7 @@ export class OneParameterHasHelper implements IHtmlEngineHelper {
 
         if (result) {
             return options.fn(context);
-        } else {
-            return options.inverse(context);
         }
+        return options.inverse(context);
     }
 }

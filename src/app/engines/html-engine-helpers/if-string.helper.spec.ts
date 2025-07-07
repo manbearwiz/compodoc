@@ -1,9 +1,9 @@
-import { IfStringHelper } from './if-string.helper';
 import { expect } from 'chai';
+import { IfStringHelper } from './if-string.helper';
 
 describe(IfStringHelper.name, () => {
     let helper: IfStringHelper;
-    let options = {
+    const options = {
         fn: () => 'fnCalled',
         inverse: () => 'inverseCalled'
     };

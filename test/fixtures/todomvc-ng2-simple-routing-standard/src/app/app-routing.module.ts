@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { AboutModule } from './about';
+import { RouterModule, type Routes } from '@angular/router';
+import type { AboutModule } from './about';
 
 export const APP_ROUTES: Routes = [
     {
@@ -8,7 +8,7 @@ export const APP_ROUTES: Routes = [
         loadChildren: (): Promise<AboutModule> =>
             // Trailing comma is added intentionally to test
             // module parsing specifically for this case.
-            import('./about/about.module').then(m => m.AboutModule,)
+            import('./about/about.module').then(m => m.AboutModule)
     },
     { path: '', redirectTo: 'home', pathMatch: 'full' },
     { path: '**', redirectTo: 'home', pathMatch: 'full' }

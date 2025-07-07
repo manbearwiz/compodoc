@@ -1,4 +1,4 @@
-import { CanActivate } from '@angular/router';
+import type { CanActivate } from '@angular/router';
 
 class AuthGuard implements CanActivate {
     public canActivate() {

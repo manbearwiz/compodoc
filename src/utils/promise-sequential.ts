@@ -9,20 +9,20 @@ export function promiseSequential(promises) {
 
         const iterateeFunc = (previousPromise, currentPromise) => {
             return previousPromise
-                .then(function(result) {
+                .then(result => {
                     if (count++ !== 0) {
                         results = results.concat(result);
                     }
                     return currentPromise(result, results, count);
                 })
                 .catch(err => {
-                    return reject(err);
+                    reject(err);
                 });
         };
 
         promises = promises.concat(() => Promise.resolve());
 
-        promises.reduce(iterateeFunc, Promise.resolve(false)).then(res => {
+        promises.reduce(iterateeFunc, Promise.resolve(false)).then(_res => {
             resolve(results);
         });
     });

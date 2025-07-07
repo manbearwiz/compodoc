@@ -1,5 +1,5 @@
-import { Component, Input, Output, HostBinding, HostListener } from '@angular/core';
-import { Todo } from '../models/todo.model';
+import { Component, HostBinding, HostListener, Input, Output } from '@angular/core';
+import type { Todo } from '../models/todo.model';
 
 import { DumbParentComponent as PapaComponent } from './dumb-parent-component';
 

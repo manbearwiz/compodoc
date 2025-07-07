@@ -7,7 +7,7 @@ export const PI: number = 3.14;
 /**
  * @deprecated This variable is deprecated
  */
-export let PIT = 4;
+export const PIT = 4;
 
 /**
  * A foo bar function. Test link for other class {@link ListComponent}
@@ -33,10 +33,10 @@ export interface TOTsdosds<T> {
  * @deprecated This enum is deprecated
  */
 export enum Direction {
-    Up,
-    Down,
-    Left,
-    Right
+    Up = 0,
+    Down = 1,
+    Left = 2,
+    Right = 3
 }
 
 /*
@@ -56,7 +56,7 @@ export type TableColumnTarget = number | string | (number | string)[];
 
 export type TableSyncRenderer = Type<TableCellRendererBase> | TemplateRef<any>;
 
-import { Todo } from '../models/todo.model';
+import type { Todo } from '../models/todo.model';
 
 /**
  * @deprecated This type alias is deprecated

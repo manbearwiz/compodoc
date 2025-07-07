@@ -48,14 +48,13 @@ export class MarkdownToPDFEngine {
     public convert(stringToConvert: string) {
         this.convertedTokens = [];
         // console.log('MarkdownToPDFEngine convert: ', stringToConvert);
-        const tokens = this.markedInstance.lexer(stringToConvert);
+        const _tokens = this.markedInstance.lexer(stringToConvert);
         // console.log(tokens);
         // const pdfmakeData = this.markedInstance.Parser.parse(tokens);
         // console.log(this.convertedTokens);
-        const result = {
+        return {
             text: this.convertedTokens
         };
-        return result;
     }
 }
 

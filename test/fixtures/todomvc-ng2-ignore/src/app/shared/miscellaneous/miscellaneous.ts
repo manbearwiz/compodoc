@@ -7,7 +7,7 @@ export const PI: number = 3.14;
 /**
  * @ignore
  */
-export let PIT = 4;
+export const PIT = 4;
 
 /**
  * A foo bar function
@@ -31,10 +31,10 @@ export interface TOTsdosds<T> {
  * @ignore
  */
 export enum Direction {
-    Up,
-    Down,
-    Left,
-    Right
+    Up = 0,
+    Down = 1,
+    Left = 2,
+    Right = 3
 }
 
 /*

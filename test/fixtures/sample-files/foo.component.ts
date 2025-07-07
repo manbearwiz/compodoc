@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, input, Output, output, model } from '@angular/core';
+import { Component, EventEmitter, Input, Output, input, model, output } from '@angular/core';
 
 /**
  * FooComponent description
@@ -29,7 +29,7 @@ export class FooComponent {
      * An example input
      * {@link BarComponent} or [BarComponent2]{@link BarComponent} or {@link BarComponent|BarComponent3}
      */
-    @Input() exampleInput: string = 'foo';
+    @Input() exampleInput = 'foo';
 
     /**
      * An example required input

@@ -1,8 +1,8 @@
-import { ts } from 'ts-morph';
+import type { ts } from 'ts-morph';
 
 export class JsDocHelper {
     public hasJSDocInternalTag(
-        filename: string,
+        _filename: string,
         sourceFile: ts.SourceFile,
         node: ts.Node
     ): boolean {
@@ -13,7 +13,7 @@ export class JsDocHelper {
         return false;
     }
 
-    private checkStatements(statements: ReadonlyArray<ts.Statement>, node: ts.Node): boolean {
+    private checkStatements(statements: readonly ts.Statement[], node: ts.Node): boolean {
         return statements.some(x => this.checkStatement(x, node));
     }
 
@@ -27,13 +27,13 @@ export class JsDocHelper {
         return false;
     }
 
-    private checkJsDocs(jsDocs: ReadonlyArray<ts.JSDoc>): boolean {
+    private checkJsDocs(jsDocs: readonly ts.JSDoc[]): boolean {
         return jsDocs
             .filter(x => x.tags && x.tags.length > 0)
             .some(x => this.checkJsDocTags(x.tags));
     }
 
-    private checkJsDocTags(tags: ReadonlyArray<ts.JSDocTag>): boolean {
+    private checkJsDocTags(tags: readonly ts.JSDocTag[]): boolean {
         return tags.some(x => x.tagName && x.tagName.text === 'internal');
     }
 }

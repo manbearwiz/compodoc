@@ -1,4 +1,4 @@
-const eol = require('os').EOL;
+const eol = require('node:os').EOL;
 
 import { expect } from 'chai';
 import { exists, read, shell, temporaryDir } from '../helpers';
@@ -10,26 +10,26 @@ describe('CLI simple generation - big app', () => {
     let interfaceIDATAFile;
     let searchFuncFile;
 
-    let todoComponentFile,
-        todoMVCComponentFile,
-        homeComponentFile,
-        aboutComponentFile,
-        appComponentFile,
-        listComponentFile,
-        footerComponentFile,
-        doNothingDirectiveFile,
-        todoClassFile,
-        tidiClassFile,
-        aboutModuleFile,
-        todoStoreFile,
-        typeAliasesFile,
-        functionsFile,
-        contactInfoInterfaceFile;
+    let todoComponentFile;
+    let todoMVCComponentFile;
+    let homeComponentFile;
+    let aboutComponentFile;
+    let appComponentFile;
+    let listComponentFile;
+    let footerComponentFile;
+    let doNothingDirectiveFile;
+    let todoClassFile;
+    let tidiClassFile;
+    let aboutModuleFile;
+    let todoStoreFile;
+    let typeAliasesFile;
+    let functionsFile;
+    let contactInfoInterfaceFile;
 
     let routesIndex;
 
-    const tmpFolder = tmp.name + '-big-app';
-    const distFolder = tmpFolder + '/documentation';
+    const tmpFolder = `${tmp.name}-big-app`;
+    const distFolder = `${tmpFolder}/documentation`;
 
     before(done => {
         tmp.create(tmpFolder);
@@ -87,22 +87,22 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should have generated main pages', () => {
-        const isIndexExists = exists(distFolder + '/index.html');
+        const isIndexExists = exists(`${distFolder}/index.html`);
         expect(isIndexExists).to.be.true;
-        const isModulesExists = exists(distFolder + '/modules.html');
+        const isModulesExists = exists(`${distFolder}/modules.html`);
         expect(isModulesExists).to.be.true;
-        const isRoutesExists = exists(distFolder + '/routes.html');
+        const isRoutesExists = exists(`${distFolder}/routes.html`);
         expect(isRoutesExists).to.be.true;
     });
 
     it('should have generated resources folder', () => {
-        const isImagesExists = exists(distFolder + '/images');
+        const isImagesExists = exists(`${distFolder}/images`);
         expect(isImagesExists).to.be.true;
-        const isJSExists = exists(distFolder + '/js');
+        const isJSExists = exists(`${distFolder}/js`);
         expect(isJSExists).to.be.true;
-        const isStylesExists = exists(distFolder + '/styles');
+        const isStylesExists = exists(`${distFolder}/styles`);
         expect(isStylesExists).to.be.true;
-        const isFontsExists = exists(distFolder + '/fonts');
+        const isFontsExists = exists(`${distFolder}/fonts`);
         expect(isFontsExists).to.be.true;
     });
 
@@ -186,27 +186,27 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should have generated interfaces', () => {
-        const isInterfaceExists = exists(distFolder + '/interfaces/ClockInterface.html');
+        const isInterfaceExists = exists(`${distFolder}/interfaces/ClockInterface.html`);
         expect(isInterfaceExists).to.be.true;
     });
 
     it('should have generated classes', () => {
-        const clockFile = exists(distFolder + '/classes/Clock.html');
+        const clockFile = exists(`${distFolder}/classes/Clock.html`);
         expect(clockFile).to.be.true;
     });
 
     it('should have generated components', () => {
-        const file = exists(distFolder + '/components/AboutComponent.html');
+        const file = exists(`${distFolder}/components/AboutComponent.html`);
         expect(file).to.be.true;
     });
 
     it('should have generated directives', () => {
-        const file = exists(distFolder + '/directives/DoNothingDirective.html');
+        const file = exists(`${distFolder}/directives/DoNothingDirective.html`);
         expect(file).to.be.true;
     });
 
     it('should have generated injectables', () => {
-        const file = exists(distFolder + '/injectables/TodoStore.html');
+        const file = exists(`${distFolder}/injectables/TodoStore.html`);
         expect(file).to.be.true;
     });
 
@@ -231,15 +231,15 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should have generated modules', () => {
-        const file = exists(distFolder + '/modules/AboutModule.html');
+        const file = exists(`${distFolder}/modules/AboutModule.html`);
         expect(file).to.be.true;
     });
 
     it('should have generated pipes', () => {
-        const file = exists(distFolder + '/pipes/FirstUpperPipe.html');
+        const file = exists(`${distFolder}/pipes/FirstUpperPipe.html`);
         expect(file).to.be.true;
 
-        const pipeFile = read(distFolder + '/pipes/FirstUpperPipe.html');
+        const pipeFile = read(`${distFolder}/pipes/FirstUpperPipe.html`);
         expect(pipeFile).to.contain('<h3>Metadata');
         expect(pipeFile).to.contain('Example property');
         expect(pipeFile).to.contain('the transform function');
@@ -248,7 +248,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should have miscellaneous page', () => {
-        const file = exists(distFolder + '/miscellaneous/enumerations.html');
+        const file = exists(`${distFolder}/miscellaneous/enumerations.html`);
         expect(file).to.be.true;
     });
 
@@ -297,24 +297,24 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should have managed array declaration in modules', () => {
-        const file = read(distFolder + '/modules/TodoModule.html');
+        const file = read(`${distFolder}/modules/TodoModule.html`);
         expect(file).to.contain('<title>FirstUpperPipe</title>'); // Inside svg graph
-        const file2 = read(distFolder + '/modules/ListModule.html');
+        const file2 = read(`${distFolder}/modules/ListModule.html`);
         expect(file2).to.contain('<title>TodoModule</title>'); // Inside svg graph
     });
 
     it('should have README tabs for each types', () => {
         expect(todoComponentFile).to.contain('id="readme-tab"');
         expect(aboutModuleFile).to.contain('id="readme-tab"');
-        let file = read(distFolder + '/directives/DoNothingDirective.html');
+        let file = read(`${distFolder}/directives/DoNothingDirective.html`);
         expect(file).to.contain('id="readme-tab"');
         expect(todoStoreFile).to.contain('id="readme-tab"');
-        file = read(distFolder + '/pipes/FirstUpperPipe.html');
+        file = read(`${distFolder}/pipes/FirstUpperPipe.html`);
         expect(file).to.contain('id="readme-tab"');
 
         expect(todoClassFile).to.contain('id="readme-tab"');
 
-        file = read(distFolder + '/interfaces/ClockInterface.html');
+        file = read(`${distFolder}/interfaces/ClockInterface.html`);
         expect(file).to.contain('id="readme-tab"');
     });
 
@@ -356,7 +356,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support simple class with custom decorator()', () => {
-        const file = read(distFolder + '/classes/DoNothing.html');
+        const file = read(`${distFolder}/classes/DoNothing.html`);
         expect(file).to.contain('aname</b>');
     });
 
@@ -371,7 +371,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support @HostBindings', () => {
-        const file = read(distFolder + '/directives/DoNothingDirective.html');
+        const file = read(`${distFolder}/directives/DoNothingDirective.html`);
         expect(file).to.contain('style.color</b>');
     });
 
@@ -381,12 +381,12 @@ describe('CLI simple generation - big app', () => {
         );
 
         expect(doNothingDirectiveFile).to.contain(
-            `<code>@HostListener(&#x27;focus&#x27;, [&#x27;$event&#x27;])<br />@HostListener(&#x27;click&#x27;, [&#x27;$event&#x27;])<br /></code>`
+            '<code>@HostListener(&#x27;focus&#x27;, [&#x27;$event&#x27;])<br />@HostListener(&#x27;click&#x27;, [&#x27;$event&#x27;])<br /></code>'
         );
     });
 
     it('should support extends for interface', () => {
-        const file = read(distFolder + '/interfaces/ClockInterface.html');
+        const file = read(`${distFolder}/interfaces/ClockInterface.html`);
         expect(file).to.contain('Extends');
     });
 
@@ -422,21 +422,21 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support accessors for directives', () => {
-        const file = read(distFolder + '/directives/DoNothingDirective.html');
+        const file = read(`${distFolder}/directives/DoNothingDirective.html`);
         expect(file).to.contain('Accessors');
         expect(file).to.contain('Getter of _fullName');
         expect(file).to.contain('Setter of _fullName');
     });
 
     it('should support accessors for components with input', () => {
-        let file = read(distFolder + '/components/HeaderComponent.html');
+        let file = read(`${distFolder}/components/HeaderComponent.html`);
         expect(file).to.contain('Accessors');
         expect(file).to.contain('Getter of _fullName');
         expect(file).to.contain('Setter of _fullName');
 
         expect(file).to.contain('Inputs');
 
-        file = read(distFolder + '/components/DumbComponent.html');
+        file = read(`${distFolder}/components/DumbComponent.html`);
         expect(file).to.contain(
             '<code>visibleTodos(value: <a href="../classes/Todo.html" target="_self">Todo</a>)</code>'
         );
@@ -447,47 +447,47 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support namespace', () => {
-        let file = read(distFolder + '/modules/AboutModule2.html');
+        let file = read(`${distFolder}/modules/AboutModule2.html`);
         expect(file).to.contain('The about module');
 
-        file = read(distFolder + '/components/AboutComponent2.html');
+        file = read(`${distFolder}/components/AboutComponent2.html`);
         expect(file).to.contain('The about component');
 
-        file = read(distFolder + '/directives/DoNothingDirective2.html');
+        file = read(`${distFolder}/directives/DoNothingDirective2.html`);
         expect(file).to.contain('This directive does nothing !');
 
-        file = read(distFolder + '/classes/Todo2.html');
+        file = read(`${distFolder}/classes/Todo2.html`);
         expect(file).to.contain('The todo class');
 
-        file = read(distFolder + '/injectables/TodoStore2.html');
+        file = read(`${distFolder}/injectables/TodoStore2.html`);
         expect(file).to.contain('This service is a todo store');
 
-        file = read(distFolder + '/interfaces/TimeInterface2.html');
+        file = read(`${distFolder}/interfaces/TimeInterface2.html`);
         expect(file).to.contain('A time interface just for documentation purpose');
 
-        file = read(distFolder + '/pipes/FirstUpperPipe2.html');
+        file = read(`${distFolder}/pipes/FirstUpperPipe2.html`);
         expect(file).to.contain('Uppercase the first letter of the string');
 
-        file = read(distFolder + '/miscellaneous/enumerations.html');
+        file = read(`${distFolder}/miscellaneous/enumerations.html`);
         expect(file).to.contain('PopupEffect2');
 
         expect(functionsFile).to.contain('foo2');
 
         expect(typeAliasesFile).to.contain('Name2');
 
-        file = read(distFolder + '/miscellaneous/variables.html');
+        file = read(`${distFolder}/miscellaneous/variables.html`);
         expect(file).to.contain('PI2');
     });
 
     it('should support spread operator for modules metadatas', () => {
-        const file = read(distFolder + '/modules/HomeModule.html');
+        const file = read(`${distFolder}/modules/HomeModule.html`);
         expect(file).to.contain('../modules/FooterModule.html');
     });
 
     it('should support interceptors', () => {
-        const file = read(distFolder + '/modules/AppModule.html');
+        const file = read(`${distFolder}/modules/AppModule.html`);
         expect(file).to.contain('../interceptors/NoopInterceptor.html');
-        const fileTest = exists(distFolder + '/interceptors/NoopInterceptor.html');
+        const fileTest = exists(`${distFolder}/interceptors/NoopInterceptor.html`);
         expect(fileTest).to.be.true;
     });
 
@@ -526,12 +526,12 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should schemas for modules', () => {
-        const file = read(distFolder + '/modules/FooterModule.html');
+        const file = read(`${distFolder}/modules/FooterModule.html`);
         expect(file).to.contain('<h3>Schemas');
     });
 
     it('should support dynamic path for routes', () => {
-        const routesFile = read(distFolder + '/js/routes/routes_index.js');
+        const routesFile = read(`${distFolder}/js/routes/routes_index.js`);
         expect(routesFile).to.contain('homeimported');
         expect(routesFile).to.contain('homeenumimported');
         expect(routesFile).to.contain('homeenuminfile');
@@ -572,23 +572,23 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support default type on default value', () => {
-        const file = read(distFolder + '/classes/TODO_STATUS.html');
+        const file = read(`${distFolder}/classes/TODO_STATUS.html`);
         expect(file).to.contain(
             'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/string"'
         );
     });
 
     it('should display project dependencies', () => {
-        const file = exists(distFolder + '/dependencies.html');
+        const file = exists(`${distFolder}/dependencies.html`);
         expect(file).to.be.true;
-        const dependencies = read(distFolder + '/dependencies.html');
+        const dependencies = read(`${distFolder}/dependencies.html`);
         expect(dependencies).to.contain('angular/forms');
     });
 
     it('should display project properties', () => {
-        const file = exists(distFolder + '/properties.html');
+        const file = exists(`${distFolder}/properties.html`);
         expect(file).to.be.true;
-        const properties = read(distFolder + '/properties.html');
+        const properties = read(`${distFolder}/properties.html`);
         expect(properties).to.contain('Demo for project');
         expect(properties).to.contain('The author');
         expect(properties).to.contain('https://github.com/just-a-repo');
@@ -611,17 +611,17 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support optional for interfaces', () => {
-        const file = read(distFolder + '/interfaces/LabelledTodo.html');
+        const file = read(`${distFolder}/interfaces/LabelledTodo.html`);
         expect(file).to.contain('Optional');
     });
 
     it('should support optional for interfaces / methods', () => {
-        const file = read(distFolder + '/interfaces/TimeInterface.html');
+        const file = read(`${distFolder}/interfaces/TimeInterface.html`);
         expect(file).to.contain('Optional');
     });
 
     it('should support private for constructor', () => {
-        const file = read(distFolder + '/classes/PrivateConstructor.html');
+        const file = read(`${distFolder}/classes/PrivateConstructor.html`);
         expect(file).to.contain('<span class="modifier">Private</span>');
     });
 
@@ -654,7 +654,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support alone elements in their own entry menu', () => {
-        const file = read(distFolder + '/js/menu-wc.js');
+        const file = read(`${distFolder}/js/menu-wc.js`);
         expect(file).to.contain(
             '<a href="components/JigsawTab.html" data-type="entity-link" >JigsawTab</a>'
         );
@@ -686,7 +686,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support component inheritance with base class without @component decorator', () => {
-        const file = read(distFolder + '/components/DumbComponent.html');
+        const file = read(`${distFolder}/components/DumbComponent.html`);
         expect(file).to.contain('parentInput</b>');
         expect(file).to.contain('parentoutput</b>');
         expect(file).to.contain('style.color</b>');
@@ -694,18 +694,18 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should display short filename + long filename in title for index of miscellaneous', () => {
-        const file = read(distFolder + '/miscellaneous/variables.html');
+        const file = read(`${distFolder}/miscellaneous/variables.html`);
         expect(file).to.contain('(src/.../about.module.ts)');
         expect(file).to.contain('title="src/app/about/about.module.ts"');
     });
 
     it('should display component even with no hostlisteners', () => {
-        const file = read(distFolder + '/coverage.html');
+        const file = read(`${distFolder}/coverage.html`);
         expect(file).to.contain('src/app/footer/footer.component.ts');
     });
 
     it('should display list of import/exports/declarations/providers in asc order', () => {
-        const file = read(distFolder + '/modules/AboutRoutingModule.html');
+        const file = read(`${distFolder}/modules/AboutRoutingModule.html`);
         expect(file).to.contain(
             `<li class="list-group-item">${eol}                            <a href="../components/CompodocComponent.html">CompodocComponent</a>${eol}                        </li>${eol}                        <li class="list-group-item">${eol}                            <a href="../components/TodoMVCComponent.html">`
         );
@@ -723,17 +723,17 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support Type parameters', () => {
-        expect(appComponentFile).to.contain(`<li>T</li>`);
-        expect(appComponentFile).to.contain(`<li>K</li>`);
+        expect(appComponentFile).to.contain('<li>T</li>');
+        expect(appComponentFile).to.contain('<li>K</li>');
     });
 
     it('should support spread elements with external variables', () => {
-        const file = read(distFolder + '/modules/FooterModule.html');
+        const file = read(`${distFolder}/modules/FooterModule.html`);
         expect(file).to.contain('<h3>Declarations<a href=');
     });
 
     it('should support interfaces with custom variables names', () => {
-        const file = read(distFolder + '/interfaces/ValueInRes.html');
+        const file = read(`${distFolder}/interfaces/ValueInRes.html`);
         expect(file).to.contain('<a href="#__allAnd">');
     });
 
@@ -755,12 +755,12 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('correct display styles tab', () => {
-        let file = read(distFolder + '/components/HeaderComponent.html');
+        let file = read(`${distFolder}/components/HeaderComponent.html`);
         expect(file).to.contain('styleData-tab');
         expect(file).to.contain('language-scss');
         expect(appComponentFile).to.contain('styleData-tab');
         expect(appComponentFile).to.contain('font-size');
-        file = read(distFolder + '/components/TodoMVCComponent.html');
+        file = read(`${distFolder}/components/TodoMVCComponent.html`);
         expect(file).to.contain('styleData-tab');
         expect(file).to.contain('pointer-events');
     });
@@ -770,7 +770,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('correct support gorRoot & forChild methods for modules', () => {
-        const file = read(distFolder + '/modules/AppModule.html');
+        const file = read(`${distFolder}/modules/AppModule.html`);
         expect(file).to.contain('code>forChild(confi');
         expect(file).to.contain('code>forRoot(confi');
     });
@@ -792,7 +792,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('correct supports 1000 as PollingSpeed for decorator arguments', () => {
-        const file = read(distFolder + '/classes/SomeFeature.html');
+        const file = read(`${distFolder}/classes/SomeFeature.html`);
         expect(file).to.contain('code>@throttle(1000 as PollingSpeed');
     });
 
@@ -809,7 +809,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support inheritance with abstract class', () => {
-        const file = read(distFolder + '/components/SonComponent.html');
+        const file = read(`${distFolder}/components/SonComponent.html`);
         expect(file).to.contain(
             'href="../components/MotherComponent.html#source" target="_self" >MotherComponent:20'
         );
@@ -819,7 +819,7 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support generic in function arguments', () => {
-        const file = read(distFolder + '/components/GenericComponent.html');
+        const file = read(`${distFolder}/components/GenericComponent.html`);
         expect(file).to.contain(
             'code>getData(foo: <a href="../interfaces/Foo.html" target="_self">Foo&lt;object&gt;</a>)</code'
         );
@@ -829,78 +829,78 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support inheritance between component and directive', () => {
-        const file = read(distFolder + '/components/InheritDirComponent.html');
+        const file = read(`${distFolder}/components/InheritDirComponent.html`);
         expect(file).to.contain('BaseDirective.html" target="_self" >BaseDirective');
         expect(file).to.contain('b>testPropertyInBase</b');
     });
 
     it('should support ECMAScript Private Fields and methods', () => {
-        const file = read(distFolder + '/classes/Todo.html');
+        const file = read(`${distFolder}/classes/Todo.html`);
         expect(file).to.contain('b>#newprivateproperty</b');
         expect(file).to.contain('p>Another private property</p');
     });
 
     it('should support type alias and template literal', () => {
-        const file = read(distFolder + '/miscellaneous/typealiases.html');
+        const file = read(`${distFolder}/miscellaneous/typealiases.html`);
         expect(file).to.contain('(min-width: ${Foo}px)&#x60;</a');
     });
 
     it('should support destructuring for functions', () => {
-        const file = read(distFolder + '/miscellaneous/functions.html');
+        const file = read(`${distFolder}/miscellaneous/functions.html`);
         expect(file).to.contain('<code>sumFunction(trackId, __namedParameters: {a');
         expect(file).to.contain('<code>2</code>');
     });
 
     it('should support default value for functions parameters', () => {
-        const file = read(distFolder + '/miscellaneous/functions.html');
+        const file = read(`${distFolder}/miscellaneous/functions.html`);
         expect(file).to.contain('<code>&#x27;toto&#x27;</code>');
     });
 
     it('should support destructuring for variables / array', () => {
-        const file = read(distFolder + '/miscellaneous/variables.html');
+        const file = read(`${distFolder}/miscellaneous/variables.html`);
         expect(file).to.contain('<code>&#x27;Gabriel&#x27;</code>');
     });
 
     it('should support JSDoc @link in JSDoc @param tag', () => {
-        let file = read(distFolder + '/injectables/TodoStore.html');
+        let file = read(`${distFolder}/injectables/TodoStore.html`);
         expect(file).to.contain(
             'all todos -&gt; see <a href="../components/FooterComponent.html">FooterComponent'
         );
-        file = read(distFolder + '/components/FooterComponent.html');
+        file = read(`${distFolder}/components/FooterComponent.html`);
         expect(file).to.contain(
             'A TodoStore -&gt; see <a href="../injectables/TodoStore.html">TodoStore'
         );
     });
 
     it('should support JSDoc @link in JSDoc @see tag', () => {
-        const file = read(distFolder + '/injectables/TodoStore.html');
+        const file = read(`${distFolder}/injectables/TodoStore.html`);
         expect(file).to.contain('See <a href="../classes/Todo.html">Todo</a> for details');
     });
 
     it('should support JSDoc @link for setters and getters', () => {
-        const file = read(distFolder + '/injectables/TodoStore.html');
+        const file = read(`${distFolder}/injectables/TodoStore.html`);
         expect(file).to.contain('or link to <a href="../classes/Todo.html">Todo');
         expect(file).to.contain('ore link to <a href="../classes/Todo.html">Todo');
     });
 
     it('should support JSDoc @link for inputs', () => {
-        const file = read(distFolder + '/components/HeaderComponent.html');
+        const file = read(`${distFolder}/components/HeaderComponent.html`);
         expect(file).to.contain('_fullName <a href="https://compodoc.app/">https://compodoc.app/');
     });
 
     it('should not crash with invalid JSDoc @link tags', () => {
-        const file = read(distFolder + '/components/AboutComponent.html');
+        const file = read(`${distFolder}/components/AboutComponent.html`);
         expect(file).to.contain('if this {@link AboutComponent.fullName} does not crash');
         expect(file).to.contain('if this {@link undefined} does not crash');
     });
 
     it('should support multiple decorators for component for example', () => {
-        const file = read(distFolder + '/components/AboutComponent.html');
+        const file = read(`${distFolder}/components/AboutComponent.html`);
         expect(file).to.contain('<code>src/app/about/about.component.ts</code>');
     });
 
     it('should not have bootstraped component in components menu entry', () => {
-        const file = read(distFolder + '/js/menu-wc.js');
+        const file = read(`${distFolder}/js/menu-wc.js`);
         expect(file).to.not.contain(
             '<a href="components/AppComponent.html" data-type="entity-link" >AppComponent</a>'
         );
@@ -913,27 +913,27 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support double layer spread for modules', () => {
-        const file = read(distFolder + '/modules/HeaderModule.html');
+        const file = read(`${distFolder}/modules/HeaderModule.html`);
         expect(file).to.contain('href="../components/HeaderComponent.html">HeaderComponent');
     });
 
     it('should support class name includes an interface name', () => {
-        const file = read(distFolder + '/classes/Container.html');
+        const file = read(`${distFolder}/classes/Container.html`);
         expect(file).to.contain('href="../classes/AaBb.html" target="_self" >AaBb');
     });
 
     it('should support service/injectable export in module providers', () => {
-        const file = read(distFolder + '/modules/FooterModule.html');
+        const file = read(`${distFolder}/modules/FooterModule.html`);
         expect(file).to.contain('href="../injectables/EmitterService.html">EmitterService');
     });
 
     it('should support exportAs for directives', () => {
-        const file = read(distFolder + '/directives/DoNothingDirective.html');
+        const file = read(`${distFolder}/directives/DoNothingDirective.html`);
         expect(file).to.contain('<code>donothing</code>');
     });
 
     it('should support standalone for components, directives and pipes', () => {
-        let file = read(distFolder + '/components/TodoComponent.html');
+        let file = read(`${distFolder}/components/TodoComponent.html`);
         expect(file).to.contain('<td class="col-md-3">standalone</td>');
         expect(file).to.contain('<td class="col-md-3">imports</td>');
         expect(file).to.contain(
@@ -943,33 +943,33 @@ describe('CLI simple generation - big app', () => {
             '<code><a href="../modules/AboutModule.html" target="_self" >AboutModule</a></code>'
         );
 
-        file = read(distFolder + '/directives/DoNothingDirective.html');
+        file = read(`${distFolder}/directives/DoNothingDirective.html`);
         expect(file).to.contain('<code>donothing</code>');
         expect(file).to.contain('<td class="col-md-3">Standalone</td>');
 
-        file = read(distFolder + '/pipes/StandAlonePipe.html');
+        file = read(`${distFolder}/pipes/StandAlonePipe.html`);
         expect(file).to.contain('<td class="col-md-3">Standalone</td>');
     });
 
     it('should support required for inputs', () => {
-        const file = read(distFolder + '/components/TodoComponent.html');
+        const file = read(`${distFolder}/components/TodoComponent.html`);
         expect(file).to.contain('<i>Required : </i>&nbsp;<b>true</b>');
     });
 
     it('should support Host Directives for directives and components', () => {
-        let file = read(distFolder + '/components/AboutComponent.html');
+        let file = read(`${distFolder}/components/AboutComponent.html`);
         expect(file).to.contain('<td class="col-md-3">HostDirectives</td>');
         expect(file).to.contain(
             '<code><a href="../directives/DoNothingDirective.html" target="_self" >DoNothingDirective</a></code>'
         );
 
-        file = read(distFolder + '/directives/DoNothingDirective.html');
+        file = read(`${distFolder}/directives/DoNothingDirective.html`);
         expect(file).to.contain('<td class="col-md-3">HostDirectives</td>');
         expect(file).to.contain(
             '<code><a href="../directives/BorderDirective.html" target="_self" >BorderDirective</a></code>'
         );
 
-        file = read(distFolder + '/directives/HighlightAndBorderDirective.html');
+        file = read(`${distFolder}/directives/HighlightAndBorderDirective.html`);
         expect(file).to.contain('<td class="col-md-3">HostDirectives</td>');
         expect(file).to.contain(
             '<code><a href="../directives/HighlightDirective.html" target="_self" >HighlightDirective</a></code>'
@@ -978,15 +978,15 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support inputs and outputs signals and model', () => {
-        const file = read(distFolder + '/classes/DumbParentComponent.html');
+        const file = read(`${distFolder}/classes/DumbParentComponent.html`);
         expect(file).to.contain('<a href="#label" >label</a>');
         expect(file).to.contain('<a href="#currentChange" >currentChange</a>');
     });
 
     it('should support component styles url/urls', () => {
-        let file = read(distFolder + '/components/CompodocComponent.html');
+        let file = read(`${distFolder}/components/CompodocComponent.html`);
         expect(file).to.contain('<code>./compodoc.component.css</code>');
-        file = read(distFolder + '/components/AboutComponent.html');
+        file = read(`${distFolder}/components/AboutComponent.html`);
         expect(file).to.contain(`<code>
         a {
             color: #03a9f4;
@@ -995,11 +995,11 @@ describe('CLI simple generation - big app', () => {
     });
 
     it('should support aliases', () => {
-        let file = read(distFolder + '/components/DumbImportComponent.html');
+        let file = read(`${distFolder}/components/DumbImportComponent.html`);
         expect(file).to.contain(
             '<a href="../classes/DumbParentComponent.html" target="_self" >PapaComponent</a>'
         );
-        file = read(distFolder + '/components/DumbWithExportComponent.html');
+        file = read(`${distFolder}/components/DumbWithExportComponent.html`);
         expect(file).to.contain(
             '<a href="../classes/DumbParentComponent.html" target="_self" >LegacyPapaComponent</a>'
         );
@@ -1013,7 +1013,7 @@ describe('CLI simple generation - big app', () => {
 
     describe('input signals', () => {
         it('should support input signals', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1041,7 +1041,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support input signals with a default value', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1068,7 +1068,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support input signals a default quoted value', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1095,7 +1095,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support input signals with an alias', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1122,7 +1122,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support required input signals', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 ` <table class="table table-sm table-bordered">
@@ -1149,7 +1149,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support required input signals with a type ', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1182,7 +1182,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support input signals with a type', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1215,7 +1215,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support input signals with a quoted type', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1248,7 +1248,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support input signals with multiple types', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1281,7 +1281,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support input signals with multiple types, quoted and standard', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1316,7 +1316,7 @@ describe('CLI simple generation - big app', () => {
 
     describe('output signals', () => {
         it('should support output signals', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1344,7 +1344,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support output signals with an alias', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1366,7 +1366,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support output signals with a type', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1394,7 +1394,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support output signals with a quoted type', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1422,7 +1422,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support output signals with multiple types', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1450,7 +1450,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support output signals with multiple types, quoted and standard', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1480,7 +1480,7 @@ describe('CLI simple generation - big app', () => {
 
     describe('model signals', () => {
         it('should support model signals', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1508,7 +1508,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support model signals with a default value', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1535,7 +1535,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support model signals a default quoted value', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1562,7 +1562,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support model signals with an alias', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1589,7 +1589,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support required model signals', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1616,7 +1616,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support required model signals with a type ', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1649,7 +1649,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support model signals with a type', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1682,7 +1682,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support model signals with a quoted type', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1715,7 +1715,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support model signals with multiple types', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">
@@ -1743,7 +1743,7 @@ describe('CLI simple generation - big app', () => {
         });
 
         it('should support model signals with multiple types, quoted and standard', () => {
-            const file = read(distFolder + '/components/CompodocComponent.html');
+            const file = read(`${distFolder}/components/CompodocComponent.html`);
 
             expect(file).to.contain(
                 `<table class="table table-sm table-bordered">

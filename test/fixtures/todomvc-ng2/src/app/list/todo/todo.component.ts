@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
 
-import { Todo } from '../../shared/models/todo.model';
+import type { Todo } from '../../shared/models/todo.model';
 
-import { TodoStore } from '../../shared/services/todo.store';
-import { DoNothingDirective } from 'app/shared/directives/do-nothing.directive';
 import { AboutModule } from 'app/about';
+import { DoNothingDirective } from 'app/shared/directives/do-nothing.directive';
+import type { TodoStore } from '../../shared/services/todo.store';
 
 /**
  * The todo component

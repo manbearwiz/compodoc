@@ -1,9 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, type OnInit } from '@angular/core';
 import { BarService } from './bar.service';
 
 @Component({
     selector: 'app-bar',
-    templateUrl: `bar.template.html`,
+    templateUrl: 'bar.template.html',
     styleUrls: ['bar.style.scss', 'bar2.style.scss'],
     providers: [BarService]
 })
@@ -42,7 +42,7 @@ export class BarComponent implements OnInit {
         /**
          * @internal
          */
-        public internalConstructorProp: string = ''
+        public internalConstructorProp = ''
     ) {}
 
     ngOnInit() {}

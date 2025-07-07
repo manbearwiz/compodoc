@@ -47,6 +47,4 @@ export class PublicConfiguration {
     public unitTestCoverage: string;
     public watch: boolean;
     public maxSearchResults: string;
-
-    constructor() {}
 }

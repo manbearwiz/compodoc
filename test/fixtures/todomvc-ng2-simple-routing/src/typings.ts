@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
-import { PipeTransform, Pipe } from '@angular/core';
+import { Pipe, type PipeTransform } from '@angular/core';
 import { Directive, HostBinding, HostListener, Input } from '@angular/core';
-import { Component, OnInit } from '@angular/core';
+import { Component, type OnInit } from '@angular/core';
 import { NgModule } from '@angular/core';
 
 import { Todo } from './app/shared/models/todo.model';
 
-import { LabelledTodo } from './app/shared/interfaces/interfaces';
+import type { LabelledTodo } from './app/shared/interfaces/interfaces';
 
 namespace BSBO {
     export namespace Events {
@@ -104,10 +104,10 @@ namespace BSBO {
             todos: Array<Todo>;
 
             constructor() {
-                let persistedTodos = JSON.parse(localStorage.getItem('angular2-todos') || '[]');
+                const persistedTodos = JSON.parse(localStorage.getItem('angular2-todos') || '[]');
                 // Normalize back into classes
                 this.todos = persistedTodos.map((todo: { _title: string; completed: boolean }) => {
-                    let ret = new Todo(todo._title);
+                    const ret = new Todo(todo._title);
                     ret.completed = todo.completed;
                     return ret;
                 });
@@ -117,7 +117,7 @@ namespace BSBO {
                 localStorage.setItem('angular2-todos', JSON.stringify(this.todos));
             }
 
-            private getWithCompleted(completed: Boolean) {
+            private getWithCompleted(completed: boolean) {
                 return this.todos.filter((todo: Todo) => todo.completed === completed);
             }
 
@@ -322,10 +322,10 @@ namespace BSBO {
         export type Name2 = string;
 
         export enum PopupEffect2 {
-            fadeIn,
-            fadeOut,
-            bubbleIn,
-            bubbleOut
+            fadeIn = 0,
+            fadeOut = 1,
+            bubbleIn = 2,
+            bubbleOut = 3
         }
     }
 }

@@ -1,23 +1,21 @@
-import { IDep } from '../dependencies.interfaces';
-import { ts } from 'ts-morph';
+import type { ts } from 'ts-morph';
+import type { IDep } from '../dependencies.interfaces';
 
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 
 export class ControllerDepFactory {
-    constructor() {}
-
     public create(
         file: any,
         srcFile: ts.SourceFile,
         name: string,
-        properties: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        properties: readonly ts.ObjectLiteralElementLike[],
         IO: any
     ): IControllerDep {
         const sourceCode = srcFile.getText();
         const hash = crypto.createHash('sha512').update(sourceCode).digest('hex');
         const infos: IControllerDep = {
             name,
-            id: 'controller-' + name + '-' + hash,
+            id: `controller-${name}-${hash}`,
             file: file,
             methodsClass: IO.methods,
             type: 'controller',
@@ -45,7 +43,7 @@ export interface IControllerDep extends IDep {
     description: string;
     rawdescription: string;
     prefix?: string;
-    methodsClass: Array<any>;
+    methodsClass: any[];
     deprecated: boolean;
     deprecationMessage: string;
     extends?: any;

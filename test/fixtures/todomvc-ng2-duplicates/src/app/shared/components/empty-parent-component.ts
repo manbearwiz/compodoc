@@ -1,4 +1,4 @@
-import { Component, Input, Output, OnInit } from '@angular/core';
+import { Component, Input, type OnInit, Output } from '@angular/core';
 
 /**
  * Empty parent component for inheritance demo

@@ -1,15 +1,15 @@
 enum BasicTypes {
-    number,
-    boolean,
-    string,
-    object,
-    date,
-    function
+    number = 0,
+    boolean = 1,
+    string = 2,
+    object = 3,
+    date = 4,
+    function = 5
 }
 
 enum BasicTypeScriptTypes {
-    any,
-    void
+    any = 0,
+    void = 1
 }
 
 export class BasicTypeUtil {
@@ -30,9 +30,8 @@ export class BasicTypeUtil {
     public isJavascriptType(type: string): boolean {
         if (typeof type !== 'undefined' && type.toLowerCase) {
             return type.toLowerCase() in BasicTypes;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -43,9 +42,8 @@ export class BasicTypeUtil {
     public isTypeScriptType(type: string): boolean {
         if (typeof type !== 'undefined' && type.toLowerCase) {
             return type.toLowerCase() in BasicTypeScriptTypes;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -67,7 +65,7 @@ export class BasicTypeUtil {
         }
 
         if (this.isTypeScriptType(type)) {
-            return `https://www.typescriptlang.org/docs/handbook/basic-types.html`;
+            return 'https://www.typescriptlang.org/docs/handbook/basic-types.html';
         }
 
         return undefined;

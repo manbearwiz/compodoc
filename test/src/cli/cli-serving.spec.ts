@@ -1,17 +1,17 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, pkg, exists, exec, read, shellAsync } from '../helpers';
+import { exec, exists, pkg, read, shell, shellAsync, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI serving', () => {
-    const distFolder = tmp.name + '-serving',
-        TIMEOUT = 8000;
+    const distFolder = `${tmp.name}-serving`;
+    const TIMEOUT = 8000;
 
     describe('when serving with -s flag in another directory', () => {
-        let stdoutString = '',
-            child;
-        before(function (done) {
+        let stdoutString = '';
+        let child;
+        before(done => {
             tmp.create(distFolder);
-            let ls = shell('node', ['./bin/index-cli.js', '-s', '-d', distFolder], {
+            const ls = shell('node', ['./bin/index-cli.js', '-s', '-d', distFolder], {
                 timeout: TIMEOUT
             });
 
@@ -32,11 +32,11 @@ describe('CLI serving', () => {
     });
 
     describe('when serving with default directory', () => {
-        let stdoutString = '',
-            child;
-        before(function (done) {
+        let stdoutString = '';
+        let child;
+        before(done => {
             tmp.create('documentation');
-            let ls = shell(
+            const ls = shell(
                 'node',
                 [
                     './bin/index-cli.js',
@@ -63,11 +63,11 @@ describe('CLI serving', () => {
     });
 
     describe('when serving with default directory and different host', () => {
-        let stdoutString = '',
-            child;
-        before(function (done) {
+        let stdoutString = '';
+        let child;
+        before(done => {
             tmp.create('documentation');
-            let ls = shell(
+            const ls = shell(
                 'node',
                 [
                     './bin/index-cli.js',
@@ -96,10 +96,10 @@ describe('CLI serving', () => {
     });
 
     describe('when serving with default directory and without doc generation', () => {
-        let stdoutString = '',
-            child;
-        before(function (done) {
-            let ls = shell('node', ['./bin/index-cli.js', '-s', '-d', './documentation/'], {
+        let stdoutString = '';
+        let child;
+        before(done => {
+            const ls = shell('node', ['./bin/index-cli.js', '-s', '-d', './documentation/'], {
                 timeout: TIMEOUT
             });
 
@@ -119,10 +119,10 @@ describe('CLI serving', () => {
     });
 
     describe('when serving with default directory, without -d and without doc generation', () => {
-        let stdoutString = '',
-            child;
-        before(function (done) {
-            let ls = shell('node', ['./bin/index-cli.js', '-s'], { timeout: TIMEOUT });
+        let stdoutString = '';
+        let child;
+        before(done => {
+            const ls = shell('node', ['./bin/index-cli.js', '-s'], { timeout: TIMEOUT });
 
             if (ls.stderr.toString() !== '') {
                 console.error(`shell error: ${ls.stderr.toString()}`);

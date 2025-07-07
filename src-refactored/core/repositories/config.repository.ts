@@ -2,10 +2,10 @@ import Logger from '../../infrastructure/logging/logger';
 
 import { COMPODOC_DEFAULTS } from '../defaults';
 
+import type { CLIProgram } from '../entities/cli-program';
 import { InternalConfiguration } from '../entities/internal-configuration';
 import { PublicConfiguration } from '../entities/public-configuration';
-import { Flag, PUBLIC_FLAGS } from '../entities/public-flags';
-import { CLIProgram } from '../entities/cli-program';
+import { type Flag, PUBLIC_FLAGS } from '../entities/public-flags';
 
 export class ConfigurationRepository {
     private static instance: ConfigurationRepository;
@@ -35,9 +35,8 @@ export class ConfigurationRepository {
     public init(currentProgram: CLIProgram) {
         PUBLIC_FLAGS.forEach((publicFlag: Flag) => {
             if (this.publicConfiguration[publicFlag.label]) {
-                this.internalConfiguration[publicFlag.label] = this.publicConfiguration[
-                    publicFlag.label
-                ];
+                this.internalConfiguration[publicFlag.label] =
+                    this.publicConfiguration[publicFlag.label];
             }
 
             if (currentProgram.hasOwnProperty(publicFlag.label)) {
@@ -53,14 +52,14 @@ export class ConfigurationRepository {
             this.internalConfiguration.coverageTest = 0;
             this.internalConfiguration.coverageTestThreshold =
                 typeof this.publicConfiguration.coverageTest === 'string'
-                    ? parseInt(this.publicConfiguration.coverageTest, 10)
+                    ? Number.parseInt(this.publicConfiguration.coverageTest, 10)
                     : COMPODOC_DEFAULTS.defaultCoverageThreshold;
         }
         if (currentProgram.coverageTest) {
             this.internalConfiguration.coverageTest = 0;
             this.internalConfiguration.coverageTestThreshold =
                 typeof currentProgram.coverageTest === 'string'
-                    ? parseInt(currentProgram.coverageTest, 10)
+                    ? Number.parseInt(currentProgram.coverageTest, 10)
                     : COMPODOC_DEFAULTS.defaultCoverageThreshold;
         }
 
@@ -68,19 +67,20 @@ export class ConfigurationRepository {
             this.internalConfiguration.coverageTestPerFile = true;
             this.internalConfiguration.coverageMinimumPerFile =
                 typeof this.publicConfiguration.coverageMinimumPerFile === 'string'
-                    ? parseInt(this.publicConfiguration.coverageMinimumPerFile, 10)
+                    ? Number.parseInt(this.publicConfiguration.coverageMinimumPerFile, 10)
                     : COMPODOC_DEFAULTS.defaultCoverageMinimumPerFile;
         }
         if (currentProgram.coverageMinimumPerFile) {
             this.internalConfiguration.coverageTestPerFile = true;
             this.internalConfiguration.coverageMinimumPerFile =
                 typeof currentProgram.coverageMinimumPerFile === 'string'
-                    ? parseInt(currentProgram.coverageMinimumPerFile, 10)
+                    ? Number.parseInt(currentProgram.coverageMinimumPerFile, 10)
                     : COMPODOC_DEFAULTS.defaultCoverageMinimumPerFile;
         }
 
         if (this.publicConfiguration.coverageTestThresholdFail) {
-            this.internalConfiguration.coverageTestThresholdFail = this.publicConfiguration.coverageTestThresholdFail;
+            this.internalConfiguration.coverageTestThresholdFail =
+                this.publicConfiguration.coverageTestThresholdFail;
         }
         if (currentProgram.coverageTestThresholdFail) {
             this.internalConfiguration.coverageTestThresholdFail =

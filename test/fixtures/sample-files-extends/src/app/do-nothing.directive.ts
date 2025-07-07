@@ -5,7 +5,7 @@ import { ADirective } from './a.directive';
  * This directive does nothing !
  */
 @Directive({
-    selector: '[donothing]',
+    selector: '[donothing]'
 })
 export class DoNothingDirective extends ADirective {
     protected popover: string;

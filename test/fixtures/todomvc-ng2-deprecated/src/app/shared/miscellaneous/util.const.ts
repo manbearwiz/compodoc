@@ -1,4 +1,4 @@
-export const enum PollingSpeed {
+export enum PollingSpeed {
     Low = 1000,
     High = 100
 }

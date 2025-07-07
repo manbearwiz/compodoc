@@ -1,39 +1,37 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, type OnInit } from '@angular/core';
 import { BarService } from './bar.service';
 
 /**
  * The bar Component
  */
 @Component({
-	selector: 'app-bar',
-	templateUrl: `bar.template.html`,
-	providers: [BarService]
-
+    selector: 'app-bar',
+    templateUrl: 'bar.template.html',
+    providers: [BarService]
 })
 export class BarComponent implements OnInit {
     /**
-	 * foo method
-	 */
-	normalMethod() {}
+     * foo method
+     */
+    normalMethod() {}
 
-	/**
-	 * bar method
-	 * @internal
-	 */
-	internalMethod() {}
+    /**
+     * bar method
+     * @internal
+     */
+    internalMethod() {}
 
-	/**
-	 * @hidden
-	 */
-	hiddenMethod() {}
+    /**
+     * @hidden
+     */
+    hiddenMethod() {}
 
-	/**
-	 * @private
-	 */
-	privateCommentMethod() {}
+    /**
+     * @private
+     */
+    privateCommentMethod() {}
 
-	private privateMethod() {}
+    private privateMethod() {}
 
     ngOnInit() {}
-
 }

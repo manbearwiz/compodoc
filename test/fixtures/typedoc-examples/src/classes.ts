@@ -72,7 +72,7 @@ export class BaseClass implements INameInterface {
     constructor(source: BaseClass);
     constructor() {
         if (arguments.length > 0) {
-            if (typeof arguments[0] == 'string') {
+            if (typeof arguments[0] === 'string') {
                 this.name = arguments[0];
             } else if (arguments[0] instanceof BaseClass) {
                 this.name = arguments[0].name;
@@ -154,13 +154,13 @@ export class BaseClass implements INameInterface {
         fieldNames: string[],
         mandatoryFields: string[]
     ): string {
-        var returnval = '';
-        var updates: string[] = [];
-        var allFields: string[] = fieldNames;
-        for (var j = 0; j < allFields.length; j++) {
-            var field = allFields[j];
-            var oldValue = originalValues[field];
-            var newValue = newRecord[field];
+        const returnval = '';
+        const updates: string[] = [];
+        const allFields: string[] = fieldNames;
+        for (let j = 0; j < allFields.length; j++) {
+            const field = allFields[j];
+            const oldValue = originalValues[field];
+            const newValue = newRecord[field];
         }
         return returnval;
     }
@@ -169,9 +169,7 @@ export class BaseClass implements INameInterface {
 /**
  * This is an internal class, it is not exported.
  */
-class InternalClass {
-    constructor(options: { name: string }) {}
-}
+class InternalClass {}
 
 /**
  * This is a class that extends another class.
@@ -237,10 +235,6 @@ export class SubClassA extends BaseClass implements IPrintNameInterface {
  * The constructor of the original class should be overwritten.
  */
 export class SubClassB extends BaseClass {
-    constructor(name: string) {
-        super(name);
-    }
-
     doSomething(value: [string, SubClassA, SubClassB]) {}
 }
 

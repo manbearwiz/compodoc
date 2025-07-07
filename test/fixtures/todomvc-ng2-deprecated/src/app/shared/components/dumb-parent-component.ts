@@ -1,4 +1,4 @@
-import { Input, Output, HostBinding, HostListener } from '@angular/core';
+import { HostBinding, HostListener, Input, Output } from '@angular/core';
 
 /**
  * Empty parent component for inheritance demo

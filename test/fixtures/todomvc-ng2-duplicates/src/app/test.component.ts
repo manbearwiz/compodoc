@@ -1,21 +1,21 @@
 import {
+    type AfterViewInit,
+    type ChangeDetectorRef,
     Component,
+    type ComponentFactoryResolver,
     ContentChildren,
-    QueryList,
-    Input,
-    ViewChildren,
-    AfterViewInit,
-    Output,
     EventEmitter,
-    TemplateRef,
-    ViewContainerRef,
-    ComponentFactoryResolver,
-    Type,
-    ChangeDetectorRef
+    Input,
+    Output,
+    type QueryList,
+    type TemplateRef,
+    type Type,
+    ViewChildren,
+    type ViewContainerRef
 } from '@angular/core';
-import { JigsawTabPane } from './tab-pane';
+import { AbstractJigsawComponent, type IDynamicInstantiatable } from '../core';
 import { JigsawTabContent, JigsawTabLabel } from './tab-item';
-import { AbstractJigsawComponent, IDynamicInstantiatable } from '../core';
+import { JigsawTabPane } from './tab-pane';
 
 @Component({
     selector: 'jigsaw-tab',
@@ -66,7 +66,7 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
     }
 
     public set selectedIndex(value: number) {
-        if (this._$selectedIndex !== value && typeof value == 'number') {
+        if (this._$selectedIndex !== value && typeof value === 'number') {
             this._$selectedIndex = value;
 
             if (this.initialized) {
@@ -89,18 +89,18 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
     private _inkBarStyle: object = {};
 
     private _setInkBarStyle(index: number) {
-        let labelPos = this._getLabelOffsetByKey(index);
+        const labelPos = this._getLabelOffsetByKey(index);
 
         this._inkBarStyle = {
             display: 'block',
-            transform: 'translate3d(' + labelPos.offSet + 'px, 0px, 0px)',
-            width: labelPos.width + 'px'
+            transform: `translate3d(${labelPos.offSet}px, 0px, 0px)`,
+            width: `${labelPos.width}px`
         };
     }
 
     // 将有纵向切换的封装.
     private _getLabelOffsetByKey(key: number): any {
-        let currentLabel = this._tabLabel.find(item => item.key === key);
+        const currentLabel = this._tabLabel.find(item => item.key === key);
 
         // 非法的 key // 有可能getTop 等扩展Tab页时再重构.
         if (currentLabel) {
@@ -109,10 +109,9 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
                 offSet: currentLabel.getOffsetLeft(),
                 width: currentLabel.getOffsetWidth()
             };
-        } else {
-            console.warn('没有对应key的tab-Label');
-            return {};
         }
+        console.warn('没有对应key的tab-Label');
+        return {};
     }
 
     private _getTabPaneByIndex(key): JigsawTabPane {
@@ -146,7 +145,7 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
      * @param key (tab pane 的顺序.)
      */
     public hideTab(index): void {
-        let tabPane = this._getTabPaneByIndex(index);
+        const tabPane = this._getTabPaneByIndex(index);
 
         if (!this._isTabPane(tabPane)) return;
 
@@ -160,7 +159,7 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
      * @param index
      */
     public showTab(index) {
-        let tabPane = this._getTabPaneByIndex(index);
+        const tabPane = this._getTabPaneByIndex(index);
 
         if (!this._isTabPane(tabPane)) return;
 
@@ -172,9 +171,8 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
         if (!tabPane) {
             console.info('没有找到对应的索引的tab-pane');
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
     /**
@@ -187,8 +185,8 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
         initData?: Object
     ) {
         const factory = this._cfr.resolveComponentFactory(JigsawTabPane);
-        let tabPane: JigsawTabPane = this._viewContainer.createComponent(factory).instance;
-        if (typeof title == 'string') {
+        const tabPane: JigsawTabPane = this._viewContainer.createComponent(factory).instance;
+        if (typeof title === 'string') {
             tabPane.title = title;
         } else {
             tabPane.label = title;
@@ -196,7 +194,7 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
         tabPane.content = content;
         tabPane.initData = initData;
 
-        let tabTemp = this._$tabPanes.toArray();
+        const tabTemp = this._$tabPanes.toArray();
         tabTemp.push(tabPane);
         this._$tabPanes.reset(tabTemp);
         this.length = this._$tabPanes.length;
@@ -204,7 +202,7 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
 
         //router link
         setTimeout(() => {
-            let link = this._tabLabel
+            const link = this._tabLabel
                 .find(item => item.key === this.selectedIndex)
                 .elementRef.nativeElement.querySelector('[routerLink]');
             if (link) {
@@ -223,13 +221,13 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
             return;
         }
 
-        let tabTemp = this._$tabPanes.toArray();
+        const tabTemp = this._$tabPanes.toArray();
         tabTemp.splice(index, 1); // 去掉要删除的元素;
 
         // 重新修改queryList. 不确定这么做有没有什么隐患.
         this._$tabPanes.reset(tabTemp);
         this.length = this._$tabPanes.length;
-        if (this.selectedIndex == index) {
+        if (this.selectedIndex === index) {
             this._handleSelect();
         } else {
             this.selectedIndex = this.selectedIndex - 1;
@@ -246,7 +244,7 @@ export class JigsawTab extends AbstractJigsawComponent implements AfterViewInit 
      * @private
      */
     private _handleSelect() {
-        let tabPane = this._getTabPaneByIndex(this.selectedIndex);
+        const tabPane = this._getTabPaneByIndex(this.selectedIndex);
 
         if (!tabPane || tabPane.hidden || tabPane.disabled) {
             this._autoSelect();

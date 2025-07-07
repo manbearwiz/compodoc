@@ -1,16 +1,11 @@
-import { IHtmlEngineHelper, IHandlebarsOptions } from './html-engine-helper.interface';
-
-import DependenciesEngine from '../dependencies.engine';
-
 import AngularVersionUtil from '../../../utils/angular-version.util';
-import ExtendsMerger from '../../../utils/extends-merger.util';
 import BasicTypeUtil from '../../../utils/basic-type.util';
-
+import ExtendsMerger from '../../../utils/extends-merger.util';
 import Configuration from '../../configuration';
+import DependenciesEngine from '../dependencies.engine';
+import type { IHandlebarsOptions, IHtmlEngineHelper } from './html-engine-helper.interface';
 
 export class LinkTypeHelper implements IHtmlEngineHelper {
-    constructor() {}
-
     public helperFunc(context: any, name: string, options: IHandlebarsOptions) {
         let _result = DependenciesEngine.find(name);
         // Find in aliases ?
@@ -33,9 +28,9 @@ export class LinkTypeHelper implements IHtmlEngineHelper {
                 if (_result.data.type === 'class') {
                     _result.data.type = 'classe';
                 }
-                context.type.href = '../' + _result.data.type + 's/' + _result.data.name + '.html';
+                context.type.href = `../${_result.data.type}s/${_result.data.name}.html`;
                 if (context.indexKey !== '' && context.indexKey !== undefined) {
-                    context.type.href += '#' + context.indexKey;
+                    context.type.href += `#${context.indexKey}`;
                     context.type.indexKey = context.indexKey;
                 }
                 if (
@@ -56,9 +51,9 @@ export class LinkTypeHelper implements IHtmlEngineHelper {
                         case 'variable':
                             mainpage = 'variables';
                     }
-                    context.type.href = '../' + _result.data.ctype + '/' + mainpage + '.html';
-                    if (_result.data && _result.data.name) {
-                        context.type.href += '#' + _result.data.name;
+                    context.type.href = `../${_result.data.ctype}/${mainpage}.html`;
+                    if (_result.data?.name) {
+                        context.type.href += `#${_result.data.name}`;
                     }
                 }
                 if (!context.type.indexKey) {
@@ -71,7 +66,8 @@ export class LinkTypeHelper implements IHtmlEngineHelper {
             }
 
             return options.fn(context);
-        } else if (BasicTypeUtil.isKnownType(name)) {
+        }
+        if (BasicTypeUtil.isKnownType(name)) {
             context.type = {
                 raw: name,
                 indexKey: ''
@@ -79,8 +75,7 @@ export class LinkTypeHelper implements IHtmlEngineHelper {
             context.type.target = '_blank';
             context.type.href = BasicTypeUtil.getTypeUrl(name);
             return options.fn(context);
-        } else {
-            return options.inverse(context);
         }
+        return options.inverse(context);
     }
 }

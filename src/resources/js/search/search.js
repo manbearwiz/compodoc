@@ -1,35 +1,34 @@
-(function (compodoc) {
-    var usePushState = typeof history.pushState !== 'undefined',
-        // DOM Elements
-        $body = document.querySelector('body'),
-        $searchResults,
-        $searchInput,
-        $searchList,
-        $searchTitle,
-        $searchResultsCount,
-        $searchQuery,
-        $mainContainer,
-        $xsMenu;
+(compodoc => {
+    const usePushState = typeof history.pushState !== 'undefined';
+    // DOM Elements
+    const $body = document.querySelector('body');
+    let $searchResults;
+    let $searchInput;
+    let $searchList;
+    let $searchTitle;
+    let $searchResultsCount;
+    let $searchQuery;
+    let $mainContainer;
+    let $xsMenu;
 
     // Throttle search
     function throttle(fn, wait) {
-        var timeout;
+        let timeout;
 
         return function () {
-            var ctx = this,
-                args = arguments;
+            const args = arguments;
             if (!timeout) {
-                timeout = setTimeout(function () {
+                timeout = setTimeout(() => {
                     timeout = undefined;
-                    fn.apply(ctx, args);
+                    fn.apply(this, args);
                 }, wait);
             }
         };
     }
 
     function displayResults(res) {
-        var noResults = res.count == 0;
-        var groups = {};
+        const noResults = res.count === 0;
+        const groups = {};
         if (noResults) {
             $searchResults.classList.add('no-results');
         } else {
@@ -44,8 +43,8 @@
         $searchQuery.innerText = res.query;
 
         // Group result by context
-        res.results.forEach(function (res) {
-            var context = res.title.split(' - ')[0];
+        res.results.forEach(res => {
+            const context = res.title.split(' - ')[0];
             if (typeof groups[context] === 'undefined') {
                 groups[context] = {
                     results: [res]
@@ -55,51 +54,41 @@
             }
         });
 
-        var sortedGroups = Object.keys(groups).sort();
+        const sortedGroups = Object.keys(groups).sort();
 
-        for (var i = 0; i < sortedGroups.length; i++) {
-            var property = sortedGroups[i];
+        for (let i = 0; i < sortedGroups.length; i++) {
+            const property = sortedGroups[i];
 
-            var $li = document.createElement('li');
+            const $li = document.createElement('li');
             $li.classList.add('search-results-group');
-            var finalPropertyLabel = '';
-            var propertyLabels = property.split('-');
+            let finalPropertyLabel = '';
+            const propertyLabels = property.split('-');
 
             if (
                 propertyLabels.length === 2 &&
                 propertyLabels[0] !== 'miscellaneous' &&
                 propertyLabels[0] !== 'additional'
             ) {
-                finalPropertyLabel =
-                    propertyLabels[0].charAt(0).toUpperCase() +
-                    propertyLabels[0].substring(1) +
-                    ' - ' +
-                    propertyLabels[1].charAt(0).toUpperCase() +
-                    propertyLabels[1].substring(1) +
-                    ' (' +
-                    groups[property].results.length +
-                    ')';
+                finalPropertyLabel = `${
+                    propertyLabels[0].charAt(0).toUpperCase() + propertyLabels[0].substring(1)
+                } - ${propertyLabels[1].charAt(0).toUpperCase()}${propertyLabels[1].substring(1)} (${groups[property].results.length})`;
             } else if (propertyLabels[0] === 'additional') {
-                finalPropertyLabel =
-                    'Additional pages' + ' (' + groups[property].results.length + ')';
+                finalPropertyLabel = `Additional pages (${groups[property].results.length})`;
             } else {
-                finalPropertyLabel =
-                    propertyLabels[0].charAt(0).toUpperCase() +
-                    propertyLabels[0].substring(1) +
-                    ' (' +
-                    groups[property].results.length +
-                    ')';
+                finalPropertyLabel = `${
+                    propertyLabels[0].charAt(0).toUpperCase() + propertyLabels[0].substring(1)
+                } (${groups[property].results.length})`;
             }
-            var $groupTitle = document.createElement('h3');
+            const $groupTitle = document.createElement('h3');
             $groupTitle.innerText = finalPropertyLabel;
             $li.appendChild($groupTitle);
 
-            var $ulResults = document.createElement('ul');
+            const $ulResults = document.createElement('ul');
             $ulResults.classList.add('search-results-list');
 
-            groups[property].results.forEach(function (res) {
-                var link = '';
-                var $liResult = document.createElement('li');
+            groups[property].results.forEach(res => {
+                let link = '';
+                const $liResult = document.createElement('li');
                 $liResult.classList.add('search-results-item');
                 switch (COMPODOC_CURRENT_PAGE_DEPTH) {
                     case 0:
@@ -113,10 +102,10 @@
                         link = '../'.repeat(COMPODOC_CURRENT_PAGE_DEPTH);
                         break;
                 }
-                var finalResLabel =
+                const finalResLabel =
                     res.title.split(' - ')[1].charAt(0).toUpperCase() +
                     res.title.split(' - ')[1].substring(1);
-                var $link = document.createElement('a');
+                const $link = document.createElement('a');
                 $link.innerText = finalResLabel;
                 $link.href = link + res.url;
                 $liResult.appendChild($link);
@@ -137,7 +126,7 @@
         }
 
         throttle(
-            compodoc.search.query(q, 0, MAX_SEARCH_RESULTS).then(function (results) {
+            compodoc.search.query(q, 0, MAX_SEARCH_RESULTS).then(results => {
                 displayResults(results);
             }),
             1000
@@ -152,7 +141,7 @@
     }
 
     function bindMenuButton() {
-        document.getElementById('btn-menu').addEventListener('click', function () {
+        document.getElementById('btn-menu').addEventListener('click', () => {
             if ($xsMenu.style.display === 'none') {
                 $body.classList.remove('with-search');
                 $mainContainer.style.height = 'calc(100% - 50px)';
@@ -177,9 +166,9 @@
 
         // Launch query based on input content
         function handleUpdate(item) {
-            var q = item.value;
+            const q = item.value;
 
-            if (q.length == 0) {
+            if (q.length === 0) {
                 closeSearch();
                 window.location.href = window.location.href.replace(window.location.search, '');
             } else {
@@ -188,7 +177,7 @@
         }
 
         // Detect true content change in search input
-        var propertyChangeUnbound = false;
+        const propertyChangeUnbound = false;
 
         $searchInputs.forEach((item, index) => {
             // HTML5 (IE9 & others)
@@ -197,7 +186,7 @@
             });
             // Workaround for IE < 9
             item.addEventListener('propertychange', function (e) {
-                if (e.originalEvent.propertyName == 'value') {
+                if (e.originalEvent.propertyName === 'value') {
                     handleUpdate(this);
                 }
             });
@@ -205,7 +194,7 @@
             item.addEventListener('blur', function (e) {
                 // Update history state
                 if (usePushState) {
-                    var uri = updateQueryString('q', this.value);
+                    const uri = updateQueryString('q', this.value);
                     if (this.value !== '') {
                         history.pushState({ path: uri }, null, uri);
                     }
@@ -215,7 +204,7 @@
     }
 
     function launchSearchFromQueryString() {
-        var q = getParameterByName('q');
+        const q = getParameterByName('q');
         if (q && q.length > 0) {
             // Update search inputs
             $searchInputs.forEach((item, index) => {
@@ -226,7 +215,7 @@
         }
     }
 
-    compodoc.addEventListener(compodoc.EVENTS.SEARCH_READY, function (event) {
+    compodoc.addEventListener(compodoc.EVENTS.SEARCH_READY, event => {
         bindSearch();
 
         bindMenuButton();
@@ -235,10 +224,10 @@
     });
 
     function getParameterByName(name) {
-        var url = window.location.href;
+        const url = window.location.href;
         name = name.replace(/[\[\]]/g, '\\$&');
-        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)', 'i'),
-            results = regex.exec(url);
+        const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`, 'i');
+        const results = regex.exec(url);
         if (!results) return null;
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, ' '));
@@ -247,27 +236,26 @@
     function updateQueryString(key, value) {
         value = encodeURIComponent(value);
 
-        var url = window.location.href;
-        var re = new RegExp('([?&])' + key + '=.*?(&|#|$)(.*)', 'gi'),
-            hash;
+        let url = window.location.href;
+        const re = new RegExp(`([?&])${key}=.*?(&|#|$)(.*)`, 'gi');
+        let hash;
 
         if (re.test(url)) {
             if (typeof value !== 'undefined' && value !== null)
-                return url.replace(re, '$1' + key + '=' + value + '$2$3');
-            else {
-                hash = url.split('#');
-                url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
-                if (typeof hash[1] !== 'undefined' && hash[1] !== null) url += '#' + hash[1];
-                return url;
-            }
-        } else {
-            if (typeof value !== 'undefined' && value !== null) {
-                var separator = url.indexOf('?') !== -1 ? '&' : '?';
-                hash = url.split('#');
-                url = hash[0] + separator + key + '=' + value;
-                if (typeof hash[1] !== 'undefined' && hash[1] !== null) url += '#' + hash[1];
-                return url;
-            } else return url;
+                return url.replace(re, `$1${key}=${value}$2$3`);
+
+            hash = url.split('#');
+            url = hash[0].replace(re, '$1$3').replace(/(&|\?)$/, '');
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null) url += `#${hash[1]}`;
+            return url;
         }
+        if (typeof value !== 'undefined' && value !== null) {
+            const separator = url.indexOf('?') !== -1 ? '&' : '?';
+            hash = url.split('#');
+            url = `${hash[0] + separator + key}=${value}`;
+            if (typeof hash[1] !== 'undefined' && hash[1] !== null) url += `#${hash[1]}`;
+            return url;
+        }
+        return url;
     }
 })(compodoc);

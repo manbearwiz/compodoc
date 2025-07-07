@@ -1,14 +1,14 @@
 import { expect } from 'chai';
-import { temporaryDir, shell, read } from '../helpers';
+import { read, shell, temporaryDir } from '../helpers';
 const tmp = temporaryDir();
 
 describe('CLI simple flags', () => {
-    const tmpFolder = tmp.name + '-tsconfig';
-    const distFolder = tmpFolder + '/documentation';
+    const tmpFolder = `${tmp.name}-tsconfig`;
+    const distFolder = `${tmpFolder}/documentation`;
 
     describe('when specific files are included in tsconfig', () => {
         let moduleFile = undefined;
-        before(function (done) {
+        before(done => {
             tmp.create(tmpFolder);
             tmp.copy('./test/fixtures/sample-files/', tmpFolder);
 
@@ -38,7 +38,7 @@ describe('CLI simple flags', () => {
 
     describe('when specific files are included in tsconfig + others', () => {
         let moduleFile = undefined;
-        before(function (done) {
+        before(done => {
             const ls = shell(
                 'node',
                 [

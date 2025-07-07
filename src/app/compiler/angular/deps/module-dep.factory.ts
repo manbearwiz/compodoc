@@ -1,9 +1,9 @@
-import { ts } from 'ts-morph';
+import type { ts } from 'ts-morph';
 
-import { IDep } from '../dependencies.interfaces';
-import { ModuleHelper } from './helpers/module-helper';
+import type { IDep } from '../dependencies.interfaces';
+import type { ModuleHelper } from './helpers/module-helper';
 
-const crypto = require('crypto');
+const crypto = require('node:crypto');
 
 export class ModuleDepFactory {
     constructor(private moduleHelper: ModuleHelper) {}
@@ -12,14 +12,14 @@ export class ModuleDepFactory {
         file: any,
         srcFile: ts.SourceFile,
         name: string,
-        properties: ReadonlyArray<ts.ObjectLiteralElementLike>,
+        properties: readonly ts.ObjectLiteralElementLike[],
         IO: any
     ): IModuleDep {
         const sourceCode = srcFile.getText();
         const hash = crypto.createHash('sha512').update(sourceCode).digest('hex');
         return {
             name,
-            id: 'module-' + name + '-' + hash,
+            id: `module-${name}-${hash}`,
             file: file,
             ngid: this.moduleHelper.getModuleId(properties, srcFile),
             providers: this.moduleHelper.getModuleProviders(properties, srcFile),
@@ -43,12 +43,12 @@ export class ModuleDepFactory {
 
 export interface IModuleDep extends IDep {
     file: any;
-    providers: Array<any>;
-    declarations: Array<any>;
-    controllers: Array<any>;
-    entryComponents: Array<any>;
-    imports: Array<any>;
-    exports: Array<any>;
+    providers: any[];
+    declarations: any[];
+    controllers: any[];
+    entryComponents: any[];
+    imports: any[];
+    exports: any[];
     bootstrap: any;
     description: string;
     rawdescription: string;

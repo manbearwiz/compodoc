@@ -1,26 +1,28 @@
-import { ts, SyntaxKind } from 'ts-morph';
+import { SyntaxKind, type ts } from 'ts-morph';
 
 export class CodeGenerator {
     public generate(node: ts.Node): string {
         return this.visitAndRecognize(node, []).join('');
     }
 
-    private visitAndRecognize(node: ts.Node, code: Array<string>, depth = 0): Array<string> {
+    private visitAndRecognize(node: ts.Node, code: string[], depth = 0): string[] {
         this.recognize(node, code);
         node.getChildren().forEach(c => this.visitAndRecognize(c, code, depth + 1));
         return code;
     }
 
-    private recognize(node: ts.Node, code: Array<string>) {
+    private recognize(node: ts.Node, code: string[]) {
         const conversion = TsKindConversion.find(x => x.kinds.some(z => z === node.kind));
 
         if (conversion) {
             const result = conversion.output(node);
-            result.forEach(text => this.gen(text, code));
+            result.forEach(text => {
+                this.gen(text, code);
+            });
         }
     }
 
-    private gen(token: string | undefined, code: Array<string>): void {
+    private gen(token: string | undefined, code: string[]): void {
         if (!token) {
             return;
         }
@@ -34,46 +36,49 @@ export class CodeGenerator {
 }
 
 class TsKindsToText {
-    constructor(public output: (node: ts.Node) => Array<string>, public kinds: Array<SyntaxKind>) {}
+    constructor(
+        public output: (node: ts.Node) => string[],
+        public kinds: SyntaxKind[]
+    ) {}
 }
 
-const TsKindConversion: Array<TsKindsToText> = [
+const TsKindConversion: TsKindsToText[] = [
     new TsKindsToText(
         node => ['"', node.text, '"'],
         [SyntaxKind.FirstLiteralToken, SyntaxKind.Identifier]
     ),
     new TsKindsToText(node => ['"', node.text, '"'], [SyntaxKind.StringLiteral]),
-    new TsKindsToText(node => [], [SyntaxKind.ArrayLiteralExpression]),
-    new TsKindsToText(node => ['import', ' '], [SyntaxKind.ImportKeyword]),
-    new TsKindsToText(node => ['from', ' '], [SyntaxKind.FromKeyword]),
-    new TsKindsToText(node => ['\n', 'export', ' '], [SyntaxKind.ExportKeyword]),
-    new TsKindsToText(node => ['class', ' '], [SyntaxKind.ClassKeyword]),
-    new TsKindsToText(node => ['this'], [SyntaxKind.ThisKeyword]),
-    new TsKindsToText(node => ['constructor'], [SyntaxKind.ConstructorKeyword]),
-    new TsKindsToText(node => ['false'], [SyntaxKind.FalseKeyword]),
-    new TsKindsToText(node => ['true'], [SyntaxKind.TrueKeyword]),
-    new TsKindsToText(node => ['null'], [SyntaxKind.NullKeyword]),
-    new TsKindsToText(node => [], [SyntaxKind.AtToken]),
-    new TsKindsToText(node => ['+'], [SyntaxKind.PlusToken]),
-    new TsKindsToText(node => [' => '], [SyntaxKind.EqualsGreaterThanToken]),
-    new TsKindsToText(node => ['('], [SyntaxKind.OpenParenToken]),
+    new TsKindsToText(_node => [], [SyntaxKind.ArrayLiteralExpression]),
+    new TsKindsToText(_node => ['import', ' '], [SyntaxKind.ImportKeyword]),
+    new TsKindsToText(_node => ['from', ' '], [SyntaxKind.FromKeyword]),
+    new TsKindsToText(_node => ['\n', 'export', ' '], [SyntaxKind.ExportKeyword]),
+    new TsKindsToText(_node => ['class', ' '], [SyntaxKind.ClassKeyword]),
+    new TsKindsToText(_node => ['this'], [SyntaxKind.ThisKeyword]),
+    new TsKindsToText(_node => ['constructor'], [SyntaxKind.ConstructorKeyword]),
+    new TsKindsToText(_node => ['false'], [SyntaxKind.FalseKeyword]),
+    new TsKindsToText(_node => ['true'], [SyntaxKind.TrueKeyword]),
+    new TsKindsToText(_node => ['null'], [SyntaxKind.NullKeyword]),
+    new TsKindsToText(_node => [], [SyntaxKind.AtToken]),
+    new TsKindsToText(_node => ['+'], [SyntaxKind.PlusToken]),
+    new TsKindsToText(_node => [' => '], [SyntaxKind.EqualsGreaterThanToken]),
+    new TsKindsToText(_node => ['('], [SyntaxKind.OpenParenToken]),
     new TsKindsToText(
-        node => ['{', ' '],
+        _node => ['{', ' '],
         [SyntaxKind.ImportClause, SyntaxKind.ObjectLiteralExpression]
     ),
-    new TsKindsToText(node => ['{', '\n'], [SyntaxKind.Block]),
-    new TsKindsToText(node => ['}'], [SyntaxKind.CloseBraceToken]),
-    new TsKindsToText(node => [')'], [SyntaxKind.CloseParenToken]),
-    new TsKindsToText(node => ['['], [SyntaxKind.OpenBracketToken]),
-    new TsKindsToText(node => [']'], [SyntaxKind.CloseBracketToken]),
-    new TsKindsToText(node => [';', '\n'], [SyntaxKind.SemicolonToken]),
-    new TsKindsToText(node => [',', ' '], [SyntaxKind.CommaToken]),
-    new TsKindsToText(node => [' ', ':', ' '], [SyntaxKind.ColonToken]),
-    new TsKindsToText(node => ['.'], [SyntaxKind.DotToken]),
-    new TsKindsToText(node => [], [SyntaxKind.DoStatement]),
-    new TsKindsToText(node => [], [SyntaxKind.Decorator]),
-    new TsKindsToText(node => [' = '], [SyntaxKind.FirstAssignment]),
-    new TsKindsToText(node => [' '], [SyntaxKind.FirstPunctuation]),
-    new TsKindsToText(node => ['private', ' '], [SyntaxKind.PrivateKeyword]),
-    new TsKindsToText(node => ['public', ' '], [SyntaxKind.PublicKeyword])
+    new TsKindsToText(_node => ['{', '\n'], [SyntaxKind.Block]),
+    new TsKindsToText(_node => ['}'], [SyntaxKind.CloseBraceToken]),
+    new TsKindsToText(_node => [')'], [SyntaxKind.CloseParenToken]),
+    new TsKindsToText(_node => ['['], [SyntaxKind.OpenBracketToken]),
+    new TsKindsToText(_node => [']'], [SyntaxKind.CloseBracketToken]),
+    new TsKindsToText(_node => [';', '\n'], [SyntaxKind.SemicolonToken]),
+    new TsKindsToText(_node => [',', ' '], [SyntaxKind.CommaToken]),
+    new TsKindsToText(_node => [' ', ':', ' '], [SyntaxKind.ColonToken]),
+    new TsKindsToText(_node => ['.'], [SyntaxKind.DotToken]),
+    new TsKindsToText(_node => [], [SyntaxKind.DoStatement]),
+    new TsKindsToText(_node => [], [SyntaxKind.Decorator]),
+    new TsKindsToText(_node => [' = '], [SyntaxKind.FirstAssignment]),
+    new TsKindsToText(_node => [' '], [SyntaxKind.FirstPunctuation]),
+    new TsKindsToText(_node => ['private', ' '], [SyntaxKind.PrivateKeyword]),
+    new TsKindsToText(_node => ['public', ' '], [SyntaxKind.PublicKeyword])
 ];

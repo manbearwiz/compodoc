@@ -1,15 +1,13 @@
-import * as path from 'path';
+import * as path from 'node:path';
 
 import ConfigurationRepository from '../repositories/config.repository';
 
 import FileEngine from '../../infrastructure/files/file.engine';
-import Logger from '../../infrastructure/logging/logger';
 import { readTsconfigFile } from '../../infrastructure/files/tsconfig.file.util';
+import Logger from '../../infrastructure/logging/logger';
 
 export class HandleTsconfigFile {
     private static instance: HandleTsconfigFile;
-
-    constructor() {}
 
     public static getInstance() {
         if (!HandleTsconfigFile.instance) {
@@ -27,19 +25,17 @@ export class HandleTsconfigFile {
          * 5. find attributes : files, exclude, include
          */
         return new Promise(async (resolve, reject) => {
-            let tsconfigFileName = ConfigurationRepository.internalConfiguration.tsconfig;
+            const tsconfigFileName = ConfigurationRepository.internalConfiguration.tsconfig;
             let cwdLocal;
 
             if (tsconfigFileName) {
                 if (!FileEngine.existsSync(tsconfigFileName)) {
                     reject(`${tsconfigFileName} file was not found in the current directory`);
                 } else {
-                    let tsconfigFilePath = tsconfigFileName.indexOf(process.cwd());
+                    const tsconfigFilePath = tsconfigFileName.indexOf(process.cwd());
                     if (tsconfigFilePath !== -1) {
-                        ConfigurationRepository.internalConfiguration.tsconfigFilePath = tsconfigFileName.replace(
-                            process.cwd() + path.sep,
-                            ''
-                        );
+                        ConfigurationRepository.internalConfiguration.tsconfigFilePath =
+                            tsconfigFileName.replace(process.cwd() + path.sep, '');
                     }
                     ConfigurationRepository.internalConfiguration.tsconfigFilePath = path.join(
                         path.join(process.cwd(), path.dirname(tsconfigFileName)),
@@ -59,7 +55,7 @@ export class HandleTsconfigFile {
                 );
             }
 
-            let tsConfigFile = readTsconfigFile(
+            const tsConfigFile = readTsconfigFile(
                 ConfigurationRepository.internalConfiguration.tsconfigFilePath
             );
 

@@ -2,16 +2,16 @@ import {
     Directive,
     Inject,
     Input,
-    OnChanges,
-    OnDestroy,
+    type OnChanges,
+    type OnDestroy,
     Optional,
     Self,
-    SimpleChanges
+    type SimpleChanges
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { QueryParamGroupService } from './query-param-group.service';
-import { QueryParamAccessor } from './query-param-accessor.interface';
+import { type ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { selectValueAccessor } from '../accessors/util';
+import type { QueryParamAccessor } from './query-param-accessor.interface';
+import type { QueryParamGroupService } from './query-param-group.service';
 
 /**
  * Binds a {@link QueryParam} to a DOM element.
@@ -40,7 +40,7 @@ export class QueryParamNameDirective implements QueryParamAccessor, OnChanges, O
     ) {
         if (!this.groupService) {
             throw new Error(
-                `No parent configuration found. Did you forget to add [queryParamGroup]?`
+                'No parent configuration found. Did you forget to add [queryParamGroup]?'
             );
         }
 
@@ -49,7 +49,7 @@ export class QueryParamNameDirective implements QueryParamAccessor, OnChanges, O
 
     /** @ignore */
     public ngOnChanges(changes: SimpleChanges) {
-        const nameChange = changes['name'];
+        const nameChange = changes.name;
         if (nameChange) {
             if (!nameChange.firstChange) {
                 this.groupService.deregisterQueryParamDirective(nameChange.previousValue);
