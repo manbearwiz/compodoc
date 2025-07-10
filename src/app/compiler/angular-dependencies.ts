@@ -1,6 +1,5 @@
 import * as path from 'path';
 
-import * as _ from 'lodash';
 import { Project, ts, SyntaxKind } from 'ts-morph';
 
 import { IsKindType, kindToType } from '../../utils/kind-to-type';
@@ -171,24 +170,12 @@ export class AngularDependencies extends FrameworkDependencies {
 
                 const onLink = mod => {
                     const process = (initialArray, _var) => {
-                        let indexToClean = 0;
-                        let found = false;
-                        const findVariableInArray = (el, index) => {
-                            if (el.name === _var.name) {
-                                indexToClean = index;
-                                found = true;
-                            }
-                        };
-                        initialArray.forEach(findVariableInArray);
-                        // Clean indexes to replace
-                        if (found) {
+                        const indexToClean = initialArray?.findIndex(el => el.name === _var.name);
+                        if (indexToClean !== -1) {
                             initialArray.splice(indexToClean, 1);
                             // Add variable
                             newVar.forEach(newEle => {
-                                if (
-                                    typeof _.find(initialArray, { name: newEle.name }) ===
-                                    'undefined'
-                                ) {
+                                if (!initialArray?.some(e => e.name === newEle.name)) {
                                     initialArray.push(newEle);
                                 }
                             });
@@ -548,7 +535,7 @@ export class AngularDependencies extends FrameworkDependencies {
                             }
                             deps = injectableDeps;
                             if (typeof IO.ignore === 'undefined') {
-                                if (_.includes(IO.implements, 'HttpInterceptor')) {
+                                if (IO.implements?.includes('HttpInterceptor')) {
                                     injectableDeps.type = 'interceptor';
                                     outputSymbols.interceptors.push(injectableDeps);
                                 } else if (this.isGuard(IO.implements)) {
@@ -823,7 +810,7 @@ export class AngularDependencies extends FrameworkDependencies {
                         // Find recusively in expression nodes one with name 'bootstrapModule'
                         let rootModule;
                         let resultNode;
-                        if (srcFile.text.indexOf(bootstrapModuleReference) !== -1) {
+                        if (srcFile.text?.includes(bootstrapModuleReference)) {
                             if (node.expression) {
                                 resultNode = this.findExpressionByNameInExpressions(
                                     node.expression,
@@ -856,7 +843,7 @@ export class AngularDependencies extends FrameworkDependencies {
                             }
                             if (resultNode) {
                                 if (resultNode.arguments.length > 0) {
-                                    _.forEach(resultNode.arguments, (argument: any) => {
+                                    resultNode.arguments?.forEach((argument: any) => {
                                         if (argument.text) {
                                             rootModule = argument.text;
                                         }
@@ -1070,24 +1057,23 @@ export class AngularDependencies extends FrameworkDependencies {
      * @param store Store
      */
     private addNewEntityInStore(entity, store) {
-        const findSameEntityInStore = _.filter(store, {
-            name: entity.name,
-            id: entity.id,
-            file: entity.file
-        });
-        if (findSameEntityInStore.length === 0) {
+        const exists = store?.some(item =>
+            item.name === entity.name &&
+            item.id === entity.id &&
+            item.file === entity.file
+        );
+        if (!exists) {
             store.push(entity);
         }
     }
 
     private debug(deps: IDep) {
-        if (deps) {
-            logger.debug('found', `${deps.name}`);
-        } else {
+        if (!deps?.name) {
             return;
         }
+        logger.debug('found', `${deps.name}`);
         ['imports', 'exports', 'declarations', 'providers', 'bootstrap'].forEach(symbols => {
-            if (deps[symbols] && deps[symbols].length > 0) {
+            if (deps?.[symbols]?.length > 0) {
                 logger.debug('', `- ${symbols}:`);
                 deps[symbols]
                     .map(i => i.name)
@@ -1099,20 +1085,18 @@ export class AngularDependencies extends FrameworkDependencies {
     }
 
     private ignore(deps: IDep) {
-        if (deps) {
-            logger.warn('ignore', `${deps.name}`);
-        } else {
+        if (!deps?.name) {
             return;
         }
+        logger.warn('ignore', `${deps.name}`);
     }
 
-    private checkForDeprecation(tags: any[], result: { [key in string | number]: any }) {
-        _.forEach(tags, tag => {
-            if (tag.tagName && tag.tagName.text && tag.tagName.text.indexOf('deprecated') > -1) {
-                result.deprecated = true;
-                result.deprecationMessage = tag.comment || '';
-            }
-        });
+    private checkForDeprecation(tags: any[] | null | undefined, result: { [key in string | number]: any }) {
+        const deprecationTag = tags?.find(tag => tag.tagName?.text.includes('deprecated'));
+        if (deprecationTag) {
+            result.deprecated = true;
+            result.deprecationMessage = deprecationTag.comment || '';
+        }
     }
 
     private findExpressionByNameInExpressions(entryNode, name) {
@@ -1160,7 +1144,7 @@ export class AngularDependencies extends FrameworkDependencies {
     private parseDecorators(decorators, type: string): boolean {
         let result = false;
         if (decorators.length > 1) {
-            _.forEach(decorators, function (decorator: any) {
+            decorators.forEach(function (decorator: any) {
                 if (decorator.expression.expression) {
                     if (decorator.expression.expression.text === type) {
                         result = true;
@@ -1229,11 +1213,11 @@ export class AngularDependencies extends FrameworkDependencies {
 
     private isGuard(ioImplements: string[]): boolean {
         return (
-            _.includes(ioImplements, 'CanActivate') ||
-            _.includes(ioImplements, 'CanActivateChild') ||
-            _.includes(ioImplements, 'CanDeactivate') ||
-            _.includes(ioImplements, 'Resolve') ||
-            _.includes(ioImplements, 'CanLoad')
+            ioImplements?.includes('CanActivate') ||
+            ioImplements?.includes('CanActivateChild') ||
+            ioImplements?.includes('CanDeactivate') ||
+            ioImplements?.includes('Resolve') ||
+            ioImplements?.includes('CanLoad')
         );
     }
 
@@ -1246,13 +1230,12 @@ export class AngularDependencies extends FrameworkDependencies {
         sourceFile: ts.SourceFile
     ): ReadonlyArray<ts.ObjectLiteralElementLike> {
         if (
-            visitedNode.expression &&
-            visitedNode.expression.arguments &&
-            visitedNode.expression.arguments.length > 0
+
+            visitedNode.expression?.arguments?.[0]
         ) {
             const pop = visitedNode.expression.arguments[0];
 
-            if (pop && pop.properties && pop.properties.length >= 0) {
+            if (pop?.properties?.length >= 0) {
                 return pop.properties;
             } else if (pop && pop.kind && pop.kind === SyntaxKind.StringLiteral) {
                 return [pop];
@@ -1283,7 +1266,7 @@ export class AngularDependencies extends FrameworkDependencies {
             'registerOnTouched',
             'setDisabledState'
         ];
-        return ANGULAR_LIFECYCLE_METHODS.indexOf(methodName) >= 0;
+        return ANGULAR_LIFECYCLE_METHODS.includes(methodName);
     }
 
     private visitTypeDeclaration(node: ts.TypeAliasDeclaration) {
@@ -1295,7 +1278,7 @@ export class AngularDependencies extends FrameworkDependencies {
         };
         const jsdoctags = this.jsdocParserUtil.getJSDocs(node);
 
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags?.[0]?.tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
             result.jsdoctags = markedtags(jsdoctags[0].tags);
         }
@@ -1358,7 +1341,7 @@ export class AngularDependencies extends FrameworkDependencies {
             }
             const jsdoctags = this.jsdocParserUtil.getJSDocs(arg);
 
-            if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+            if (jsdoctags?.[0]?.tags) {
                 this.checkForDeprecation(jsdoctags[0].tags, result);
             }
             return result;
@@ -1439,20 +1422,20 @@ export class AngularDependencies extends FrameworkDependencies {
                     })
                     .reverse();
                 if (
-                    _.indexOf(kinds, SyntaxKind.PublicKeyword) !== -1 &&
-                    _.indexOf(kinds, SyntaxKind.StaticKeyword) !== -1
+                    kinds.includes(SyntaxKind.PublicKeyword) &&
+                    kinds.includes(SyntaxKind.StaticKeyword)
                 ) {
                     kinds = kinds.filter(kind => kind !== SyntaxKind.PublicKeyword);
                 }
             }
         }
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags?.[0]?.tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
             result.jsdoctags = markedtags(jsdoctags[0].tags);
-            _.forEach(jsdoctags[0].tags, tag => {
+            jsdoctags[0].tags.forEach(tag => {
                 if (tag.tagName) {
                     if (tag.tagName.text) {
-                        if (tag.tagName.text.indexOf('ignore') > -1) {
+                        if (tag.tagName.text.includes('ignore')) {
                             result.ignore = true;
                         }
                     }
@@ -1496,7 +1479,7 @@ export class AngularDependencies extends FrameworkDependencies {
                 const jsdoctags = this.jsdocParserUtil.getJSDocs(
                     node.declarationList.declarations[i]
                 );
-                if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+                if (jsdoctags?.[0]?.tags) {
                     this.checkForDeprecation(jsdoctags[0].tags, result);
                 }
                 return result;
@@ -1541,14 +1524,14 @@ export class AngularDependencies extends FrameworkDependencies {
                         : node.members[i].initializer.text;
                 }
                 memberjsdoctags = this.jsdocParserUtil.getJSDocs(node.members[i]);
-                if (memberjsdoctags && memberjsdoctags.length >= 1 && memberjsdoctags[0].tags) {
+                if (memberjsdoctags?.[0]?.tags) {
                     this.checkForDeprecation(memberjsdoctags[0].tags, member);
                 }
                 result.members.push(member);
             }
         }
         const jsdoctags = this.jsdocParserUtil.getJSDocs(node);
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags?.[0]?.tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
         }
         return result;

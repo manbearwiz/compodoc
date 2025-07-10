@@ -171,15 +171,7 @@ export class Application {
      * @return {boolean} Result of scan
      */
     public hasWatchedFilesTSFiles(): boolean {
-        let result = false;
-
-        _.forEach(this.updatedFiles, file => {
-            if (path.extname(file) === '.ts') {
-                result = true;
-            }
-        });
-
-        return result;
+        return this.updatedFiles?.some(file => path.extname(file) === '.ts');
     }
 
     /**
@@ -187,15 +179,9 @@ export class Application {
      * @return {boolean} Result of scan
      */
     public hasWatchedFilesRootMarkdownFiles(): boolean {
-        let result = false;
-
-        _.forEach(this.updatedFiles, file => {
-            if (path.extname(file) === '.md' && path.dirname(file) === cwd) {
-                result = true;
-            }
-        });
-
-        return result;
+        return this.updatedFiles?.some(
+            file => path.extname(file) === '.md' && path.dirname(file) === cwd
+        );
     }
 
     /**
@@ -590,9 +576,9 @@ export class Application {
             .then(res => {
                 if (Configuration.mainData.exportFormat !== COMPODOC_DEFAULTS.exportFormat) {
                     if (
-                        COMPODOC_DEFAULTS.exportFormatsSupported.indexOf(
+                        COMPODOC_DEFAULTS.exportFormatsSupported.includes(
                             Configuration.mainData.exportFormat
-                        ) > -1
+                        )
                     ) {
                         logger.info(
                             `Generating documentation in export format ${Configuration.mainData.exportFormat}`
@@ -785,9 +771,9 @@ export class Application {
             .then(res => {
                 if (Configuration.mainData.exportFormat !== COMPODOC_DEFAULTS.exportFormat) {
                     if (
-                        COMPODOC_DEFAULTS.exportFormatsSupported.indexOf(
+                        COMPODOC_DEFAULTS.exportFormatsSupported.includes(
                             Configuration.mainData.exportFormat
-                        ) > -1
+                        )
                     ) {
                         logger.info(
                             `Generating documentation in export format ${Configuration.mainData.exportFormat}`
@@ -1066,7 +1052,7 @@ export class Application {
                     );
                 });
                 // Try fixing type undefined for each providers
-                _.forEach(ngModule.providers, provider => {
+                ngModule.providers?.forEach(provider => {
                     if (
                         DependenciesEngine.getInjectables().find(
                             injectable => (injectable as any).name === provider.name
@@ -1386,18 +1372,18 @@ export class Application {
 
     private getNavTabs(dependency): Array<any> {
         let navTabConfig = Configuration.mainData.navTabConfig;
-        const hasCustomNavTabConfig = navTabConfig.length !== 0;
+        const hasCustomNavTabConfig = navTabConfig.length > 0;
         navTabConfig =
             navTabConfig.length === 0
                 ? _.cloneDeep(COMPODOC_CONSTANTS.navTabDefinitions)
                 : navTabConfig;
-        const matchDepType = (depType: string) => {
-            return depType === 'all' || depType === dependency.type;
-        };
+        const matchDepType = (depType: string) => depType === 'all' || depType === dependency.type;
 
         let navTabs = [];
-        _.forEach(navTabConfig, customTab => {
-            const navTab = _.find(COMPODOC_CONSTANTS.navTabDefinitions, { id: customTab.id });
+        navTabConfig?.forEach(customTab => {
+            const navTab = COMPODOC_CONSTANTS.navTabDefinitions.find(
+                tab => tab.id === customTab.id
+            );
             if (!navTab) {
                 throw new Error(`Invalid tab ID '${customTab.id}' specified in tab configuration`);
             }
@@ -1409,7 +1395,7 @@ export class Application {
             }
 
             // is tab applicable to target dependency?
-            if (-1 === _.findIndex(navTab.depTypes, matchDepType)) {
+            if (!navTab.depTypes?.some(matchDepType)) {
                 return;
             }
 
@@ -1857,7 +1843,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                 return status;
             };
             const processComponentsAndDirectivesAndControllersAndEntities = list => {
-                _.forEach(list, (el: any) => {
+                list?.forEach((el: any) => {
                     const element = (Object as any).assign({}, el);
                     if (!element.propertiesClass) {
                         element.propertiesClass = [];
@@ -1895,11 +1881,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
 
                     if (element.constructorObj) {
                         totalStatements += 1;
-                        if (
-                            element.constructorObj &&
-                            element.constructorObj.description &&
-                            element.constructorObj.description !== ''
-                        ) {
+                        if (element.constructorObj?.description) {
                             totalStatementDocumented += 1;
                         }
                     }
@@ -1907,7 +1889,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                         totalStatementDocumented += 1;
                     }
 
-                    _.forEach(element.propertiesClass, (property: any) => {
+                    element.propertiesClass?.forEach((property: any) => {
                         if (property.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
@@ -1920,7 +1902,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                             totalStatementDocumented += 1;
                         }
                     });
-                    _.forEach(element.methodsClass, (method: any) => {
+                    element.methodsClass?.forEach((method: any) => {
                         if (method.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
@@ -1933,7 +1915,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                             totalStatementDocumented += 1;
                         }
                     });
-                    _.forEach(element.hostBindings, (property: any) => {
+                    element.hostBindings?.forEach((property: any) => {
                         if (property.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
@@ -1946,7 +1928,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                             totalStatementDocumented += 1;
                         }
                     });
-                    _.forEach(element.hostListeners, (method: any) => {
+                    element.hostListeners?.forEach((method: any) => {
                         if (method.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
@@ -1959,7 +1941,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                             totalStatementDocumented += 1;
                         }
                     });
-                    _.forEach(element.inputsClass, (input: any) => {
+                    element.inputsClass?.forEach((input: any) => {
                         if (input.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
@@ -1972,7 +1954,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                             totalStatementDocumented += 1;
                         }
                     });
-                    _.forEach(element.outputsClass, (output: any) => {
+                    element.outputsClass?.forEach((output: any) => {
                         if (output.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
@@ -2030,7 +2012,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                 };
             };
             let processFunctionsAndVariables = (id, type) => {
-                _.forEach(id, (el: any) => {
+                id?.forEach((el: any) => {
                     let cl: any = {
                         filePath: el.file,
                         type: type,
@@ -2067,7 +2049,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
             };
 
             let processClasses = (list, type, linktype) => {
-                _.forEach(list, (cl: any) => {
+                list?.forEach((cl: any) => {
                     let element = (Object as any).assign({}, cl);
                     if (!element.properties) {
                         element.properties = [];
@@ -2087,38 +2069,34 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                     if (element.constructorObj) {
                         totalStatements += 1;
                         if (
-                            element.constructorObj &&
-                            element.constructorObj.description &&
-                            element.constructorObj.description !== ''
+                            element.constructorObj?.description
                         ) {
                             totalStatementDocumented += 1;
                         }
                     }
-                    if (element.description && element.description !== '') {
+                    if (element.description) {
                         totalStatementDocumented += 1;
                     }
 
-                    _.forEach(element.properties, (property: any) => {
+                    element.properties?.forEach((property: any) => {
                         if (property.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
                         }
                         if (
                             property.description &&
-                            property.description !== '' &&
                             property.modifierKind !== SyntaxKind.PrivateKeyword
                         ) {
                             totalStatementDocumented += 1;
                         }
                     });
-                    _.forEach(element.methods, (method: any) => {
+                    element.methods?.forEach((method: any) => {
                         if (method.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
                         }
                         if (
                             method.description &&
-                            method.description !== '' &&
                             method.modifierKind !== SyntaxKind.PrivateKeyword
                         ) {
                             totalStatementDocumented += 1;
@@ -2157,7 +2135,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
             processClasses(Configuration.mainData.guards, 'guard', 'guard');
             processClasses(Configuration.mainData.interceptors, 'interceptor', 'interceptor');
 
-            _.forEach(Configuration.mainData.pipes, (pipe: any) => {
+            Configuration.mainData.pipes?.forEach((pipe: any) => {
                 let cl: any = {
                     filePath: pipe.file,
                     type: pipe.type,
@@ -2348,7 +2326,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                 logger.warn('Missing documentation coverage data');
             } else {
                 covDat = {};
-                covFileNames = _.map(coverageData.files, el => {
+                covFileNames = coverageData.files?.map(el => {
                     let fileName = path.normalize(el.filePath);
                     covDat[fileName] = {
                         type: el.type,
@@ -2389,7 +2367,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                         // need a name to include in output but this isn't visible
                         out = { name: fileName, filePath: fileName };
                     } else {
-                        const findMatch = _.filter(covFileNames, el => {
+                        const findMatch = covFileNames?.filter(el => {
                             const normalizedFilename = path.normalize(fileName).replace(/\\/g, '/');
                             return el.includes(fileName) || normalizedFilename.includes(el);
                         });
@@ -2400,7 +2378,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                     }
                 }
                 let keysToGet = ['statements', 'branches', 'functions', 'lines'];
-                _.forEach(keysToGet, key => {
+                keysToGet?.forEach(key => {
                     if (data[key]) {
                         let t = data[key];
                         out[key] = {
@@ -2438,7 +2416,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
 
             if (Configuration.mainData.exportFormat === COMPODOC_DEFAULTS.exportFormat) {
                 let keysToGet = ['statements', 'branches', 'functions', 'lines'];
-                _.forEach(keysToGet, key => {
+                keysToGet?.forEach(key => {
                     if (unitTestData['total'][key]) {
                         HtmlEngine.generateCoverageBadge(Configuration.mainData.output, key, {
                             count: unitTestData['total'][key]['coveragePercent'],
@@ -2606,9 +2584,8 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                         this.processPage(page),
                         ...page.children.map(childPage => this.processPage(childPage))
                     ]);
-                } else {
-                    return this.processPage(page);
                 }
+                return this.processPage(page);
             })
         )
             .then(() => {

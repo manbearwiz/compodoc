@@ -113,33 +113,33 @@ export class ExportJsonEngine {
                 ]
             };
 
-            for (let k = 0; k < module.providers.length; k++) {
+            for (const provider of module.providers) {
                 const providerElement = {
-                    name: module.providers[k].name
+                    name: provider.name
                 };
                 moduleElement.children[0].elements.push(providerElement);
             }
-            for (let k = 0; k < module.declarations.length; k++) {
+            for (const declaration of module.declarations) {
                 const declarationElement = {
-                    name: module.declarations[k].name
+                    name: declaration.name
                 };
                 moduleElement.children[1].elements.push(declarationElement);
             }
-            for (let k = 0; k < module.imports.length; k++) {
+            for (const imp of module.imports) {
                 const importElement = {
-                    name: module.imports[k].name
+                    name: imp.name
                 };
                 moduleElement.children[2].elements.push(importElement);
             }
-            for (let k = 0; k < module.exports.length; k++) {
+            for (const exp of module.exports) {
                 const exportElement = {
-                    name: module.exports[k].name
+                    name: exp.name
                 };
                 moduleElement.children[3].elements.push(exportElement);
             }
-            for (let k = 0; k < module.bootstrap.length; k++) {
+            for (const bootstrap of module.bootstrap) {
                 const bootstrapElement = {
-                    name: module.bootstrap[k].name
+                    name: bootstrap.name
                 };
                 moduleElement.children[4].elements.push(bootstrapElement);
             }

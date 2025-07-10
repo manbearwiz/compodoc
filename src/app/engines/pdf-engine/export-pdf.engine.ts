@@ -186,7 +186,7 @@ export class ExportPdfEngine {
             style: 'header'
         });
 
-        _.forEach(Configuration.mainData.modules, module => {
+        Configuration.mainData.modules?.forEach(module => {
             data.push({
                 text: `${module.name}`,
                 style: 'subheader',
@@ -228,7 +228,7 @@ export class ExportPdfEngine {
 
                 let list = { ul: [] };
 
-                _.forEach(module.declarations, declaration => {
+                module.declarations?.forEach(declaration => {
                     list.ul.push({
                         text: `${declaration.name}`
                     });
@@ -246,7 +246,7 @@ export class ExportPdfEngine {
 
                 let list = { ul: [] };
 
-                _.forEach(module.providers, provider => {
+                module.providers?.forEach(provider => {
                     list.ul.push({
                         text: `${provider.name}`
                     });
@@ -264,7 +264,7 @@ export class ExportPdfEngine {
 
                 let list = { ul: [] };
 
-                _.forEach(module.imports, importRef => {
+                module.imports?.forEach(importRef => {
                     list.ul.push({
                         text: `${importRef.name}`
                     });
@@ -282,7 +282,7 @@ export class ExportPdfEngine {
 
                 let list = { ul: [] };
 
-                _.forEach(module.exports, exportRef => {
+                module.exports?.forEach(exportRef => {
                     list.ul.push({
                         text: `${exportRef.name}`
                     });
@@ -311,7 +311,7 @@ export class ExportPdfEngine {
             style: 'header'
         });
 
-        _.forEach(Configuration.mainData.components, component => {
+        Configuration.mainData.components?.forEach(component => {
             data.push({
                 text: `${component.name}`,
                 style: 'subheader',
