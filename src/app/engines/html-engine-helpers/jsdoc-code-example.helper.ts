@@ -9,7 +9,7 @@ export class JsdocCodeExampleHelper implements IHtmlEngineHelper {
         if (comment.charAt(0) === ' ') {
             comment = comment.substring(1, comment.length);
         }
-        if (comment.indexOf('<p>') === 0) {
+        if (comment.startsWith('<p>')) {
             comment = comment.substring(3, comment.length);
         }
         if (comment.substr(-1) === '\n') {
@@ -44,7 +44,7 @@ export class JsdocCodeExampleHelper implements IHtmlEngineHelper {
                 if (jsdocTags[i].tagName.text === 'example') {
                     let tag = {} as JsdocTagInterface;
                     if (jsdocTags[i].comment) {
-                        if (jsdocTags[i].comment.indexOf('<caption>') !== -1) {
+                        if (jsdocTags[i].comment.includes('<caption>')) {
                             tag.comment = jsdocTags[i].comment
                                 .replace(/<caption>/g, '<b><i>')
                                 .replace(/\/caption>/g, '/b></i>');

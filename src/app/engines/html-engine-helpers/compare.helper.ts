@@ -15,7 +15,7 @@ export class CompareHelper implements IHtmlEngineHelper {
         let result;
         switch (operator) {
             case 'indexof':
-                result = b.indexOf(a) !== -1;
+                result = b.includes(a);
                 break;
             case '===':
                 result = a === b;

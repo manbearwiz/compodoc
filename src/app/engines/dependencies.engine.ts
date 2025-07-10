@@ -151,33 +151,30 @@ export class DependenciesEngine {
             score: 0
         };
         let nameFoundCounter = 0;
-        if (data && data.length > 0) {
-            for (let i = 0; i < data.length; i++) {
-                if (typeof name !== 'undefined') {
-                    if (typeof file !== 'undefined') {
-                        if (
-                            name === data[i].name &&
-                            file.replace(/\\/g, '/').indexOf(data[i].file) !== -1
-                        ) {
+        if (data?.length > 0) {
+            for (const item of data) {
+                if (name !== undefined) {
+                    if (file !== undefined) {
+                        if (name === item.name && file.replace(/\\/g, '/').includes(item.file)) {
                             nameFoundCounter += 1;
-                            _result.data = data[i];
+                            _result.data = item;
                             _result.score = 2;
                         } else if (
-                            name.indexOf(data[i].name) !== -1 &&
-                            file.replace(/\\/g, '/').indexOf(data[i].file) !== -1
+                            name.includes(item.name) &&
+                            file.replace(/\\/g, '/').includes(item.file)
                         ) {
                             nameFoundCounter += 1;
-                            _result.data = data[i];
+                            _result.data = item;
                             _result.score = 1;
                         }
                     } else {
-                        if (name === data[i].name) {
+                        if (name === item.name) {
                             nameFoundCounter += 1;
-                            _result.data = data[i];
+                            _result.data = item;
                             _result.score = 2;
-                        } else if (name.indexOf(data[i].name) !== -1) {
+                        } else if (name.includes(item.name)) {
                             nameFoundCounter += 1;
-                            _result.data = data[i];
+                            _result.data = item;
                             _result.score = 1;
                         }
                     }
@@ -187,18 +184,18 @@ export class DependenciesEngine {
             // Prevent wrong matching like MultiSelectOptionDirective with SelectOptionDirective, or QueryParamGroupService with QueryParamGroup
             if (nameFoundCounter > 1) {
                 let found = false;
-                for (let i = 0; i < data.length; i++) {
-                    if (typeof name !== 'undefined') {
-                        if (typeof file !== 'undefined') {
-                            if (name === data[i].name) {
+                for (const item of data) {
+                    if (name !== undefined) {
+                        if (file !== undefined) {
+                            if (name === item.name) {
                                 found = true;
-                                _result.data = data[i];
+                                _result.data = item;
                                 _result.score = 2;
                             }
                         } else {
-                            if (name === data[i].name) {
+                            if (name === item.name) {
                                 found = true;
-                                _result.data = data[i];
+                                _result.data = item;
                                 _result.score = 2;
                             }
                         }
@@ -218,7 +215,7 @@ export class DependenciesEngine {
 
     private manageDuplicatesName() {
         const processDuplicates = (element, index, array) => {
-            const elementsWithSameName = _.filter(array, { name: element.name });
+            const elementsWithSameName = array?.filter(e => e.name === element.name);
             if (elementsWithSameName.length > 1) {
                 // First element is the reference for duplicates
                 for (let i = 1; i < elementsWithSameName.length; i++) {
@@ -283,68 +280,68 @@ export class DependenciesEngine {
 
     public update(updatedData): void {
         if (updatedData.modules.length > 0) {
-            _.forEach(updatedData.modules, (module: IModuleDep) => {
-                const _index = _.findIndex(this.modules, { name: module.name });
+            updatedData.modules?.forEach((module: IModuleDep) => {
+                const _index = this.modules?.findIndex(m => m.name === module.name);
                 this.modules[_index] = module;
             });
         }
         if (updatedData.components.length > 0) {
-            _.forEach(updatedData.components, (component: IComponentDep) => {
-                const _index = _.findIndex(this.components, { name: component.name });
+            updatedData.components?.forEach((component: IComponentDep) => {
+                const _index = this.components?.findIndex(c => c.name === component.name);
                 this.components[_index] = component;
             });
         }
         if (updatedData.controllers.length > 0) {
-            _.forEach(updatedData.controllers, (controller: IControllerDep) => {
-                const _index = _.findIndex(this.controllers, { name: controller.name });
+            updatedData.controllers?.forEach((controller: IControllerDep) => {
+                const _index = this.controllers?.findIndex(c => c.name === controller.name);
                 this.controllers[_index] = controller;
             });
         }
         if (updatedData.entities.length > 0) {
-            _.forEach(updatedData.entities, (entity: IControllerDep) => {
-                const _index = _.findIndex(this.entities, { name: entity.name });
+            updatedData.entities?.forEach((entity: IControllerDep) => {
+                const _index = this.entities?.findIndex(e => e.name === entity.name);
                 this.entities[_index] = entity;
             });
         }
         if (updatedData.directives.length > 0) {
-            _.forEach(updatedData.directives, (directive: IDirectiveDep) => {
-                const _index = _.findIndex(this.directives, { name: directive.name });
+            updatedData.directives?.forEach((directive: IDirectiveDep) => {
+                const _index = this.directives?.findIndex(d => d.name === directive.name);
                 this.directives[_index] = directive;
             });
         }
         if (updatedData.injectables.length > 0) {
-            _.forEach(updatedData.injectables, (injectable: IInjectableDep) => {
-                const _index = _.findIndex(this.injectables, { name: injectable.name });
+            updatedData.injectables?.forEach((injectable: IInjectableDep) => {
+                const _index = this.injectables?.findIndex(i => i.name === injectable.name);
                 this.injectables[_index] = injectable;
             });
         }
         if (updatedData.interceptors.length > 0) {
-            _.forEach(updatedData.interceptors, (interceptor: IInterceptorDep) => {
-                const _index = _.findIndex(this.interceptors, { name: interceptor.name });
+            updatedData.interceptors?.forEach((interceptor: IInterceptorDep) => {
+                const _index = this.interceptors?.findIndex(i => i.name === interceptor.name);
                 this.interceptors[_index] = interceptor;
             });
         }
         if (updatedData.guards.length > 0) {
-            _.forEach(updatedData.guards, (guard: IGuardDep) => {
-                const _index = _.findIndex(this.guards, { name: guard.name });
+            updatedData.guards?.forEach((guard: IGuardDep) => {
+                const _index = this.guards?.findIndex(g => g.name === guard.name);
                 this.guards[_index] = guard;
             });
         }
         if (updatedData.interfaces.length > 0) {
-            _.forEach(updatedData.interfaces, (int: IInterfaceDep) => {
-                const _index = _.findIndex(this.interfaces, { name: int.name });
+            updatedData.interfaces?.forEach((int: IInterfaceDep) => {
+                const _index = this.interfaces?.findIndex(i => i.name === int.name);
                 this.interfaces[_index] = int;
             });
         }
         if (updatedData.pipes.length > 0) {
-            _.forEach(updatedData.pipes, (pipe: IPipeDep) => {
-                const _index = _.findIndex(this.pipes, { name: pipe.name });
+            updatedData.pipes?.forEach((pipe: IPipeDep) => {
+                const _index = this.pipes?.findIndex(p => p.name === pipe.name);
                 this.pipes[_index] = pipe;
             });
         }
         if (updatedData.classes.length > 0) {
-            _.forEach(updatedData.classes, (classe: any) => {
-                const _index = _.findIndex(this.classes, { name: classe.name });
+            updatedData.classes?.forEach((classe: any) => {
+                const _index = this.classes?.findIndex(c => c.name === classe.name);
                 this.classes[_index] = classe;
             });
         }
@@ -352,38 +349,34 @@ export class DependenciesEngine {
          * Miscellaneous update
          */
         if (updatedData.miscellaneous.variables.length > 0) {
-            _.forEach(updatedData.miscellaneous.variables, (variable: any) => {
-                const _index = _.findIndex(this.miscellaneous.variables, {
-                    name: variable.name,
-                    file: variable.file
-                });
+            updatedData.miscellaneous.variables?.forEach((variable: any) => {
+                const _index = this.miscellaneous.variables?.findIndex(
+                    v => v.name === variable.name && v.file === variable.file
+                );
                 this.miscellaneous.variables[_index] = variable;
             });
         }
         if (updatedData.miscellaneous.functions.length > 0) {
-            _.forEach(updatedData.miscellaneous.functions, (func: IFunctionDecDep) => {
-                const _index = _.findIndex(this.miscellaneous.functions, {
-                    name: func.name,
-                    file: func.file
-                });
+            updatedData.miscellaneous.functions?.forEach((func: IFunctionDecDep) => {
+                const _index = this.miscellaneous.functions?.findIndex(
+                    f => f.name === func.name && f.file === func.file
+                );
                 this.miscellaneous.functions[_index] = func;
             });
         }
         if (updatedData.miscellaneous.typealiases.length > 0) {
-            _.forEach(updatedData.miscellaneous.typealiases, (typealias: ITypeAliasDecDep) => {
-                const _index = _.findIndex(this.miscellaneous.typealiases, {
-                    name: typealias.name,
-                    file: typealias.file
-                });
+            updatedData.miscellaneous.typealiases?.forEach((typealias: ITypeAliasDecDep) => {
+                const _index = this.miscellaneous.typealiases?.findIndex(
+                    t => t.name === typealias.name && t.file === typealias.file
+                );
                 this.miscellaneous.typealiases[_index] = typealias;
             });
         }
         if (updatedData.miscellaneous.enumerations.length > 0) {
-            _.forEach(updatedData.miscellaneous.enumerations, (enumeration: IEnumDecDep) => {
-                const _index = _.findIndex(this.miscellaneous.enumerations, {
-                    name: enumeration.name,
-                    file: enumeration.file
-                });
+            updatedData.miscellaneous.enumerations?.forEach((enumeration: IEnumDecDep) => {
+                const _index = this.miscellaneous.enumerations?.findIndex(
+                    e => e.name === enumeration.name && e.file === enumeration.file
+                );
                 this.miscellaneous.enumerations[_index] = enumeration;
             });
         }
@@ -391,25 +384,24 @@ export class DependenciesEngine {
     }
 
     public findInCompodoc(name: string) {
-        const mergedData = _.concat(
-            [],
-            this.modules,
-            this.components,
-            this.controllers,
-            this.entities,
-            this.directives,
-            this.injectables,
-            this.interceptors,
-            this.guards,
-            this.interfaces,
-            this.pipes,
-            this.classes,
-            this.miscellaneous.enumerations,
-            this.miscellaneous.typealiases,
-            this.miscellaneous.variables,
-            this.miscellaneous.functions
-        );
-        const result = _.find(mergedData, { name: name } as any);
+        const mergedData = [
+            ...this.modules,
+            ...this.components,
+            ...this.controllers,
+            ...this.entities,
+            ...this.directives,
+            ...this.injectables,
+            ...this.interceptors,
+            ...this.guards,
+            ...this.interfaces,
+            ...this.pipes,
+            ...this.classes,
+            ...this.miscellaneous.enumerations,
+            ...this.miscellaneous.typealiases,
+            ...this.miscellaneous.variables,
+            ...this.miscellaneous.functions
+        ];
+        const result = mergedData.find((item: any) => item.name === name);
         return result || false;
     }
 
@@ -426,11 +418,11 @@ export class DependenciesEngine {
     }
 
     public getModule(name: string) {
-        return _.find(this.modules, ['name', name]);
+        return this.modules?.find((item: any) => item.name === name);
     }
 
     public getRawModule(name: string): any {
-        return _.find(this.rawModules, ['name', name]);
+        return this.rawModules?.find((item: any) => item.name === name);
     }
 
     public getModules() {

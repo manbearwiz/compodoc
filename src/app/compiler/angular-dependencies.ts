@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { Project, ts, SyntaxKind, SourceFile } from 'ts-morph';
+import { Project, ts, SyntaxKind } from 'ts-morph';
 
 import { IsKindType, kindToType } from '../../utils/kind-to-type';
 import { logger } from '../../utils/logger';
@@ -200,29 +200,14 @@ export class AngularDependencies extends FrameworkDependencies {
                     elementsMatcher(_var);
                 })(_variable, newVar);
 
-                const onLink = (mod: {
-                    imports: any;
-                    exports: any;
-                    controllers: any;
-                    declarations: any;
-                    providers: any;
-                }) => {
-                    const process = (initialArray: any[], _var: { name: any }) => {
-                        let indexToClean = 0;
-                        let found = false;
-                        const findVariableInArray = (el: { name }, index: number) => {
-                            if (el.name === _var.name) {
-                                indexToClean = index;
-                                found = true;
-                            }
-                        };
-                        initialArray.forEach(findVariableInArray);
-                        // Clean indexes to replace
-                        if (found) {
+                const onLink = mod => {
+                    const process = (initialArray, _var) => {
+                        const indexToClean = initialArray?.findIndex(el => el.name === _var.name);
+                        if (indexToClean !== -1) {
                             initialArray.splice(indexToClean, 1);
                             // Add variable
                             newVar.forEach(newEle => {
-                                if (initialArray.some(item => item.name === newEle.name)) {
+                                if (!initialArray?.some(e => e.name === newEle.name)) {
                                     initialArray.push(newEle);
                                 }
                             });
@@ -440,16 +425,13 @@ export class AngularDependencies extends FrameworkDependencies {
         if (variableRoutesStatements.length > 0) {
             // Clean file for spread and dynamics inside routes definitions
             variableRoutesStatements.forEach(s => {
-
                 hasRoutesStatements = s.getDeclarations().some(declaration => {
                     return (
                         declaration.getTypeNode() &&
                         declaration.getTypeNode().getText() === 'Routes'
                     );
-                }
-                );
-            }
-            );
+                });
+            });
         }
 
         if (hasRoutesStatements && !Configuration.mainData.disableRoutesGraph) {
@@ -591,7 +573,7 @@ export class AngularDependencies extends FrameworkDependencies {
                             }
                             deps = injectableDeps;
                             if (typeof IO.ignore === 'undefined') {
-                                if (_.includes(IO.implements, 'HttpInterceptor')) {
+                                if (IO.implements?.includes('HttpInterceptor')) {
                                     injectableDeps.type = 'interceptor';
                                     outputSymbols.interceptors.push(injectableDeps);
                                 } else if (this.isGuard(IO.implements)) {
@@ -862,7 +844,7 @@ export class AngularDependencies extends FrameworkDependencies {
                         // Find recusively in expression nodes one with name 'bootstrapModule'
                         let rootModule: string;
                         let resultNode: { arguments: string | any[] };
-                        if (srcFile.text.indexOf(bootstrapModuleReference) !== -1) {
+                        if (srcFile.text?.includes(bootstrapModuleReference)) {
                             if (
                                 ts.isExpressionStatement(node) &&
                                 ts.isCallExpression(node.expression)
@@ -896,13 +878,12 @@ export class AngularDependencies extends FrameworkDependencies {
                                     );
                                 }
                             }
-                            if (resultNode?.arguments?.length > 0) {
-                                _.forEach(resultNode.arguments, argument => {
-                                    if (argument?.text) {
-                                        rootModule = argument.text;
-                                    }
-                                });
-                            }
+                            resultNode.arguments?.forEach(argument => {
+                                if (argument?.text) {
+                                    rootModule = argument.text;
+                                }
+                            });
+
                             if (rootModule) {
                                 RouterParserUtil.setRootModule(rootModule);
                             }
@@ -1112,43 +1093,36 @@ export class AngularDependencies extends FrameworkDependencies {
         }
     }
 
-    private debug(deps: IDep | Record<string, unknown>) {
-        if (deps) {
-            logger.debug('found', `${deps.name}`);
-        } else {
+    private debug(deps: IDep) {
+        if (!deps?.name) {
             return;
         }
-        for (const symbols of ['imports', 'exports', 'declarations', 'providers', 'bootstrap']) {
-            if (deps[symbols] && deps[symbols].length > 0) {
+        logger.debug('found', `${deps.name}`);
+        ['imports', 'exports', 'declarations', 'providers', 'bootstrap'].forEach(symbols => {
+            if (deps?.[symbols]?.length > 0) {
                 logger.debug('', `- ${symbols}:`);
                 for (const i of deps[symbols]) {
                     logger.debug('', `\t- ${i.name}`);
                 }
             }
-        }
+        });
     }
 
     private ignore(deps: IDep) {
-        if (deps) {
-            logger.warn('ignore', `${deps.name}`);
-        } else {
+        if (!deps?.name) {
             return;
         }
+        logger.warn('ignore', `${deps.name}`);
     }
 
-    private checkForDeprecation(tags: unknown[], result: Record<string | number, unknown>) {
-        for (const tag of tags) {
-            if (
-                typeof tag === 'object' &&
-                tag !== null &&
-                'tagName' in tag &&
-                tag.tagName &&
-                tag.tagName.text &&
-                tag.tagName.text.indexOf('deprecated') > -1
-            ) {
-                result.deprecated = true;
-                result.deprecationMessage = tag.comment || '';
-            }
+    private checkForDeprecation(
+        tags: ts.JSDocTag[],
+        result: Record<string | number, unknown>
+    ) {
+        const deprecationTag = tags?.find(tag => tag.tagName?.text.includes('deprecated'));
+        if (deprecationTag) {
+            result.deprecated = true;
+            result.deprecationMessage = deprecationTag.comment || '';
         }
     }
 
@@ -1269,11 +1243,11 @@ export class AngularDependencies extends FrameworkDependencies {
 
     private isGuard(ioImplements: string[]): boolean {
         return (
-            ioImplements.includes('CanActivate') ||
-            ioImplements.includes('CanActivateChild') ||
-            ioImplements.includes('CanDeactivate') ||
-            ioImplements.includes('Resolve') ||
-            ioImplements.includes('CanLoad')
+            ioImplements?.includes('CanActivate') ||
+            ioImplements?.includes('CanActivateChild') ||
+            ioImplements?.includes('CanDeactivate') ||
+            ioImplements?.includes('Resolve') ||
+            ioImplements?.includes('CanLoad')
         );
     }
 
@@ -1285,10 +1259,7 @@ export class AngularDependencies extends FrameworkDependencies {
         visitedNode: ts.Decorator,
         sourceFile: ts.SourceFile
     ): ReadonlyArray<ts.ObjectLiteralElementLike> {
-        if (
-            ts.isCallExpression(visitedNode.expression) &&
-            visitedNode.expression?.arguments?.length > 0
-        ) {
+        if (ts.isCallExpression(visitedNode.expression) && visitedNode.expression?.arguments?.[0]) {
             const pop = visitedNode.expression.arguments[0];
 
             if (pop?.properties?.length >= 0) {
@@ -1322,7 +1293,7 @@ export class AngularDependencies extends FrameworkDependencies {
             'registerOnTouched',
             'setDisabledState'
         ];
-        return ANGULAR_LIFECYCLE_METHODS.indexOf(methodName) >= 0;
+        return ANGULAR_LIFECYCLE_METHODS.includes(methodName);
     }
 
     private visitTypeDeclaration(node: ts.TypeAliasDeclaration) {
@@ -1334,7 +1305,7 @@ export class AngularDependencies extends FrameworkDependencies {
         };
         const jsdoctags = this.jsdocParserUtil.getJSDocs(node);
 
-        if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+        if (jsdoctags?.[0]?.tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
             result.jsdoctags = markedtags(jsdoctags[0].tags);
         }
@@ -1415,7 +1386,7 @@ export class AngularDependencies extends FrameworkDependencies {
             }
             const jsdoctags = this.jsdocParserUtil.getJSDocs(arg);
 
-            if (jsdoctags && jsdoctags.length >= 1 && jsdoctags[0].tags) {
+            if (jsdoctags?.[0]?.tags) {
                 this.checkForDeprecation(jsdoctags[0].tags, result);
             }
             return result;
@@ -1498,21 +1469,21 @@ export class AngularDependencies extends FrameworkDependencies {
                     })
                     .reverse();
                 if (
-                    _.indexOf(kinds, SyntaxKind.PublicKeyword) !== -1 &&
-                    _.indexOf(kinds, SyntaxKind.StaticKeyword) !== -1
+                    kinds.includes(SyntaxKind.PublicKeyword) &&
+                    kinds.includes(SyntaxKind.StaticKeyword)
                 ) {
                     kinds = kinds.filter(kind => kind !== SyntaxKind.PublicKeyword);
                 }
             }
         }
-        if (jsdoctags && jsdoctags.length >= 1 && Array.isArray(jsdoctags[0].tags)) {
+        if (jsdoctags?.[0]?.tags) {
             const tags = jsdoctags[0].tags;
             this.checkForDeprecation(tags, result);
             result.jsdoctags = markedtags(tags);
             for (const tag of tags) {
                 if (tag.tagName) {
                     if (tag.tagName.text) {
-                        if (tag.tagName.text.indexOf('ignore') > -1) {
+                        if (tag.tagName.text.includes('ignore')) {
                             result.ignore = true;
                         }
                     }
@@ -1603,7 +1574,7 @@ export class AngularDependencies extends FrameworkDependencies {
             }
         }
         const jsdoctags = this.jsdocParserUtil.getJSDocs(node);
-        if (Array.isArray(jsdoctags) && jsdoctags.length > 0 && jsdoctags[0]?.tags) {
+        if (jsdoctags?.[0]?.tags) {
             this.checkForDeprecation(jsdoctags[0].tags, result);
         }
         return result;

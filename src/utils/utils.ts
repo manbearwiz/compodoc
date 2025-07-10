@@ -38,7 +38,7 @@ export const formatDiagnosticsHost: ts.FormatDiagnosticsHost = {
 export function markedtags(tags: Array<any>) {
     const jsdocParserUtil = new JsdocParserUtil();
     let mtags = tags;
-    _.forEach(mtags, tag => {
+    mtags?.forEach(tag => {
         const rawComment = jsdocParserUtil.parseJSDocNode(tag);
         tag.comment = markedAcl(LinkParser.resolveLinks(rawComment));
     });
@@ -47,49 +47,38 @@ export function markedtags(tags: Array<any>) {
 
 export function mergeTagsAndArgs(args: Array<any>, jsdoctags?: Array<any>): Array<any> {
     let margs = _.cloneDeep(args);
-    _.forEach(margs, arg => {
+    margs?.forEach(arg => {
         arg.tagName = {
             text: 'param'
         };
-        if (jsdoctags) {
-            _.forEach(jsdoctags, jsdoctag => {
-                if (jsdoctag.name && jsdoctag.name.text === arg.name) {
-                    arg.tagName = jsdoctag.tagName;
-                    arg.name = jsdoctag.name;
-                    arg.comment = jsdoctag.comment;
-                    arg.typeExpression = jsdoctag.typeExpression;
-                }
+        jsdoctags?.forEach(jsdoctag => {
+            if (jsdoctag.name?.text === arg.name) {
+                arg.tagName = jsdoctag.tagName;
+                arg.name = jsdoctag.name;
+                arg.comment = jsdoctag.comment;
+                arg.typeExpression = jsdoctag.typeExpression;
+            }
+        });
+    });
+    // Add example & returns & private
+    jsdoctags?.forEach(jsdoctag => {
+        if (jsdoctag.tagName?.text === 'example' || jsdoctag.tagName?.text === 'private') {
+            margs.push({
+                tagName: jsdoctag.tagName,
+                comment: jsdoctag.comment
+            });
+        }
+        if (jsdoctag.tagName?.text === 'returns' || jsdoctag.tagName?.text === 'return') {
+            margs.push({
+                tagName: jsdoctag.tagName,
+                comment: jsdoctag.comment,
+                returnType:
+                    jsdoctag.typeExpression && jsdoctag.typeExpression.type
+                        ? kindToType(jsdoctag.typeExpression.type.kind)
+                        : undefined
             });
         }
     });
-    // Add example & returns & private
-    if (jsdoctags) {
-        _.forEach(jsdoctags, jsdoctag => {
-            if (
-                jsdoctag.tagName &&
-                (jsdoctag.tagName.text === 'example' || jsdoctag.tagName.text === 'private')
-            ) {
-                margs.push({
-                    tagName: jsdoctag.tagName,
-                    comment: jsdoctag.comment
-                });
-            }
-            if (
-                jsdoctag.tagName &&
-                (jsdoctag.tagName.text === 'returns' || jsdoctag.tagName.text === 'return')
-            ) {
-                let ret = {
-                    tagName: jsdoctag.tagName,
-                    comment: jsdoctag.comment,
-                    returnType: undefined
-                };
-                if (jsdoctag.typeExpression && jsdoctag.typeExpression.type) {
-                    ret.returnType = kindToType(jsdoctag.typeExpression.type.kind);
-                }
-                margs.push(ret);
-            }
-        });
-    }
     return margs;
 }
 
@@ -114,17 +103,7 @@ export function hasBom(source: string): boolean {
 }
 
 export function handlePath(files: Array<string>, cwd: string): Array<string> {
-    let _files = files;
-    let i = 0;
-    let len = files.length;
-
-    for (i; i < len; i++) {
-        if (files[i].indexOf(cwd) === -1) {
-            files[i] = path.resolve(cwd + path.sep + files[i]);
-        }
-    }
-
-    return _files;
+    return files?.map(f => (f.includes(cwd) ? f : path.resolve(cwd + path.sep + f)));
 }
 
 export function cleanLifecycleHooksFromMethods(methods: Array<any>): Array<any> {
@@ -169,7 +148,7 @@ export function isIgnore(member): boolean {
         for (const doc of member.jsDoc) {
             if (doc.tags) {
                 for (const tag of doc.tags) {
-                    if (tag.tagName.text.indexOf('ignore') > -1) {
+                    if (tag.tagName.text.includes('ignore')) {
                         return true;
                     }
                 }
@@ -241,16 +220,11 @@ export function findMainSourceFolder(files: string[]) {
         return path.dirname(shortPath);
     });
     let folders = {};
-    rawFolders = _.uniq(rawFolders);
+    rawFolders = Array.from(new Set(rawFolders));
 
-    for (let i = 0; i < rawFolders.length; i++) {
-        let sep = rawFolders[i].split(path.sep);
-        sep.forEach(folder => {
-            if (folders[folder]) {
-                folders[folder] += 1;
-            } else {
-                folders[folder] = 1;
-            }
+    for (const rawFolder of rawFolders) {
+        rawFolder.split(path.sep).forEach(folder => {
+            folders[folder] = (folders[folder] || 0) + 1;
         });
     }
     for (let f in folders) {
@@ -269,7 +243,7 @@ export function compilerHost(transpileOptions: any): ts.CompilerHost {
 
     const toReturn: ts.CompilerHost = {
         getSourceFile: (fileName: string) => {
-            if (fileName.lastIndexOf('.ts') !== -1 || fileName.lastIndexOf('.js') !== -1) {
+            if (fileName.endsWith('.ts') || fileName.endsWith('.js')) {
                 if (fileName === 'lib.d.ts') {
                     return undefined;
                 }
@@ -391,7 +365,13 @@ export function detectIndent(str, count): string {
     return indentString(stripIndent(str), count || 0);
 }
 
-export function getSubstringFromMultilineString(multilineString: string, startLine: number, startColumn: number, endLine: number, endColumn: number) {
+export function getSubstringFromMultilineString(
+    multilineString: string,
+    startLine: number,
+    startColumn: number,
+    endLine: number,
+    endColumn: number
+) {
     // Split the string into lines
     const lines = multilineString.split('\n');
 
@@ -406,7 +386,10 @@ export function getSubstringFromMultilineString(multilineString: string, startLi
         selectedLines[0] = selectedLines[0].slice(startColumn + 1);
 
         // And slice the end line from the start to endColumn
-        selectedLines[selectedLines.length - 1] = selectedLines[selectedLines.length - 1].slice(0, endColumn - 1);
+        selectedLines[selectedLines.length - 1] = selectedLines[selectedLines.length - 1].slice(
+            0,
+            endColumn - 1
+        );
     }
 
     // Join the lines back together into a single string

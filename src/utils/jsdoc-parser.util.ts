@@ -55,13 +55,12 @@ export class JsdocParserUtil {
         } else if (node.kind === ts.SyntaxKind.ModuleDeclaration) {
             if (!this.isTopmostModuleDeclaration(<ts.ModuleDeclaration>node)) {
                 return null;
-            } else {
-                node = this.getRootModuleDeclaration(<ts.ModuleDeclaration>node);
             }
+            node = this.getRootModuleDeclaration(<ts.ModuleDeclaration>node);
         }
 
         const comments = _ts.getJSDocCommentRanges(node, sourceFile.text);
-        if (comments && comments.length) {
+        if (comments?.length) {
             let comment: ts.CommentRange;
             if (node.kind === ts.SyntaxKind.SourceFile) {
                 if (comments.length === 1) {
@@ -106,7 +105,7 @@ export class JsdocParserUtil {
                 inCode = !inCode;
             }
 
-            if (line.indexOf('@example') !== -1) {
+            if (line.includes('@example')) {
                 inExample = true;
                 line = '```html';
             }
@@ -152,7 +151,7 @@ export class JsdocParserUtil {
                         result.push(doc);
                     }
                 } else if (ts.isJSDoc(doc)) {
-                    result.push(..._.filter(doc.tags, tag => tag.kind === kind));
+                    result.push(...(doc.tags ? doc.tags.filter(tag => tag.kind === kind) : []));
                 } else {
                     throw new Error('Unexpected type');
                 }
@@ -189,16 +188,15 @@ export class JsdocParserUtil {
         const variableStatementNode = isInitializerOfVariableDeclarationInStatement
             ? parent.parent.parent
             : isVariableOfVariableDeclarationStatement
-            ? parent.parent
-            : undefined;
+              ? parent.parent
+              : undefined;
         if (variableStatementNode) {
             cache = this.getJSDocsWorker(variableStatementNode, cache);
         }
 
         // Also recognize when the node is the RHS of an assignment expression
         const isSourceOfAssignmentExpressionStatement =
-            parent &&
-            parent.parent &&
+            parent?.parent &&
             ts.isBinaryExpression(parent) &&
             parent.operatorToken.kind === SyntaxKind.EqualsToken &&
             ts.isExpressionStatement(parent.parent);
@@ -239,22 +237,21 @@ export class JsdocParserUtil {
         if (!param.name) {
             // this is an anonymous jsdoc param from a `function(type1, type2): type3` specification
             const i = func.parameters.indexOf(param);
-            const paramTags = _.filter(tags, tag => ts.isJSDocParameterTag(tag));
+            const paramTags = tags?.filter(tag => ts.isJSDocParameterTag(tag));
 
             if (paramTags && 0 <= i && i < paramTags.length) {
                 return [paramTags[i]];
             }
         } else if (ts.isIdentifier(param.name)) {
             const name = param.name.text;
-            return _.filter(tags, tag => {
-                if (ts && ts.isJSDocParameterTag(tag)) {
+            return tags?.filter(tag => {
+                if (ts?.isJSDocParameterTag(tag)) {
                     let t: JSDocParameterTagExt = tag;
-                    if (typeof t.parameterName !== 'undefined') {
+                    if (t.parameterName) {
                         return t.parameterName.text === name;
-                    } else if (typeof t.name !== 'undefined') {
-                        if (typeof t.name.escapedText !== 'undefined') {
-                            return t.name.escapedText === name;
-                        }
+                    }
+                    if (t.name?.escapedText) {
+                        return t.name.escapedText === name;
                     }
                 }
             });
@@ -270,38 +267,29 @@ export class JsdocParserUtil {
 
         if (typeof node.comment === 'string') {
             rawDescription += node.comment;
-        } else {
-            if (node.comment) {
-                const len = node.comment.length;
-
-                for (let i = 0; i < len; i++) {
-                    const JSDocNode = node.comment[i];
-                    switch (JSDocNode.kind) {
-                        case SyntaxKind.JSDocComment:
-                            rawDescription += JSDocNode.comment;
-                            break;
-                        case SyntaxKind.JSDocText:
-                            rawDescription += JSDocNode.text;
-                            break;
-                        case SyntaxKind.JSDocLink:
-                            if (JSDocNode.name) {
-                                let text = JSDocNode.name.escapedText;
-                                if (
-                                    text === undefined &&
-                                    JSDocNode.name.left &&
-                                    JSDocNode.name.right
-                                ) {
-                                    text =
-                                        JSDocNode.name.left.escapedText +
-                                        '.' +
-                                        JSDocNode.name.right.escapedText;
-                                }
-                                rawDescription += JSDocNode.text + '{@link ' + text + '}';
+        } else if (node.comment) {
+            for (const JSDocNode of node.comment) {
+                switch (JSDocNode.kind) {
+                    case SyntaxKind.JSDocComment:
+                        rawDescription += JSDocNode.comment;
+                        break;
+                    case SyntaxKind.JSDocText:
+                        rawDescription += JSDocNode.text;
+                        break;
+                    case SyntaxKind.JSDocLink:
+                        if (JSDocNode.name) {
+                            let text = JSDocNode.name.escapedText;
+                            if (text === undefined && JSDocNode.name.left && JSDocNode.name.right) {
+                                text =
+                                    JSDocNode.name.left.escapedText +
+                                    '.' +
+                                    JSDocNode.name.right.escapedText;
                             }
-                            break;
-                        default:
-                            break;
-                    }
+                            rawDescription += JSDocNode.text + '{@link ' + text + '}';
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
         }
