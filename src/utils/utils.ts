@@ -80,7 +80,8 @@ export function mergeTagsAndArgs(args: Array<any>, jsdoctags?: Array<any>): Arra
             ) {
                 let ret = {
                     tagName: jsdoctag.tagName,
-                    comment: jsdoctag.comment
+                    comment: jsdoctag.comment,
+                    returnType: undefined
                 };
                 if (jsdoctag.typeExpression && jsdoctag.typeExpression.type) {
                     ret.returnType = kindToType(jsdoctag.typeExpression.type.kind);

@@ -15,7 +15,7 @@ const traverse = require('neotraverse/legacy');
 const ast = new Project();
 
 export class RouterParserUtil {
-    public scannedFiles: any[] = [];
+    public scannedFiles: readonly ts.SourceFile[] = [];
     private routes: any[] = [];
     private incompleteRoutes = [];
     private modules = [];
@@ -588,12 +588,8 @@ export class RouterParserUtil {
 
             if (foundWithAliasInImports) {
                 if (typeof searchedImport !== 'undefined') {
-                    const routePathIsBad = path => {
-                        const result = this.scannedFiles.find(
-                            scannedFile => path === scannedFile.path
-                        );
-                        return !result;
-                    };
+                    const routePathIsBad = path =>
+                        this.scannedFiles.some(scannedFile => path === scannedFile.path);
 
                     const getIndicesOf = (searchStr, str, caseSensitive) => {
                         const searchStrLen = searchStr.length;
@@ -805,31 +801,24 @@ export class RouterParserUtil {
                     case 'redirectTo':
                     case 'outlet':
                     case 'pathMatch':
-                        if (propertyInitializer) {
-                            if (propertyInitializer.kind !== SyntaxKind.StringLiteral) {
-                                // Identifier(71) won't break parsing, but it will be better to retrive them
-                                // PropertyAccessExpression(179) ex: MYIMPORT.path will break it, find it in import
-                                if (
-                                    propertyInitializer.kind === SyntaxKind.PropertyAccessExpression
-                                ) {
-                                    let lastObjectLiteralAttributeName =
-                                            propertyInitializer.name.getText(),
-                                        firstObjectLiteralAttributeName;
-                                    if (propertyInitializer.expression) {
-                                        firstObjectLiteralAttributeName =
-                                            propertyInitializer.expression.getText();
-                                        const result =
-                                            ImportsUtil.findPropertyValueInImportOrLocalVariables(
-                                                firstObjectLiteralAttributeName +
-                                                    '.' +
-                                                    lastObjectLiteralAttributeName,
-                                                sourceFile
-                                            ); // tslint:disable-line
-                                        if (result !== '') {
-                                            propertyInitializer.kind = 9;
-                                            propertyInitializer.text = result;
-                                        }
-                                    }
+                        // Identifier(71) won't break parsing, but it will be better to retrive them
+                        // PropertyAccessExpression(179) ex: MYIMPORT.path will break it, find it in import
+                        if (ts.isPropertyAccessExpression(propertyInitializer)) {
+                            let lastObjectLiteralAttributeName = propertyInitializer.name.getText(),
+                                firstObjectLiteralAttributeName;
+                            if (propertyInitializer.expression) {
+                                firstObjectLiteralAttributeName =
+                                    propertyInitializer.expression.getText();
+                                const result =
+                                    ImportsUtil.findPropertyValueInImportOrLocalVariables(
+                                        firstObjectLiteralAttributeName +
+                                            '.' +
+                                            lastObjectLiteralAttributeName,
+                                        sourceFile
+                                    ); // tslint:disable-line
+                                if (result !== '') {
+                                    propertyInitializer.kind = 9;
+                                    propertyInitializer.text = result;
                                 }
                             }
                         }
