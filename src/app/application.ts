@@ -1892,7 +1892,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                         totalStatementDocumented += 1;
                     }
 
-                    element.propertiesClass.forEach(element.propertiesClass, (property: any) => {
+                    element.propertiesClass.forEach((property: any) => {
                         if (property.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
@@ -1905,7 +1905,7 @@ at least one config for the 'info' or 'source' tab in --navTabConfig.`);
                             totalStatementDocumented += 1;
                         }
                     });
-                    element.methodsClass.forEach(element.methodsClass, (method: any) => {
+                    element.methodsClass.forEach((method: any) => {
                         if (method.modifierKind === SyntaxKind.PrivateKeyword) {
                             // Doesn't handle private for coverage
                             totalStatements -= 1;
